@@ -1,0 +1,23 @@
+cat > .gitignore << 'EOF'
+# Backend (Symfony)
+backend/vendor/
+backend/.env.local
+backend/.env.local.php
+backend/var/
+backend/public/bundles/
+
+# Frontend (Angular)
+frontend/my-ankode-app/node_modules/
+frontend/my-ankode-app/dist/
+frontend/my-ankode-app/.angular/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+EOF
