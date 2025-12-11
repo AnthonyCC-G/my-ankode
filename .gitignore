@@ -21,3 +21,10 @@ frontend/my-ankode-app/.angular/
 .DS_Store
 Thumbs.db
 EOF
+
+
+# ============================================
+# DOCUMENTATION - Maquettes uniquement
+# ============================================
+# Ignorer toutes les maquettes et autres dans le dossier /docs
+/docs/
