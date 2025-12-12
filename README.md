@@ -160,6 +160,55 @@ my-ankode/
 
 ---
 
+## 🛠️ Stack Technique
+
+### Backend
+- **Framework** : Symfony 7 (PHP 8.2+)
+- **Bases de données** : 
+  - **PostgreSQL 16** (Données relationnelles)
+    - Tables : USER, PROJECT, TASK, COMPETENCE
+    - Relations : Foreign Keys natives
+  - **MongoDB 6** (Données documentaires)
+    - Collections : KEYWORD, ARTICLE, SNIPPET
+    - Références logiques vers PostgreSQL
+- **Architecture** : API REST (JSON)
+- **Authentification** : JWT
+
+
+## 🗄️ Architecture des Données
+
+MY-ANKODE utilise une **architecture hybride** PostgreSQL + MongoDB.
+
+### PostgreSQL (Relationnel)
+Gère les données structurées avec intégrité référentielle :
+- 👤 **USER** : Utilisateurs et authentification
+- 📁 **PROJECT** : Projets utilisateur
+- ✅ **TASK** : Tâches en mode Kanban
+- 🎯 **COMPETENCE** : Compétences et portfolio
+
+### MongoDB (Documentaire)
+Gère les données flexibles et volumineuses :
+- 🔖 **KEYWORD** : Mots-clés de veille technologique
+- 📰 **ARTICLE** : Articles agrégés depuis flux RSS
+- 💾 **SNIPPET** : Extraits de code avec annotations
+
+### Justification
+Voir [DECISIONS.md](./docs/DECISIONS.md) pour la justification détaillée de cette architecture.
+
+## 📚 Documentation
+
+Ce projet contient plusieurs documents techniques :
+
+| Document | Description |
+|----------|-------------|
+| **[ARCHITECTURE.md](./ARCHITECTURE.md)** | Architecture 3-tiers, modules Symfony, endpoints API |
+| **[DECISIONS.md](./docs/DECISIONS.md)** | Justification architecture hybride PostgreSQL + MongoDB |
+| **[`/docs/schemas/`](./docs/schemas/)** | Diagrammes UML et Merise (MCD, MLD, MPD) |
+| **`/docs/maquettes/`** | Maquettes Figma des interfaces utilisateur |
+
+
+---
+
 ## 🧪 Tests
 
 ### Backend (PHPUnit)

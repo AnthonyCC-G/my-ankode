@@ -52,6 +52,8 @@ MY-ANKODE est une application web fullstack destinée aux développeurs juniors 
 - **PostgreSQL** : Données structurées avec relations (User → Projects → Tasks)
 - **MongoDB** : Données flexibles (code snippets, articles HTML)
 
+**→ Voir [DECISIONS.md](./docs/DECISIONS.md) pour la justification détaillée.**
+
 ---
 
 ## 3. Organisation du code Backend
