@@ -281,10 +281,3 @@ Projet éducatif - Certification DWWM 2024-2025
 **⭐ Si ce projet vous inspire, n'hésitez pas à mettre une étoile !**
 ```
 
----
-
-## 🎨 Explications des badges
-
-### Structure d'un badge
-```
-https://img.shields.io/badge/<LABEL>-<MESSAGE>-<COLOR>?style=for-the-badge&logo=<LOGO>&logoColor=white
