@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard - My-Ankode{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1>Bienvenue sur My-Ankode !</h1>
+    
+    {% if app.user %}
+        <div class="alert alert-success">
+            <p><strong>Vous êtes connecté en tant que :</strong> {{ app.user.username }} ({{ app.user.email }})</p>
+            <p><strong>Rôles :</strong> {{ app.user.roles|join(', ') }}</p>
+            <p><strong>Compte créé le :</strong> {{ app.user.createdAt|date('d/m/Y à H:i') }}</p>
+        </div>
+        
+        <div class="mt-4">
+            <h2> Prochaines fonctionnalités</h2>
+            <ul>
+                <li> Gestion de projets (Todo Kanban)</li>
+                <li> Bibliothèque de snippets</li>
+                <li> Veille technologique (flux RSS)</li>
+                <li> Suivi de compétences</li>
+            </ul>
+        </div>
+        
+        <a href="{{ path('app_logout') }}" class="btn btn-danger mt-3">Se déconnecter</a>
+    {% else %}
+        <p>Vous n'êtes pas connecté.</p>
+        <a href="{{ path('app_login') }}" class="btn btn-primary">Se connecter</a>
+    {% endif %}
+</div>
+{% endblock %}
