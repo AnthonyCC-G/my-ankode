@@ -230,7 +230,7 @@ ng test
 - [x] Setup environnement (Symfony + Angular)
 - [x] Configuration bases de données (PostgreSQL + MongoDB)
 - [x] Modélisation UML et Merise
-- [ ] Authentification (JWT)
+- [x] Authentification (JWT)
 - [ ] Module TODO (Projets + Tâches Kanban)
 - [ ] Module Snippets
 - [ ] Module Veille (Flux RSS)
