@@ -1,0 +1,148 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion / Inscription - My-Ankode{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/auth.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="auth-page">
+    
+    {# ===== LOGO + TITRE ===== #}
+    <header class="auth-header">
+        <div class="logo-temp">
+            <div class="logo-leaf"></div>
+            <div class="logo-leaf"></div>
+            <div class="logo-leaf"></div>
+        </div>
+        <h1 class="auth-title">{ Inscription/Connexion }</h1>
+    </header>
+
+    {# ===== MESSAGES FLASH ===== #}
+    {% for message in app.flashes('success') %}
+        <div class="message message--success">
+            <span>{{ message }}</span>
+            <button type="button" class="message__close" onclick="this.parentElement.remove()">×</button>
+        </div>
+    {% endfor %}
+
+    {# ===== BLOC INSCRIPTION ===== #}
+    <div class="auth-block auth-block--register">
+        <h2 class="block-title">If ( S'inscrire ) {</h2>
+        
+        {{ form_start(registrationForm, {'attr': {'class': 'auth-form', 'novalidate': 'novalidate'}}) }}
+        
+        {# Username #}
+        <div class="form-field">
+            <div class="form-inline">
+                {{ form_label(registrationForm.username, 'username =', {'label_attr': {'class': 'field-label'}}) }}
+                {{ form_widget(registrationForm.username, {'attr': {'class': 'field-input', 'placeholder': 'Votre identifiant'}}) }}
+            </div>
+            <div class="field-error">{{ form_errors(registrationForm.username) }}</div>
+        </div>
+
+        {# Email #}
+        <div class="form-field">
+            <div class="form-inline">
+                {{ form_label(registrationForm.email, 'email =', {'label_attr': {'class': 'field-label'}}) }}
+                {{ form_widget(registrationForm.email, {'attr': {'class': 'field-input', 'placeholder': 'votre@email.com'}}) }}
+            </div>
+            <div class="field-error">{{ form_errors(registrationForm.email) }}</div>
+        </div>
+
+        {# Mot de passe #}
+        <div class="form-field">
+            <div class="form-inline">
+                {{ form_label(registrationForm.plainPassword, 'motDePasse =', {'label_attr': {'class': 'field-label'}}) }}
+                {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'field-input', 'placeholder': 'Mot de passe'}}) }}
+            </div>
+            <div class="field-error">{{ form_errors(registrationForm.plainPassword) }}</div>
+        </div>
+
+        {# Checkbox CGU #}
+        <div class="form-field form-field--checkbox">
+            {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'field-checkbox'}}) }}
+            {{ form_label(registrationForm.agreeTerms, "J'accepte les conditions d'utilisation", {'label_attr': {'class': 'field-label-checkbox'}}) }}
+            <div class="field-error">{{ form_errors(registrationForm.agreeTerms) }}</div>
+        </div>
+
+        <button type="submit" class="btn btn--primary">s'inscrire</button>
+
+        {{ form_end(registrationForm) }}
+    </div>
+
+    {# ===== ILLUSTRATION DÉVELOPPEUR ===== #}
+    <div class="illustration-developer">
+        <img src="{{ asset('images/Ankode_Isometric.png') }}" 
+             alt="Développeur au travail" 
+             class="illustration-img">
+    </div>
+
+    {# ===== BLOC CONNEXION ===== #}
+    <div class="auth-block auth-block--login">
+        <h2 class="block-title">} else if ( Se connecter )</h2>
+
+        {# Erreurs de connexion #}
+        {% if login_error %}
+            <div class="message message--error">
+                {{ login_error.messageKey|trans(login_error.messageData, 'security') }}
+            </div>
+        {% endif %}
+
+        <form method="post" action="{{ path('app_auth') }}" class="auth-form">
+            {# Email #}
+            <div class="form-field">
+                <div class="form-inline">
+                    <label for="inputEmail" class="field-label">email =</label>
+                    <input type="email" 
+                        id="inputEmail" 
+                        name="email" 
+                        class="field-input" 
+                        value="{{ last_username }}" 
+                        required 
+                        autofocus
+                        placeholder="votre@email.com">
+                </div>
+            </div>
+
+            {# Mot de passe #}
+            <div class="form-field">
+                <div class="form-inline">
+                    <label for="inputPassword" class="field-label">motDePasse =</label>
+                    <input type="password" 
+                        id="inputPassword" 
+                        name="password" 
+                        class="field-input" 
+                        required
+                        placeholder="Votre mot de passe">
+                </div>
+            </div>
+
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+            {# Remember me #}
+            <div class="form-field form-field--checkbox">
+                <input type="checkbox" 
+                    class="field-checkbox" 
+                    id="remember_me" 
+                    name="_remember_me">
+                <label class="field-label-checkbox" for="remember_me">
+                    Se souvenir de moi
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn--primary">se connecter</button>
+        </form>
+    </div>
+
+    {# ===== MASCOTTE ===== #}
+    <div class="mascot">
+        <img src="{{ asset('images/Ankode_Ok.png') }}" 
+             alt="Mascotte My-Ankode" 
+             class="mascot-img">
+    </div>
+
+</div>
+{% endblock %}
