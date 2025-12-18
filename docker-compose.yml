@@ -1,0 +1,105 @@
+# ============================================
+# MY-ANKODE - Configuration Docker Compose
+# Projet de certification DWWM
+# ============================================
+
+version: '3.8'
+
+services:
+  # ==========================================
+  # SERVICE BACKEND - Symfony 7 + PHP 8.3
+  # ==========================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: my-ankode-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      # Monte ton code Symfony dans le conteneur (hot-reload)
+      - ./backend:/var/www/html
+    environment:
+      # Variables d'environnement pour Symfony
+      APP_ENV: dev
+      APP_SECRET: changeme_in_production
+      DATABASE_URL: postgresql://ankode_user:ankode_password@postgres:5432/my_ankode?serverVersion=16&charset=utf8
+      MONGODB_URL: mongodb://mongo:27017
+      MONGODB_DB: my_ankode
+    depends_on:
+      - postgres
+      - mongo
+    networks:
+      - my-ankode-network
+    command: >
+      sh -c "composer install --no-scripts &&
+            php bin/console cache:clear &&
+            php bin/console doctrine:database:create --if-not-exists &&
+            php bin/console doctrine:migrations:migrate --no-interaction &&
+            php -S 0.0.0.0:8000 -t public"
+
+  # ==========================================
+  # SERVICE BASE DE DONNÉES - PostgreSQL 16
+  # ==========================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: my-ankode-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: my_ankode
+      POSTGRES_USER: ankode_user
+      POSTGRES_PASSWORD: ankode_password
+    volumes:
+      # Persistance des données PostgreSQL
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - my-ankode-network
+
+  # ==========================================
+  # SERVICE BASE DE DONNÉES - MongoDB 6
+  # ==========================================
+  mongo:
+    image: mongo:6
+    container_name: my-ankode-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      # Persistance des données MongoDB
+      - mongo-data:/data/db
+    networks:
+      - my-ankode-network
+
+  # ==========================================
+  # SERVICE FRONTEND - Angular 18 (OPTIONNEL)
+  # ==========================================
+  # Décommenter quand tu voudras développer le frontend
+  # frontend:
+  #   build:
+  #     context: ./frontend/my-ankode-app
+  #     dockerfile: Dockerfile
+  #   container_name: my-ankode-frontend
+  #   ports:
+  #     - "4200:4200"
+  #   volumes:
+  #     - ./frontend/my-ankode-app:/app
+  #     - /app/node_modules
+  #   networks:
+  #     - my-ankode-network
+  #   command: npm start
+
+# ==========================================
+# VOLUMES (Persistance des données)
+# ==========================================
+volumes:
+  postgres-data:
+    driver: local
+  mongo-data:
+    driver: local
+
+# ==========================================
+# RÉSEAU (Communication entre conteneurs)
+# ==========================================
+networks:
+  my-ankode-network:
+    driver: bridge

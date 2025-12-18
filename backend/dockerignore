@@ -1,0 +1,29 @@
+# ============================================
+# .dockerignore - MY-ANKODE Backend
+# Fichiers à exclure du contexte Docker
+# ============================================
+
+# Dépendances
+/vendor/
+/node_modules/
+
+# Variables d'environnement sensibles
+.env.local
+.env.*.local
+
+# Cache Symfony
+/var/cache/*
+/var/log/*
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# Données de test
+/public/uploads/
