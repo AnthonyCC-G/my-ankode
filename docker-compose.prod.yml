@@ -1,0 +1,84 @@
+# ============================================
+# MY-ANKODE - Configuration Docker Production
+# Architecture Nginx + PHP-FPM sécurisée
+# ============================================
+
+version: '3.8'
+
+services:
+  # ==========================================
+  # SERVICE NGINX - Serveur Web
+  # ==========================================
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: my-ankode-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./backend/public:/var/www/html/public:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+    networks:
+      - my-ankode-network
+    restart: unless-stopped
+
+  # ==========================================
+  # SERVICE BACKEND - PHP-FPM (Production)
+  # ==========================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: my-ankode-backend-prod
+    environment:
+      APP_ENV: prod
+      APP_DEBUG: 0
+      APP_SECRET: 6e3074702e331df0f10e28dbc75a6d1197cf9746ae4edde0f1186fc026caad48
+      DATABASE_URL: postgresql://ankode_user:ankode_password@postgres:5432/my_ankode?serverVersion=16&charset=utf8
+      MONGODB_URL: mongodb://mongo:27017
+      MONGODB_DB: my_ankode
+    depends_on:
+      - postgres
+      - mongo
+    networks:
+      - my-ankode-network
+    restart: unless-stopped
+
+  # ==========================================
+  # SERVICE BASE DE DONNÉES - PostgreSQL 16
+  # ==========================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: my-ankode-postgres-prod
+    environment:
+      POSTGRES_DB: my_ankode
+      POSTGRES_USER: ankode_user
+      POSTGRES_PASSWORD: ankode_password
+    volumes:
+      - postgres-data-prod:/var/lib/postgresql/data
+    networks:
+      - my-ankode-network
+    restart: unless-stopped
+
+  # ==========================================
+  # SERVICE BASE DE DONNÉES - MongoDB 6
+  # ==========================================
+  mongo:
+    image: mongo:6
+    container_name: my-ankode-mongo-prod
+    volumes:
+      - mongo-data-prod:/data/db
+    networks:
+      - my-ankode-network
+    restart: unless-stopped
+
+volumes:
+  postgres-data-prod:
+    driver: local
+  mongo-data-prod:
+    driver: local
+
+networks:
+  my-ankode-network:
+    driver: bridge
