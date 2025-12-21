@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API Kanban</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(0deg, #000 0%, #003f88 55%, #000 100%);
+            color: white;
+        }
+        h1 { color: #fdc500; }
+        button {
+            background: #00509d;
+            color: white;
+            border: 2px solid #fdc500;
+            padding: 10px 20px;
+            margin: 10px 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #fdc500;
+            color: #000;
+        }
+        pre {
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border: 2px solid #fdc500;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+    </style>
+</head>
+<body>
+    <h1> Test API Kanban - MY-ANKODE</h1>
+    
+    <h2>Test 1 : Récupérer les tâches du projet 1</h2>
+    <button onclick="testGetTasks()"> GET /api/projects/1/tasks</button>
+    <pre id="result1">Cliquez sur le bouton pour tester...</pre>
+    
+    <h2>Test 2 : Changer le statut d'une tâche</h2>
+    <label>ID de la tâche : <input type="number" id="taskId" value="1" style="padding: 5px;"></label>
+    <label>Nouveau statut :
+        <select id="newStatus" style="padding: 5px;">
+            <option value="todo">TODO</option>
+            <option value="in_progress">IN PROGRESS</option>
+            <option value="done">DONE</option>
+        </select>
+    </label>
+    <button onclick="testUpdateStatus()"> PATCH /api/tasks/{id}/status</button>
+    <pre id="result2">Cliquez sur le bouton pour tester...</pre>
+    
+    <h2>Test 3 : Créer une nouvelle tâche</h2>
+    <label>Titre : <input type="text" id="taskTitle" value="Tâche de test" style="padding: 5px; width: 300px;"></label>
+    <label>Projet ID : <input type="number" id="projectId" value="1" style="padding: 5px;"></label>
+    <button onclick="testCreateTask()"> POST /api/projects/{id}/tasks</button>
+    <pre id="result3">Cliquez sur le bouton pour tester...</pre>
+
+    <script>
+        // Test 1 : GET - Récupérer toutes les tâches d'un projet
+        async function testGetTasks() {
+            const result = document.getElementById('result1');
+            result.textContent = ' Chargement...';
+            
+            try {
+                const response = await fetch('/api/projects/1/tasks');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    result.innerHTML = `<span class="success"> Succès !</span>\n\n` + 
+                                    JSON.stringify(data, null, 2);
+                } else {
+                    result.innerHTML = `<span class="error"> Erreur ${response.status}</span>\n\n` + 
+                                    JSON.stringify(data, null, 2);
+                }
+            } catch (error) {
+                result.innerHTML = `<span class="error"> Erreur réseau</span>\n\n${error.message}`;
+            }
+        }
+        
+        // Test 2 : PATCH - Changer le statut d'une tâche
+        async function testUpdateStatus() {
+            const result = document.getElementById('result2');
+            const taskId = document.getElementById('taskId').value;
+            const newStatus = document.getElementById('newStatus').value;
+            
+            result.textContent = ' Envoi de la requête...';
+            
+            try {
+                const response = await fetch(`/api/tasks/${taskId}/status`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    result.innerHTML = `<span class="success">✅ Succès !</span>\n\n` + 
+                                    JSON.stringify(data, null, 2);
+                } else {
+                    result.innerHTML = `<span class="error">❌ Erreur ${response.status}</span>\n\n` + 
+                                    JSON.stringify(data, null, 2);
+                }
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ Erreur réseau</span>\n\n${error.message}`;
+            }
+        }
+        
+        // Test 3 : POST - Créer une nouvelle tâche
+        async function testCreateTask() {
+            const result = document.getElementById('result3');
+            const title = document.getElementById('taskTitle').value;
+            const projectId = document.getElementById('projectId').value;
+            
+            result.textContent = ' Création de la tâche...';
+            
+            try {
+                const response = await fetch(`/api/projects/${projectId}/tasks`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title: title,
+                        description: 'Tâche créée via le test API',
+                        status: 'todo',
+                        position: 0
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    result.innerHTML = `<span class="success">✅ Tâche créée !</span>\n\n` + 
+                                    JSON.stringify(data, null, 2);
+                } else {
+                    result.innerHTML = `<span class="error">❌ Erreur ${response.status}</span>\n\n` + 
+                                    JSON.stringify(data, null, 2);
+                }
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ Erreur réseau</span>\n\n${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
