@@ -1,4 +1,5 @@
 <?php
+// src/DataFixtures/UserFixtures.php
 
 namespace App\DataFixtures;
 
@@ -18,24 +19,42 @@ class UserFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        // Créer un utilisateur de test
-        $user = new User();
-        $user->setEmail('anthony@test.com');
-        $user->setUsername('anthony_dev');
-        $user->setRoles(['ROLE_USER']);
+        // 1️⃣ ADMIN (toi, pour les tests complets)
+        $admin = new User();
+        $admin->setEmail('anthony@test.com');
+        $admin->setUsername('anthony_dev');
+        $admin->setRoles(['ROLE_USER', 'ROLE_ADMIN']); // Rôle admin
         
-        // Hash du mot de passe
         $hashedPassword = $this->passwordHasher->hashPassword(
-            $user,
-            'password123'  // Mot de passe en clair
+            $admin,
+            'password123'
         );
-        $user->setPassword($hashedPassword);
-        $user->setCreatedAt(new \DateTimeImmutable());  // ← CORRIGÉ
+        $admin->setPassword($hashedPassword);
+        $admin->setCreatedAt(new \DateTimeImmutable());
 
-        $manager->persist($user);
-        $manager->flush();
-
+        $manager->persist($admin);
+        
         // Créer une référence pour les autres fixtures
-        $this->addReference('user_anthony', $user);
+        $this->addReference('user_anthony', $admin);
+
+        // 2️⃣ UTILISATEUR LAMBDA (pour tester les permissions)
+        $userLambda = new User();
+        $userLambda->setEmail('marie@test.com');
+        $userLambda->setUsername('marie_user');
+        $userLambda->setRoles(['ROLE_USER']); // Simple utilisateur
+        
+        $hashedPasswordLambda = $this->passwordHasher->hashPassword(
+            $userLambda,
+            'password123'
+        );
+        $userLambda->setPassword($hashedPasswordLambda);
+        $userLambda->setCreatedAt(new \DateTimeImmutable());
+
+        $manager->persist($userLambda);
+        
+        // Créer une référence pour ProjectFixtures
+        $this->addReference('user_marie', $userLambda);
+
+        $manager->flush();
     }
 }

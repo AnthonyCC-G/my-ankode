@@ -1,9 +1,10 @@
 <?php
+// src/DataFixtures/TaskFixtures.php
 
 namespace App\DataFixtures;
 
 use App\Entity\Task;
-use App\Entity\Project;  // ← IMPORTANT : Importer l'entité Project
+use App\Entity\Project;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -12,11 +13,10 @@ class TaskFixtures extends Fixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
-        // 1️⃣ Statuts variés pour rendre le Kanban réaliste
         $statusList = ['todo', 'in_progress', 'done'];
         
-        // 2️⃣ Exemples de tâches par projet
-        $tasksData = [
+        // 📋 Tâches pour les projets d'Anthony
+        $tasksDataAnthony = [
             // Projet 0 : Site E-commerce
             0 => [
                 ['title' => 'Créer page d\'accueil', 'status' => 'todo'],
@@ -43,18 +43,47 @@ class TaskFixtures extends Fixture implements DependentFixtureInterface
             ],
         ];
 
-        // 3️⃣ Créer les tâches pour chaque projet
-        foreach ($tasksData as $projectIndex => $tasks) {
-            // Récupérer le projet via sa référence
-            $project = $this->getReference('project_' . $projectIndex, Project::class);
+        foreach ($tasksDataAnthony as $projectIndex => $tasks) {
+            $project = $this->getReference('project_anthony_' . $projectIndex, Project::class);
 
             foreach ($tasks as $position => $taskData) {
                 $task = new Task();
                 $task->setTitle($taskData['title']);
                 $task->setDescription('Description de : ' . $taskData['title']);
                 $task->setStatus($taskData['status']);
-                $task->setPosition($position + 1);  // Position 1, 2, 3, 4, 5
-                $task->setProject($project);  // ← Relation ManyToOne
+                $task->setPosition($position + 1);
+                $task->setProject($project);
+                $task->setCreatedAt(new \DateTime());
+
+                $manager->persist($task);
+            }
+        }
+
+        // 📋 Tâches pour les projets de Marie
+        $tasksDataMarie = [
+            // Projet 0 : Blog Cuisine
+            0 => [
+                ['title' => 'Installer WordPress', 'status' => 'done'],
+                ['title' => 'Créer thème personnalisé', 'status' => 'in_progress'],
+                ['title' => 'Ajouter 10 recettes', 'status' => 'todo'],
+            ],
+            // Projet 1 : Dashboard Analytics
+            1 => [
+                ['title' => 'Configurer API Google Analytics', 'status' => 'in_progress'],
+                ['title' => 'Créer graphiques temps réel', 'status' => 'todo'],
+            ],
+        ];
+
+        foreach ($tasksDataMarie as $projectIndex => $tasks) {
+            $project = $this->getReference('project_marie_' . $projectIndex, Project::class);
+
+            foreach ($tasks as $position => $taskData) {
+                $task = new Task();
+                $task->setTitle($taskData['title']);
+                $task->setDescription('Description de : ' . $taskData['title']);
+                $task->setStatus($taskData['status']);
+                $task->setPosition($position + 1);
+                $task->setProject($project);
                 $task->setCreatedAt(new \DateTime());
 
                 $manager->persist($task);
