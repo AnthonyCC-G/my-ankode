@@ -1,4 +1,5 @@
 <?php
+// src/DataFixtures/ProjectFixtures.php
 
 namespace App\DataFixtures;
 
@@ -12,11 +13,12 @@ class ProjectFixtures extends Fixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
-        // 1️⃣ Récupérer le User créé par UserFixtures
-        $user = $this->getReference('user_anthony', User::class);
+        // Récupérer les 2 utilisateurs
+        $userAnthony = $this->getReference('user_anthony', User::class);
+        $userMarie = $this->getReference('user_marie', User::class);
 
-        // 2️⃣ Créer 3 projets
-        $projectsData = [
+        // 📁 Projets pour Anthony (3 projets)
+        $projectsAnthony = [
             [
                 'name' => 'Site E-commerce',
                 'description' => 'Boutique en ligne avec panier et paiement sécurisé'
@@ -31,23 +33,47 @@ class ProjectFixtures extends Fixture implements DependentFixtureInterface
             ]
         ];
 
-        foreach ($projectsData as $index => $data) {
+        foreach ($projectsAnthony as $index => $data) {
             $project = new Project();
             $project->setName($data['name']);
             $project->setDescription($data['description']);
-            $project->setOwner($user);  // ← Relation ManyToOne
+            $project->setOwner($userAnthony);
             $project->setCreatedAt(new \DateTime());
 
             $manager->persist($project);
             
-            // 3️⃣ Créer une référence pour TaskFixtures
-            $this->addReference('project_' . $index, $project);
+            // Référence pour TaskFixtures
+            $this->addReference('project_anthony_' . $index, $project);
+        }
+
+        // 📁 Projets pour Marie (2 projets)
+        $projectsMarie = [
+            [
+                'name' => 'Blog Cuisine',
+                'description' => 'Blog de recettes avec système de commentaires'
+            ],
+            [
+                'name' => 'Dashboard Analytics',
+                'description' => 'Tableau de bord de statistiques temps réel'
+            ]
+        ];
+
+        foreach ($projectsMarie as $index => $data) {
+            $project = new Project();
+            $project->setName($data['name']);
+            $project->setDescription($data['description']);
+            $project->setOwner($userMarie);
+            $project->setCreatedAt(new \DateTime());
+
+            $manager->persist($project);
+            
+            // Référence pour TaskFixtures si besoin
+            $this->addReference('project_marie_' . $index, $project);
         }
 
         $manager->flush();
     }
 
-    // 4️⃣ Dépendance : exécuter APRÈS UserFixtures
     public function getDependencies(): array
     {
         return [
