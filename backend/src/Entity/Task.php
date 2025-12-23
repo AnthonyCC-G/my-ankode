@@ -16,9 +16,18 @@ class Task
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le titre de la tâche est obligatoire")]
+    #[Assert\Length(
+    max: 255,
+    maxMessage: "Le titre ne peut pas dépasser {{ limit }} caractères"
+    )]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\Length(
+    max: 1000,
+    maxMessage: "La description ne peut pas dépasser {{ limit }} caractères"
+    )]
     private ?string $description = null;
 
     #[ORM\Column(length: 50)]
