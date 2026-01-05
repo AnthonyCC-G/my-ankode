@@ -29,8 +29,8 @@ class Snippet
     #[MongoDB\Field(type: 'date_immutable')]
     private ?DateTimeImmutable $createdAt = null;
 
-    #[MongoDB\ReferenceOne(targetDocument: 'App\Entity\User', storeAs: 'id')]
-    private $user = null;
+    #[MongoDB\Field(type: 'int')]
+    private ?int $userId = null;
 
     public function __construct()
     {
@@ -104,14 +104,14 @@ class Snippet
         return $this->createdAt;
     }
 
-    public function getUser()
+    public function getUserId(): ?int
     {
-        return $this->user;
+        return $this->userId;
     }
 
-    public function setUser($user): self
+    public function setUserId(int $userId): self
     {
-        $this->user = $user;
+        $this->userId = $userId;
         return $this;
     }
 }
