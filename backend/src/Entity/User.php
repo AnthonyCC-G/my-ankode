@@ -50,12 +50,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Project::class, mappedBy: 'owner', orphanRemoval: true)]
     private Collection $projects;
 
+    /**
+     * @var Collection<int, Competence>
+     */
+    #[ORM\OneToMany(targetEntity: Competence::class, mappedBy: 'owner', orphanRemoval: true)]
+    private Collection $competences;
+
     /*  */
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->roles = ['ROLE_USER']; // Ici le rôle de l'utilisateur par défaut
         $this->projects = new ArrayCollection();
+        $this->competences = new ArrayCollection();
     }
 
 
@@ -191,6 +198,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($project->getOwner() === $this) {
                 $project->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Competence>
+     */
+    public function getCompetences(): Collection
+    {
+        return $this->competences;
+    }
+
+    public function addCompetence(Competence $competence): static
+    {
+        if (!$this->competences->contains($competence)) {
+            $this->competences->add($competence);
+            $competence->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCompetence(Competence $competence): static
+    {
+        if ($this->competences->removeElement($competence)) {
+            // set the owning side to null (unless already changed)
+            if ($competence->getOwner() === $this) {
+                $competence->setOwner(null);
             }
         }
 

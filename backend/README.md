@@ -15,7 +15,7 @@
 - 📊 **Kanban** - Gestion de projets et tâches (À faire / En cours / Terminé)
 - 💾 **Snippets** - Bibliothèque de code avec annotations et tags
 - 📰 **Veille techno** - Agrégation de flux RSS (Dev.to, Korben, etc.)
-- 🎯 **Compétences** - Suivi de progression développeur (à venir)
+- 🎯 **Compétences** - Suivi de progression développeur (niveaux 1-5)
 
 ---
 
@@ -57,7 +57,7 @@ exit
 
 ## 🗄️ Architecture Hybride
 
-**PostgreSQL** - User, Project, Task (relations strictes, intégrité référentielle)  
+**PostgreSQL** - User, Project, Task, Competence (relations strictes, intégrité référentielle)
 **MongoDB** - Snippet, Article (schéma flexible, performance lecture)
 
 ---
@@ -135,7 +135,7 @@ docker-compose exec mongo mongosh my_ankode --eval "db.snippets.countDocuments()
 
 ### ✅ Sprint 1 & 2 (Terminé)
 - Architecture Docker (dev + prod)
-- PostgreSQL : User, Project, Task
+- PostgreSQL : User, Project, Task, Competence
 - MongoDB : Snippet, Article
 - Authentification complète
 - API REST CRUD Projects & Tasks
