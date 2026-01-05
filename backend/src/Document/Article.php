@@ -2,10 +2,12 @@
 
 namespace App\Document;
 
+use App\Repository\ArticleRepository;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use DateTimeImmutable;
 
-#[MongoDB\Document(collection: 'articles')]
+
+#[MongoDB\Document(collection: 'articles', repositoryClass: ArticleRepository::class)]
 class Article
 {
     #[MongoDB\Id]
@@ -35,7 +37,7 @@ class Article
     #[MongoDB\Field(type: 'bool')]
     private bool $isRead = false;
 
-    #[MongoDB\ReferenceOne(targetDocument: 'App\Entity\User', storeAs: 'id')]
+    #[MongoDB\Field(type: 'string')]
     private $user = null;
 
     public function __construct()
@@ -132,14 +134,15 @@ class Article
         return $this;
     }
 
-    public function getUser()
+    public function getUserId(): ?string
     {
-        return $this->user;
+        return $this->userId;
     }
 
-    public function setUser($user): self
+    public function setUserId(?string $userId): self
     {
-        $this->user = $user;
+        $this->userId = $userId;
         return $this;
     }
+
 }
