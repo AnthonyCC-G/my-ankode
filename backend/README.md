@@ -13,23 +13,22 @@
 ## 📋 Fonctionnalités
 
 - 📊 **Kanban** - Gestion de projets et tâches (À faire / En cours / Terminé)
-- 💾 **Snippets** - Bibliothèque de code avec annotations
+- 💾 **Snippets** - Bibliothèque de code avec annotations et tags
 - 📰 **Veille techno** - Agrégation de flux RSS (Dev.to, Korben, etc.)
-- 🎯 **Compétences** - Suivi de progression développeur
+- 🎯 **Compétences** - Suivi de progression développeur (à venir)
 
 ---
 
 ## 🛠️ Stack Technique
 
 **Backend** : Symfony 7 (PHP 8.3) + API REST  
-**Frontend** : JavaScript Vanilla ES6+ (MVP) → Angular 18 (prévu)  
+**Frontend** : JavaScript Vanilla ES6+ (MVP) → Angular 18 (migration en cours)  
 **Bases de données** : PostgreSQL 16 (relationnel) + MongoDB 6 (documentaire)  
 **DevOps** : Docker Compose (dev + prod)
 
 ---
 
 ## 🚀 Installation Rapide
-
 ```bash
 # 1. Cloner le projet
 git clone https://github.com/ton-username/my-ankode.git
@@ -44,11 +43,14 @@ composer install
 php bin/console doctrine:database:create
 php bin/console doctrine:migrations:migrate
 php bin/console doctrine:fixtures:load
+
+# 4. Setup MongoDB (schema Snippets & Articles)
+php bin/console doctrine:mongodb:schema:create
 exit
 
-# 4. Accéder à l'application
+# 5. Accéder à l'application
 # Auth : http://localhost:8000/auth
-# Kanban : http://localhost:8000/kanban.html
+# Dashboard : http://localhost:8000/dashboard
 ```
 
 ---
@@ -68,13 +70,39 @@ http://localhost:8000/auth
 → Inscription / Connexion / Déconnexion
 ```
 
-### Kanban (MVP fonctionnel)
+### API REST - Projects & Tasks
+```bash
+# Lister les projets
+GET http://localhost:8000/api/projects
+
+# Créer une tâche
+POST http://localhost:8000/api/tasks
+Body: {"title": "Ma tâche", "projectId": 1, "status": "todo"}
 ```
-http://localhost:8000/kanban.html
-→ 3 colonnes : TO DO / IN PROGRESS / DONE
-→ Déplacement avec boutons ← →
-→ Création de tâches avec formulaire
+
+### API REST - Snippets (MongoDB)
+```bash
+# Lister les snippets
+GET http://localhost:8000/api/snippets
+
+# Créer un snippet
+POST http://localhost:8000/api/snippets
+Body: {
+  "title": "Fonction utile",
+  "language": "php",
+  "code": "function example() { return true; }",
+  "description": "Description optionnelle"
+}
+
+# Modifier un snippet
+PUT http://localhost:8000/api/snippets/{id}
+Body: {"title": "Nouveau titre"}
+
+# Supprimer un snippet
+DELETE http://localhost:8000/api/snippets/{id}
 ```
+
+**Langages supportés** : `js`, `php`, `html`, `css`, `sql`, `other`
 
 ### Veille RSS
 ```bash
@@ -88,6 +116,9 @@ php bin/console app:fetch-rss https://dev.to/feed "Dev.to"
 
 # Vérifier les articles
 docker-compose exec mongo mongosh my_ankode --eval "db.articles.countDocuments()"
+
+# Vérifier les snippets
+docker-compose exec mongo mongosh my_ankode --eval "db.snippets.countDocuments()"
 ```
 
 ---
@@ -108,6 +139,7 @@ docker-compose exec mongo mongosh my_ankode --eval "db.articles.countDocuments()
 - MongoDB : Snippet, Article
 - Authentification complète
 - API REST CRUD Projects & Tasks
+- API REST CRUD Snippets (MongoDB)
 - Kanban HTML/CSS/JS fonctionnel
 - Service RSS + Commande Symfony
 
