@@ -2,46 +2,72 @@
 
 [![Documentation](https://img.shields.io/badge/docs-architecture-blue?style=for-the-badge&logo=readthedocs&logoColor=white)](./ARCHITECTURE.md)
 [![Symfony](https://img.shields.io/badge/Symfony-7-000000?style=for-the-badge&logo=symfony&logoColor=white)](https://symfony.com/)
-[![Angular](https://img.shields.io/badge/Angular-18-DD0031?style=for-the-badge&logo=angular&logoColor=white)](https://angular.io/)
 [![Docker](https://img.shields.io/badge/Docker-Dev%20%2B%20Prod-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-6-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![PHPUnit](https://img.shields.io/badge/PHPUnit-Tests-3776AB?style=for-the-badge&logo=php&logoColor=white)](https://phpunit.de/)
 [![License](https://img.shields.io/badge/license-Educational-green?style=for-the-badge)](./LICENSE)
 
-> Application web complète pour jeunes développeurs - Projet de certification DWWM (Développeur Web et Web Mobile)
+> **Projet de certification DWWM (Développeur Web et Web Mobile) - Niveau 5 (Bac+2)**  
+> Application web complète pour développeurs juniors - Stack Backend Symfony + Frontend Twig/Bootstrap/Vanilla JS
 
 ---
 
 ## 📋 Description
 
-MY-ANKODE est une application tout-en-un destinée aux développeurs juniors, proposant :
+MY-ANKODE est une application tout-en-un destinée aux développeurs juniors, proposant **4 modules complémentaires** :
 
 - 📊 **Gestion de projets** : Kanban pour organiser vos tâches (À faire / En cours / Terminé)
-- 💾 **Bibliothèque de code** : Snippets avec annotations et explications
-- 📰 **Veille technologique** : Agrégation de flux RSS (Dev.to, Medium, etc.)
-- 🎯 **Suivi de compétences** : Profil développeur et auto-évaluation
+- 💾 **Bibliothèque de code** : Snippets avec annotations et catégorisation par langage
+- 📰 **Veille technologique** : Agrégation automatique de flux RSS (Dev.to, Medium, Korben, etc.)
+- 🎯 **Suivi de compétences** : Profil développeur et auto-évaluation (niveaux 1-5)
+
+**🎓 Contexte :** Ce projet démontre la maîtrise des **8 compétences DWWM** via une architecture hybride SQL/NoSQL et un déploiement Docker professionnel.
 
 ---
 
 ## 🛠️ Stack Technique
 
-### Backend
+### 🎯 MVP Certification (Version Actuelle)
+
+#### Backend
 - **Framework** : Symfony 7 (PHP 8.3+)
 - **Architecture** : API REST (JSON)
 - **Authentification** : Symfony Security + bcrypt
 - **Bases de données** : 
-  - **PostgreSQL 16** (Données relationnelles : User, Project, Task, Competence)
-  - **MongoDB 6** (Données documentaires : Snippet, Article)
+  - **PostgreSQL 16** (Relationnel) → User, Project, Task, Competence
+  - **MongoDB 6** (Documentaire) → Snippet, Article
+- **ORM/ODM** : Doctrine ORM + Doctrine MongoDB ODM
 
-### Frontend
-- **Framework** : Angular 18 (TypeScript)
-- **UI Library** : Bootstrap 5 + ng-bootstrap
-- **Styling** : SCSS personnalisé
+#### Frontend
+- **Templating** : Twig (moteur natif Symfony)
+- **UI Framework** : Bootstrap 5 (responsive mobile-first)
+- **Interactivité** : JavaScript Vanilla (Fetch API, DOM manipulation)
+- **Styling** : CSS personnalisé (palette cyan #00C2D1 / orange #FDAB5E)
 
-### DevOps
+#### DevOps & Tests
 - **Conteneurisation** : Docker + Docker Compose
-- **Environnements** : Dev (php -S) + Prod (Nginx + PHP-FPM)
+- **Environnements** : Dev (PHP built-in) + Prod (Nginx + PHP-FPM)
+- **Tests** : PHPUnit (tests unitaires backend)
 - **Versioning** : Git + GitHub (Git Flow)
+
+---
+
+### 🚀 Évolution Post-Certification (Roadmap Future)
+
+#### Migration Frontend Progressive
+- **Framework** : Angular 18 (TypeScript)
+- **State Management** : RxJS + Services Angular
+- **UI Library** : ng-bootstrap
+- **Tests** : Jasmine + Karma
+
+**📌 Pourquoi cette évolution ?**
+- ✅ **Stratégie MVP-first** : Valider la certification avec une stack maîtrisée et fonctionnelle
+- ✅ **Architecture API REST** : Backend déjà découplé, migration frontend facilitée
+- ✅ **Apprentissage ciblé** : Se concentrer sur Angular après avoir consolidé les bases Symfony/PostgreSQL/MongoDB
+- ✅ **Marché régional** : 80% des offres d'emploi en Hauts-de-France requièrent Angular (compétence stratégique post-certif)
+
+**⏱️ Timeline :** Février 2026 → Été 2026 (migration progressive module par module)
 
 ---
 
@@ -55,12 +81,13 @@ MY-ANKODE utilise une **architecture de données hybride** pour tirer parti des 
 - 👤 **USER** : Utilisateurs et authentification
 - 📁 **PROJECT** : Projets utilisateur (1 user → N projects)
 - ✅ **TASK** : Tâches en mode Kanban (1 project → N tasks)
-- 🎯 **COMPETENCE** : Compétences et portfolio
+- 🎯 **COMPETENCE** : Compétences et auto-évaluation (1 user → N competences)
 
 **Avantages :**
 - Relations strictes avec CASCADE
 - Intégrité référentielle garantie
 - Transactions ACID
+- Requêtes SQL optimisées (JOIN)
 
 ### MongoDB (Documentaire)
 **Usage :** Données flexibles et volumineuses sans relations complexes
@@ -79,9 +106,10 @@ MY-ANKODE utilise une **architecture de données hybride** pour tirer parti des 
 - Flexibilité du schéma (JSON natif)
 - Tableaux et objets imbriqués
 - Performance sur gros volumes
+- Recherche full-text native
 
-### Justification
-Pour une analyse détaillée de ce choix architectural, consultez [DECISIONS.md](./DECISIONS.md)
+### Justification Architecturale
+Pour une analyse détaillée de ce choix technique, consultez [DECISIONS.md](./DECISIONS.md)
 
 ---
 
@@ -89,10 +117,10 @@ Pour une analyse détaillée de ce choix architectural, consultez [DECISIONS.md]
 
 | Document | Description |
 |----------|-------------|
-| **[ARCHITECTURE.md](./ARCHITECTURE.md)** | Architecture 3-tiers, modules Symfony, endpoints API |
+| **[ARCHITECTURE.md](./ARCHITECTURE.md)** | Architecture 3-tiers, modules Symfony, endpoints API REST |
 | **[DECISIONS.md](./DECISIONS.md)** | Justification architecture hybride PostgreSQL + MongoDB |
-| **[backend/README.md](./backend/README.md)** | Documentation technique backend (Entities, Documents, Routes) |
-| **[`/docs/schemas/`](./docs/schemas/)** | Diagrammes UML et Merise (MCD, MLD, MPD) |
+| **[backend/README.md](./backend/README.md)** | Documentation technique backend (Entities, Documents, API Routes) |
+| **[`/docs/schemas/`](./docs/schemas/)** | Diagrammes UML et Merise (MCD, MLD, classes) |
 | **[`/docs/maquettes/`](./docs/maquettes/)** | Maquettes Figma des interfaces utilisateur |
 
 📖 **Pour comprendre l'organisation du code**, consultez [ARCHITECTURE.md](./ARCHITECTURE.md)
@@ -102,12 +130,13 @@ Pour une analyse détaillée de ce choix architectural, consultez [DECISIONS.md]
 ## 🚀 Installation
 
 ### Prérequis
-- Docker Desktop (recommandé)
-- OU : PHP 8.3+, Composer, PostgreSQL 16, MongoDB 6, Node.js 20+, Angular CLI 18
+- **Docker Desktop** (recommandé) ✅
+- **OU** : PHP 8.3+, Composer, PostgreSQL 16, MongoDB 6
 
 ---
 
 ### Option 1 : Installation avec Docker (RECOMMANDÉ)
+
 ```bash
 # 1. Cloner le repository
 git clone https://github.com/ton-username/my-ankode.git
@@ -158,13 +187,6 @@ MONGODB_URL="mongodb://127.0.0.1:27017"
 MONGODB_DB="my_ankode"
 ```
 
-#### Frontend (Angular)
-```bash
-cd frontend/my-ankode-app
-npm install
-ng serve
-```
-
 ---
 
 ## 🐳 Environnements Docker (Dev vs Prod)
@@ -176,6 +198,7 @@ MY-ANKODE propose **deux environnements Docker distincts** pour refléter les pr
 **Fichier :** `docker-compose.yml`  
 **Port Backend :** 8000  
 **Serveur web :** PHP built-in server (`php -S 0.0.0.0:8000`)
+
 ```bash
 # Démarrer
 docker-compose up -d
@@ -186,9 +209,10 @@ http://localhost:8000/auth
 
 **Caractéristiques :**
 - ✅ Hot-reload (modifications visibles instantanément)
-- ✅ Volumes montés (code modifiable depuis Windows)
+- ✅ Volumes montés (code modifiable depuis Windows/Linux)
 - ✅ Debug activé (APP_DEBUG=1)
 - ✅ Logs verbeux pour débogage
+- ✅ OPcache désactivé (développement)
 
 **📝 Note :** Le serveur PHP intégré remplace Symfony CLI qui a des problèmes de compatibilité avec Docker (écoute sur 127.0.0.1 uniquement). Cette solution simple convient parfaitement au développement.
 
@@ -199,6 +223,7 @@ http://localhost:8000/auth
 **Fichier :** `docker-compose.prod.yml`  
 **Port :** 80  
 **Serveur web :** Nginx + PHP-FPM
+
 ```bash
 # Démarrer
 docker-compose -f docker-compose.prod.yml up -d
@@ -225,6 +250,7 @@ Client → Nginx:80 → PHP-FPM:9000 → Symfony 7
 ---
 
 ### 🔄 Basculer entre environnements
+
 ```bash
 # Dev → Prod
 docker-compose down
@@ -242,51 +268,53 @@ docker-compose up -d
 ### Développement (`docker-compose.yml`)
 - **Backend** : http://localhost:8000
 - **Page auth** : http://localhost:8000/auth
-- **Frontend** : http://localhost:4200 *(à venir)*
+- **Dashboard** : http://localhost:8000/dashboard
 - **PostgreSQL** : localhost:5432
 - **MongoDB** : localhost:27017
 
 ### Production (`docker-compose.prod.yml`)
 - **Application** : http://localhost
 - **Page auth** : http://localhost/auth
+- **Dashboard** : http://localhost/dashboard
 - **PostgreSQL** : localhost:5432 *(conteneur interne)*
 - **MongoDB** : localhost:27017 *(conteneur interne)*
 
 ---
 
 ## 🗂️ Structure du projet
+
 ```
 my-ankode/
-├── backend/                   # API Symfony
+├── backend/                   # API Symfony 7
 │   ├── src/
-│   │   ├── Command/           # Commandes console (test MongoDB, etc.)
-│   │   ├── Controller/        # Controllers API REST
+│   │   ├── Command/           # Commandes console (test MongoDB, RSS)
+│   │   ├── Controller/        # Controllers API REST + Pages Twig
 │   │   ├── Entity/            # Entities Doctrine (PostgreSQL)
 │   │   ├── Document/          # Documents MongoDB ODM
-│   │   ├── Repository/        # Repositories
-│   │   └── Security/          # Authentification
+│   │   ├── Repository/        # Repositories (ORM + ODM)
+│   │   ├── Security/          # Authentification (Authenticator, Voters)
+│   │   └── Service/           # Services métier (RssFeedService, etc.)
+│   ├── templates/             # Templates Twig (auth, dashboard, kanban, etc.)
+│   ├── public/                # Assets publics (CSS, JS, images)
 │   ├── config/
 │   │   └── packages/
 │   │       ├── doctrine.yaml           # Config PostgreSQL
 │   │       ├── doctrine_mongodb.yaml   # Config MongoDB
-│   │       └── security.yaml           # Config sécurité
+│   │       └── security.yaml           # Config authentification
 │   ├── migrations/            # Migrations PostgreSQL
+│   ├── tests/                 # Tests PHPUnit
 │   ├── Dockerfile             # Image Docker dev
 │   ├── Dockerfile.prod        # Image Docker production
 │   └── README.md              # Documentation backend
-├── frontend/                  # Application Angular
-│   └── my-ankode-app/
-│       └── src/
-│           └── app/           # Composants Angular
 ├── nginx/                     # Configuration Nginx production
 │   └── default.conf           # Routing Symfony + sécurité
-├── docs/                      # Documentation
-│   ├── schemas/               # Diagrammes UML/Merise
-│   └── maquettes/             # Maquettes Figma
+├── docs/                      # Documentation projet
+│   ├── schemas/               # Diagrammes UML/Merise (MCD, MLD, classes)
+│   └── maquettes/             # Maquettes Figma (PNG/PDF)
 ├── docker-compose.yml         # Environnement DEV
 ├── docker-compose.prod.yml    # Environnement PROD
-├── ARCHITECTURE.md            # Architecture technique
-├── DECISIONS.md               # Décisions architecturales
+├── ARCHITECTURE.md            # Architecture technique détaillée
+├── DECISIONS.md               # Décisions architecturales justifiées
 └── README.md                  # Ce fichier
 ```
 
@@ -303,6 +331,72 @@ http://localhost:8000/auth
 # Connexion : Formulaire droit → Redirection /dashboard
 # Déconnexion : http://localhost:8000/logout → /auth
 ```
+
+### Tests API REST
+
+#### Projects
+```bash
+# Lister les projets de l'utilisateur connecté
+GET http://localhost:8000/api/projects
+Authorization: Cookie (session Symfony)
+
+# Créer un projet
+POST http://localhost:8000/api/projects
+Body: {"name": "Mon projet", "description": "Description"}
+
+# Modifier un projet
+PUT http://localhost:8000/api/projects/{id}
+Body: {"name": "Nouveau nom"}
+
+# Supprimer un projet
+DELETE http://localhost:8000/api/projects/{id}
+```
+
+#### Tasks
+```bash
+# Lister les tâches d'un projet
+GET http://localhost:8000/api/projects/{projectId}/tasks
+
+# Créer une tâche
+POST http://localhost:8000/api/tasks
+Body: {
+  "title": "Ma tâche",
+  "description": "Description",
+  "projectId": 1,
+  "status": "todo"
+}
+
+# Changer le statut d'une tâche
+PATCH http://localhost:8000/api/tasks/{id}/status
+Body: {"status": "in_progress"}
+
+# Supprimer une tâche
+DELETE http://localhost:8000/api/tasks/{id}
+```
+
+#### Snippets (MongoDB)
+```bash
+# Lister les snippets de l'utilisateur
+GET http://localhost:8000/api/snippets
+
+# Créer un snippet
+POST http://localhost:8000/api/snippets
+Body: {
+  "title": "Fonction utile",
+  "language": "php",
+  "code": "function example() { return true; }",
+  "description": "Description optionnelle"
+}
+
+# Modifier un snippet
+PUT http://localhost:8000/api/snippets/{id}
+Body: {"title": "Nouveau titre"}
+
+# Supprimer un snippet
+DELETE http://localhost:8000/api/snippets/{id}
+```
+
+**Langages supportés** : `js`, `php`, `html`, `css`, `sql`, `other`
 
 ### Tests MongoDB
 ```bash
@@ -323,53 +417,75 @@ php bin/console app:test-mongo-insert
 # ✅ 1 Article créé
 ```
 
-### Tests Backend (PHPUnit)
+### Veille RSS
+```bash
+docker-compose exec backend sh
+
+# Tester flux français
+php bin/console app:fetch-rss https://korben.info/feed "Korben"
+
+# Tester flux anglais
+php bin/console app:fetch-rss https://dev.to/feed "Dev.to"
+
+# Vérifier les articles créés
+docker-compose exec mongo mongosh my_ankode --eval "db.articles.countDocuments()"
+```
+
+### Tests Unitaires Backend (PHPUnit)
 ```bash
 cd backend
 php bin/phpunit
-```
 
-### Tests Frontend (Jasmine/Karma)
-```bash
-cd frontend/my-ankode-app
-ng test
+# Tester une classe spécifique
+php bin/phpunit tests/Entity/UserTest.php
 ```
 
 ---
 
 ## 🛣️ Roadmap
 
-### Sprint 1 : Architecture & Auth (Terminé ✅)
-- [x] Setup environnement (Symfony + Angular)
+### ✅ Sprint 1 & 2 : Architecture & Backend (Terminé)
+- [x] Setup environnement (Symfony + Docker dev + prod)
 - [x] Configuration bases de données (PostgreSQL + MongoDB)
-- [x] Modélisation UML et Merise
-- [x] Déploiement Docker (dev + prod)
+- [x] Modélisation UML et Merise (MCD, MLD, diagramme classes)
 - [x] Authentification Backend (User entity + Security)
-- [x] Authentification Frontend (Interface /auth)
-- [x] Entities Project & Task (PostgreSQL)
-- [x] Configuration MongoDB + Documents (Snippet, Article)
+- [x] Authentification Frontend (Templates Twig /auth)
+- [x] Entities : User, Project, Task, Competence (PostgreSQL)
+- [x] Documents : Snippet, Article (MongoDB)
+- [x] API REST CRUD Projects & Tasks
+- [x] API REST CRUD Snippets (MongoDB)
+- [x] Service Veille RSS (Commande Symfony)
 
-### Sprint 2 : API REST & CRUD (En cours)
-- [ ] API REST CRUD Projects
-- [ ] API REST CRUD Tasks
-- [ ] CRUD Snippets (MongoDB)
-- [ ] Module Veille (Flux RSS → Articles)
+### 🔄 Sprint 3 : Finalisation Backend (En cours)
+- [x] API REST CRUD Competences
+- [ ] Tests unitaires PHPUnit (User, Project, Task, Competence, Snippet)
+- [ ] Fixtures pour données de test
 
-### Sprint 3 : Frontend Angular
-- [ ] Composants Angular (Dashboard, Kanban)
-- [ ] Services et routing Angular
-- [ ] Intégration API REST
+### 📅 Sprint 4 : Frontend MVP (À faire)
+- [ ] Structure Twig : Layout de base (header, nav, footer, responsive)
+- [ ] Dashboard : Page d'accueil avec widgets statistiques
+- [ ] Kanban Board : Interface Twig + JS Vanilla (3 colonnes)
+- [ ] CRUD Compétences : Formulaires + affichage
+- [ ] CRUD Snippets : Liste + formulaires
+- [ ] Veille Techno : Liste articles avec liens externes
+- [ ] Dark/Light Mode : Toggle CSS + localStorage
+- [ ] Responsive Mobile : Media queries Bootstrap
 
-### Sprint 4 : Fonctionnalités avancées
-- [ ] Module Compétences
-- [ ] Drag & Drop Kanban
-- [ ] Filtres et recherche
+### 📚 Sprint 5 : Documentation & Finitions (À faire)
+- [ ] Rédiger le dossier professionnel DWWM
+- [ ] Créer le diaporama de présentation
+- [ ] Mettre à jour ARCHITECTURE.md
+- [ ] Tester déploiement prod Docker
+- [ ] Optimisations performances (OPcache, index DB)
+- [ ] Validation W3C HTML/CSS
+- [ ] Préparation soutenance orale
 
-### Sprint 5 : Finitions & Tests
-- [ ] Tests unitaires (PHPUnit + Jasmine)
-- [ ] Optimisations performances
-- [ ] Documentation finale
-- [ ] Préparation certification
+### 🚀 Post-Certification : Migration Angular (Bonus Future)
+- [ ] Setup Angular 18 + routing
+- [ ] Migration progressive composants (Dashboard, Kanban, Profil, etc.)
+- [ ] Services Angular + Interceptor HTTP
+- [ ] Tests Jasmine/Karma
+- [ ] Drag & Drop Kanban avec CDK
 
 ---
 
@@ -379,20 +495,20 @@ Ce projet est réalisé dans le cadre de la certification **Développeur Web et 
 
 ### Compétences validées
 
-| Code | Compétence | Validation |
-|------|------------|------------|
-| **CP1** | Installer et configurer son environnement de travail | Docker dev + prod ✅ |
-| **CP2** | Maquetter des interfaces utilisateur | Maquettes Figma ✅ |
-| **CP3** | Réaliser des interfaces utilisateur statiques | Templates Twig ✅ |
-| **CP4** | Développer la partie dynamique des interfaces | Angular 18 (en cours) |
-| **CP5** | Mettre en place une base de données relationnelle | PostgreSQL 16 ✅ |
-| **CP6** | Développer des composants d'accès aux données SQL et NoSQL | Doctrine ORM + ODM ✅ |
-| **CP7** | Développer des composants métier côté serveur | Symfony Services (en cours) |
-| **CP8** | Documenter le déploiement | README + ARCHITECTURE ✅ |
+| Code | Compétence | Validation MVP |
+|------|------------|----------------|
+| **CP1** | Installer et configurer son environnement de travail | ✅ Docker dev + prod |
+| **CP2** | Maquetter des interfaces utilisateur | ✅ Maquettes Figma |
+| **CP3** | Réaliser des interfaces utilisateur statiques | ✅ Templates Twig + Bootstrap |
+| **CP4** | Développer la partie dynamique des interfaces | ✅ JavaScript Vanilla (Fetch API, DOM) |
+| **CP5** | Mettre en place une base de données relationnelle | ✅ PostgreSQL 16 (MCD/MLD/UML) |
+| **CP6** | Développer des composants d'accès aux données SQL et NoSQL | ✅ Doctrine ORM + ODM |
+| **CP7** | Développer des composants métier côté serveur | ✅ Symfony Services (RSS, Auth) |
+| **CP8** | Documenter le déploiement | ✅ README + ARCHITECTURE + Dossier pro |
 
 ### Timeline du projet
 - **Début** : 8 décembre 2024
-- **Fin prévue** : Mi-janvier 2025
+- **Fin MVP** : Mi-janvier 2026
 - **Présentation** : Février 2026
 - **Méthodologie** : Agile (sprints d'1 semaine)
 
@@ -406,7 +522,7 @@ Ce projet est réalisé dans le cadre de la certification **Développeur Web et 
 - ✅ Performance sur gros volumes
 - ✅ Stockage JSON naturel
 
-**PostgreSQL pour User/Project/Task :**
+**PostgreSQL pour User/Project/Task/Competence :**
 - ✅ Relations strictes nécessaires (User → Projects → Tasks)
 - ✅ CASCADE on delete requis (supprimer user = supprimer projets)
 - ✅ Intégrité référentielle critique
@@ -418,14 +534,15 @@ Ce projet est réalisé dans le cadre de la certification **Développeur Web et 
 
 ## 👨‍💻 Auteur
 
-**Anthony** - Développeur Web et Web Mobile en formation  
-🔗 [LinkedIn](https://www.linkedin.com/in/anthonycatancavery)
+**Anthony CATAN-CAVERY** - Développeur Web et Web Mobile en formation  
+🔗 [LinkedIn](https://www.linkedin.com/in/anthonycatancavery)  
+🎓 Certification DWWM - Février 2026
 
 ---
 
 ## 📄 Licence
 
-Projet éducatif - Certification DWWM 2024-2025
+Projet éducatif - Certification DWWM 2024-2026
 
 ---
 
