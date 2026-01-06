@@ -808,6 +808,23 @@ security:
 
 ---
 
+## 🧪 Tests
+
+### Lancer les tests unitaires
+```bash
+docker-compose exec backend php bin/phpunit tests/Entity/
+```
+
+### Résultats
+- UserTest : 5 tests ✅
+- ProjectTest : 5 tests ✅
+- TaskTest : 5 tests ✅
+- CompetenceTest : 4 tests ✅
+
+**Total : 19 tests, 53 assertions**
+
+---
+
 ## 📂 Structure des dossiers
 
 ```
