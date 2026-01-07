@@ -810,18 +810,86 @@ security:
 
 ## 🧪 Tests
 
-### Lancer les tests unitaires
-```bash
-docker-compose exec backend php bin/phpunit tests/Entity/
+### Vue d'ensemble
+
+**Total : 26 tests automatisés PHPUnit**
+- 19 tests unitaires (validation entités)
+- 7 tests fonctionnels (API REST)
+```
+tests/
+├── ApiTestCase.php              # Helper pour tests API
+├── Entity/                      # Tests unitaires (19 tests)
+│   ├── UserTest.php
+│   ├── ProjectTest.php
+│   ├── TaskTest.php
+│   └── CompetenceTest.php
+└── Controller/                  # Tests fonctionnels (7 tests)
+    └── TaskControllerTest.php
 ```
 
-### Résultats
-- UserTest : 5 tests ✅
-- ProjectTest : 5 tests ✅
-- TaskTest : 5 tests ✅
-- CompetenceTest : 4 tests ✅
+---
 
-**Total : 19 tests, 53 assertions**
+### Lancer les tests
+```bash
+# Tous les tests
+docker-compose exec backend php bin/phpunit
+
+# Tests entités uniquement
+docker-compose exec backend php bin/phpunit tests/Entity/
+
+# Tests controllers uniquement
+docker-compose exec backend php bin/phpunit tests/Controller/
+
+# Format lisible
+docker-compose exec backend php bin/phpunit --testdox
+```
+
+**Résultat attendu :**
+```
+OK (26 tests, 82 assertions)
+Time: ~40s
+```
+
+---
+
+### Configuration
+
+**Base de test :** PostgreSQL séparée (`.env.test`)
+
+**Initialisation base de test :**
+```bash
+php bin/console doctrine:database:create --env=test
+php bin/console doctrine:schema:create --env=test
+```
+
+---
+
+### Couverture
+
+**Tests unitaires (19 tests) :**
+- Validation contraintes Doctrine
+- Relations entités (OneToMany, ManyToOne)
+- Valeurs par défaut (createdAt, roles, status)
+
+**Tests fonctionnels (7 tests) :**
+- CRUD API REST (GET, POST, PUT, PATCH, DELETE)
+- Sécurité ownership (403 Forbidden)
+- Codes HTTP (200, 201, 403)
+
+**Code coverage estimé :** ~70% sur entités/controllers critiques
+
+---
+
+### Tests manuels
+
+**Collection Postman :** `/docs/postman/MY-ANKODE.postman_collection.json`
+
+**Workflow :**
+1. POST /register → Inscription
+2. POST /login → Connexion (récupérer cookie)
+3. POST /api/projects → Créer projet
+4. POST /api/tasks → Créer tâche
+5. GET /api/projects/{id}/tasks → Lister tâches
 
 ---
 
