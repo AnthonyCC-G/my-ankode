@@ -13,6 +13,9 @@
         <testsuite name="Controller">
             <directory>tests/Controller</directory>
         </testsuite>
+        <testsuite name="Document">
+            <directory>tests/Document</directory>
+        </testsuite>
     </testsuites>
 
     <php>

@@ -806,25 +806,26 @@ security:
         - { path: ^/dashboard, roles: ROLE_USER }
 ```
 
----
-
 ## 🧪 Tests
 
 ### Vue d'ensemble
 
-**Total : 26 tests automatisés PHPUnit**
+**Total : 34 tests automatisés PHPUnit**
 - 19 tests unitaires (validation entités)
-- 7 tests fonctionnels (API REST)
+- 15 tests fonctionnels (API REST + MongoDB)
 ```
 tests/
-├── ApiTestCase.php              # Helper pour tests API
+├── ApiTestCase.php              # Helper pour tests API (PostgreSQL + MongoDB)
 ├── Entity/                      # Tests unitaires (19 tests)
 │   ├── UserTest.php
 │   ├── ProjectTest.php
 │   ├── TaskTest.php
 │   └── CompetenceTest.php
-└── Controller/                  # Tests fonctionnels (7 tests)
-    └── TaskControllerTest.php
+├── Controller/                  # Tests fonctionnels API REST (11 tests)
+│   ├── TaskControllerTest.php
+│   └── ProjectControllerTest.php
+└── Document/                    # Tests fonctionnels MongoDB (4 tests)
+    └── ArticleMongoTest.php
 ```
 
 ---
@@ -840,14 +841,17 @@ docker-compose exec backend php bin/phpunit tests/Entity/
 # Tests controllers uniquement
 docker-compose exec backend php bin/phpunit tests/Controller/
 
+# Tests MongoDB uniquement
+docker-compose exec backend php bin/phpunit tests/Document/
+
 # Format lisible
 docker-compose exec backend php bin/phpunit --testdox
 ```
 
 **Résultat attendu :**
 ```
-OK (26 tests, 82 assertions)
-Time: ~40s
+OK (34 tests, 119 assertions)
+Time: ~45s
 ```
 
 ---
@@ -871,12 +875,18 @@ php bin/console doctrine:schema:create --env=test
 - Relations entités (OneToMany, ManyToOne)
 - Valeurs par défaut (createdAt, roles, status)
 
-**Tests fonctionnels (7 tests) :**
-- CRUD API REST (GET, POST, PUT, PATCH, DELETE)
-- Sécurité ownership (403 Forbidden)
-- Codes HTTP (200, 201, 403)
+**Tests fonctionnels API REST (11 tests) :**
+- TaskController : 7 tests (CRUD complet + ownership)
+- ProjectController : 4 tests (GET, POST, PUT)
+- Codes HTTP : 200, 201, 403, 404
 
-**Code coverage estimé :** ~70% sur entités/controllers critiques
+**Tests fonctionnels MongoDB (4 tests) :**
+- Création d'articles RSS dans MongoDB
+- Lecture d'articles par ID
+- Filtrage d'articles par utilisateur (isolation)
+- Marquage articles lu/non-lu
+
+**Code coverage estimé :** ~75% sur entités/controllers/documents critiques
 
 ---
 
@@ -890,70 +900,6 @@ php bin/console doctrine:schema:create --env=test
 3. POST /api/projects → Créer projet
 4. POST /api/tasks → Créer tâche
 5. GET /api/projects/{id}/tasks → Lister tâches
-
----
-
-## 📂 Structure des dossiers
-
-```
-backend/
-├── config/
-│   └── packages/
-│       ├── doctrine.yaml           # Config PostgreSQL
-│       ├── doctrine_mongodb.yaml   # Config MongoDB
-│       └── security.yaml           # Config authentification
-├── migrations/                     # Migrations PostgreSQL
-├── public/
-│   ├── index.php                   # Entry point
-│   └── css/                        # CSS personnalisés
-├── src/
-│   ├── Command/
-│   │   ├── TestMongoCommand.php          # Test connexion MongoDB
-│   │   ├── TestMongoInsertCommand.php    # Insert test data
-│   │   └── FetchRssCommand.php           # Import RSS
-│   ├── Controller/
-│   │   ├── AuthController.php            # Auth + register
-│   │   ├── DashboardController.php       # Dashboard Twig
-│   │   ├── ProjectController.php         # API Projects
-│   │   ├── TaskController.php            # API Tasks
-│   │   ├── SnippetController.php         # API Snippets (MongoDB)
-│   │   └── CompetenceController.php      # API Competences
-│   ├── Document/
-│   │   ├── Snippet.php                   # Document MongoDB
-│   │   └── Article.php                   # Document MongoDB
-│   ├── Entity/
-│   │   ├── User.php                      # Entity PostgreSQL
-│   │   ├── Project.php                   # Entity PostgreSQL
-│   │   ├── Task.php                      # Entity PostgreSQL
-│   │   └── Competence.php                # Entity PostgreSQL
-│   ├── Repository/
-│   │   ├── UserRepository.php
-│   │   ├── ProjectRepository.php
-│   │   ├── TaskRepository.php
-│   │   ├── CompetenceRepository.php
-│   │   ├── SnippetRepository.php         # MongoDB ODM
-│   │   └── ArticleRepository.php         # MongoDB ODM
-│   ├── Security/
-│   │   └── AppCustomAuthenticator.php    # Form login authenticator
-│   └── Service/
-│       └── RssFeedService.php            # Service RSS parsing
-├── templates/
-│   ├── base.html.twig                    # Layout de base
-│   ├── auth/
-│   │   └── index.html.twig               # Page auth (login/register)
-│   ├── dashboard/
-│   │   └── index.html.twig               # Dashboard
-│   └── task/
-│       └── index.html.twig               # Kanban board
-├── tests/
-│   ├── Entity/                           # Tests entities
-│   └── Controller/                       # Tests controllers
-├── .env                                  # Config par défaut
-├── composer.json                         # Dépendances PHP
-├── Dockerfile                            # Image Docker dev
-├── Dockerfile.prod                       # Image Docker prod
-└── README.md                             # Ce fichier
-```
 
 ---
 
