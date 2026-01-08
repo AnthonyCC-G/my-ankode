@@ -38,7 +38,7 @@ class Article
     private bool $isRead = false;
 
     #[MongoDB\Field(type: 'string')]
-    private $user = null;
+    private ?string $userId = null;
 
     public function __construct()
     {

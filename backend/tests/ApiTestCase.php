@@ -6,15 +6,18 @@ use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ODM\MongoDB\DocumentManager;
 
 /**
  * Classe de base pour tous les tests API REST
  * Fournit des helpers pour authentification et requêtes JSON
+ * Supporte PostgreSQL (EntityManager) et MongoDB (DocumentManager)
  */
 abstract class ApiTestCase extends WebTestCase
 {
     protected KernelBrowser $client;
     protected EntityManagerInterface $entityManager;
+    protected DocumentManager $documentManager;
 
     protected function setUp(): void
     {
@@ -23,10 +26,14 @@ abstract class ApiTestCase extends WebTestCase
         // Création du client HTTP de test
         $this->client = static::createClient();
         
-        // Récupération de l'EntityManager pour créer des fixtures à la volée
+        // Récupération de l'EntityManager pour créer des fixtures à la volée (PostgreSQL)
         $this->entityManager = static::getContainer()
             ->get('doctrine')
             ->getManager();
+        
+        // Récupération du DocumentManager pour MongoDB
+        $this->documentManager = static::getContainer()
+            ->get('doctrine_mongodb.odm.document_manager');
     }
 
     /**
@@ -103,5 +110,8 @@ abstract class ApiTestCase extends WebTestCase
         
         // Fermeture EntityManager pour éviter fuites mémoire entre tests
         $this->entityManager->close();
+        
+        // Nettoyage MongoDB : Fermeture DocumentManager
+        $this->documentManager->clear();
     }
 }
