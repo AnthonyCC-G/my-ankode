@@ -19,11 +19,11 @@ class UserFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        // 1️⃣ ADMIN (toi, pour les tests complets)
+        // 1️⃣ ADMIN 
         $admin = new User();
         $admin->setEmail('anthony@test.com');
         $admin->setUsername('anthony_dev');
-        $admin->setRoles(['ROLE_USER', 'ROLE_ADMIN']); // Rôle admin
+        $admin->setRoles(['ROLE_USER', 'ROLE_ADMIN']); // Les deux rôles explicites
         
         $hashedPassword = $this->passwordHasher->hashPassword(
             $admin,
@@ -34,26 +34,44 @@ class UserFixtures extends Fixture
 
         $manager->persist($admin);
         
-        // Créer une référence pour les autres fixtures
+        // Référence pour tests admin futurs
         $this->addReference('user_anthony', $admin);
 
-        // 2️⃣ UTILISATEUR LAMBDA (pour tester les permissions)
-        $userLambda = new User();
-        $userLambda->setEmail('marie@test.com');
-        $userLambda->setUsername('marie_user');
-        $userLambda->setRoles(['ROLE_USER']); // Simple utilisateur
+        // 2️⃣ ALICE - Utilisatrice lambda #1 (reprend les données d'Anthony)
+        $alice = new User();
+        $alice->setEmail('alice@test.com');
+        $alice->setUsername('alice_user');
+        $alice->setRoles(['ROLE_USER']); // Simple utilisatrice
         
-        $hashedPasswordLambda = $this->passwordHasher->hashPassword(
-            $userLambda,
+        $hashedPasswordAlice = $this->passwordHasher->hashPassword(
+            $alice,
             'password123'
         );
-        $userLambda->setPassword($hashedPasswordLambda);
-        $userLambda->setCreatedAt(new \DateTimeImmutable());
+        $alice->setPassword($hashedPasswordAlice);
+        $alice->setCreatedAt(new \DateTimeImmutable());
 
-        $manager->persist($userLambda);
+        $manager->persist($alice);
         
-        // Créer une référence pour ProjectFixtures
-        $this->addReference('user_marie', $userLambda);
+        // Référence pour ProjectFixtures, TaskFixtures, CompetenceFixtures
+        $this->addReference('user_alice', $alice);
+
+        // 3️⃣ MARIE - Utilisatrice lambda #2 (garde ses données)
+        $marie = new User();
+        $marie->setEmail('marie@test.com');
+        $marie->setUsername('marie_user');
+        $marie->setRoles(['ROLE_USER']); // Simple utilisatrice
+        
+        $hashedPasswordMarie = $this->passwordHasher->hashPassword(
+            $marie,
+            'password123'
+        );
+        $marie->setPassword($hashedPasswordMarie);
+        $marie->setCreatedAt(new \DateTimeImmutable());
+
+        $manager->persist($marie);
+        
+        // Référence pour ProjectFixtures, TaskFixtures, CompetenceFixtures
+        $this->addReference('user_marie', $marie);
 
         $manager->flush();
     }

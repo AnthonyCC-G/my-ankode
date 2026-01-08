@@ -12,12 +12,12 @@ class CompetenceFixtures extends Fixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
-        // Récupérer les 2 utilisateurs de test
-        $anthony = $this->getReference('user_anthony', User::class);
+        // Récupérer les 2 utilisateurs LAMBDA (pas l'admin)
+        $alice = $this->getReference('user_alice', User::class);
         $marie = $this->getReference('user_marie', User::class);
 
-        // === COMPÉTENCES ANTHONY (5 compétences) ===
-        $competencesAnthony = [
+        // === COMPÉTENCES ALICE (5 compétences )
+        $competencesAlice = [
             [
                 'name' => 'PHP',
                 'level' => 4,
@@ -55,9 +55,9 @@ class CompetenceFixtures extends Fixture implements DependentFixtureInterface
             ]
         ];
 
-        foreach ($competencesAnthony as $data) {
+        foreach ($competencesAlice as $data) {
             $competence = new Competence();
-            $competence->setOwner($anthony);
+            $competence->setOwner($alice);
             $competence->setName($data['name']);
             $competence->setLevel($data['level']);
             $competence->setNotes($data['notes']);
@@ -67,7 +67,7 @@ class CompetenceFixtures extends Fixture implements DependentFixtureInterface
             $manager->persist($competence);
         }
 
-        // === COMPÉTENCES MARIE (3 compétences) ===
+        // === COMPÉTENCES MARIE (3 compétences)
         $competencesMarie = [
             [
                 'name' => 'HTML/CSS',

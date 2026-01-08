@@ -804,15 +804,17 @@ security:
         - { path: ^/register, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: ROLE_USER }
         - { path: ^/dashboard, roles: ROLE_USER }
+
 ```
 
 ## 🧪 Tests
 
 ### Vue d'ensemble
 
-**Total : 34 tests automatisés PHPUnit**
+**Total : 47 tests automatisés PHPUnit**
 - 19 tests unitaires (validation entités)
 - 15 tests fonctionnels (API REST + MongoDB)
+- 13 tests de sécurité (ownership + validation + authentification)
 ```
 tests/
 ├── ApiTestCase.php              # Helper pour tests API (PostgreSQL + MongoDB)
@@ -824,47 +826,67 @@ tests/
 ├── Controller/                  # Tests fonctionnels API REST (11 tests)
 │   ├── TaskControllerTest.php
 │   └── ProjectControllerTest.php
-└── Document/                    # Tests fonctionnels MongoDB (4 tests)
-    └── ArticleMongoTest.php
+├── Document/                    # Tests fonctionnels MongoDB (4 tests)
+│   └── ArticleMongoTest.php
+└── Security/                    # Tests de sécurité (13 tests)
+    ├── OwnershipTest.php        # 403 Forbidden (4 tests)
+    ├── ValidationTest.php       # 400 Bad Request (4 tests)
+    └── AuthenticationTest.php   # 401/404 (5 tests)
 ```
 
 ---
 
 ### Lancer les tests
 ```bash
-# Tous les tests
+# Script complet : fixtures + cache + tous les tests
+./scripts/check-tests.sh
+
+# Tous les tests manuellement
 docker-compose exec backend php bin/phpunit
 
-# Tests entités uniquement
+# Tests par type
 docker-compose exec backend php bin/phpunit tests/Entity/
-
-# Tests controllers uniquement
 docker-compose exec backend php bin/phpunit tests/Controller/
-
-# Tests MongoDB uniquement
 docker-compose exec backend php bin/phpunit tests/Document/
+docker-compose exec backend php bin/phpunit tests/Security/
 
-# Format lisible
+# Tests par testsuite (défini dans phpunit.dist.xml)
+docker-compose exec backend php bin/phpunit --testsuite=Entity
+docker-compose exec backend php bin/phpunit --testsuite=Controller
+docker-compose exec backend php bin/phpunit --testsuite=Security
+
+# Format lisible avec détails
 docker-compose exec backend php bin/phpunit --testdox
 ```
 
 **Résultat attendu :**
 ```
-OK (34 tests, 119 assertions)
-Time: ~45s
+OK (47 tests, 134 assertions)
+Time: ~1min
 ```
 
 ---
 
 ### Configuration
 
-**Base de test :** PostgreSQL séparée (`.env.test`)
+**Base de test :** PostgreSQL séparée (`my_ankode_test`)
+
+**Fichier de config :** `.env.test`
+```env
+DATABASE_URL="postgresql://db_user:db_password@postgres:5432/my_ankode_test?charset=utf8"
+```
 
 **Initialisation base de test :**
 ```bash
 php bin/console doctrine:database:create --env=test
 php bin/console doctrine:schema:create --env=test
+php bin/console doctrine:fixtures:load --env=test --no-interaction
 ```
+
+**Fixtures de test :** 3 utilisateurs
+- `anthony@test.com` : ROLE_ADMIN (sans données)
+- `alice@test.com` : ROLE_USER (3 projets, ~15 tasks, 5 compétences)
+- `marie@test.com` : ROLE_USER (2 projets, ~5 tasks, 3 compétences)
 
 ---
 
@@ -886,20 +908,31 @@ php bin/console doctrine:schema:create --env=test
 - Filtrage d'articles par utilisateur (isolation)
 - Marquage articles lu/non-lu
 
+**Tests de sécurité (13 tests) :**
+- **Ownership (4 tests - 403 Forbidden) :**
+  - User ne peut PAS voir les tasks d'un autre user
+  - User ne peut PAS modifier le project d'un autre user
+  - User ne peut PAS supprimer la task d'un autre user
+  - User ne peut PAS créer une task dans le project d'un autre user
+  
+- **Validation (4 tests - 400 Bad Request) :**
+  - Création task sans title obligatoire
+  - Création task avec status invalide
+  - Création project sans name obligatoire
+  - Task title > 255 caractères
+  
+- **Authentification + Edge cases (5 tests - 401/404/200) :**
+  - GET /api/projects sans login → 401 ou 302
+  - POST /api/projects sans login → 401 ou 302
+  - GET task inexistante → 404
+  - DELETE project inexistant → 404
+  - PUT task avec données partielles → 200 OK
+
 **Code coverage estimé :** ~75% sur entités/controllers/documents critiques
 
----
-
-### Tests manuels
-
-**Collection Postman :** `/docs/postman/MY-ANKODE.postman_collection.json`
-
-**Workflow :**
-1. POST /register → Inscription
-2. POST /login → Connexion (récupérer cookie)
-3. POST /api/projects → Créer projet
-4. POST /api/tasks → Créer tâche
-5. GET /api/projects/{id}/tasks → Lister tâches
+**Référentiel DWWM :** 
+> "Réaliser les tests de sécurité. Les composants métier sont sécurisés."
+> ✅ Validé par les 13 tests de sécurité (ownership + validation + auth)
 
 ---
 

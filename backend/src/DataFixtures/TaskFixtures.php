@@ -15,8 +15,8 @@ class TaskFixtures extends Fixture implements DependentFixtureInterface
     {
         $statusList = ['todo', 'in_progress', 'done'];
         
-        // 📋 Tâches pour les projets d'Anthony
-        $tasksDataAnthony = [
+        // Tâches pour les projets d'Alice 
+        $tasksDataAlice = [
             // Projet 0 : Site E-commerce
             0 => [
                 ['title' => 'Créer page d\'accueil', 'status' => 'todo'],
@@ -43,8 +43,8 @@ class TaskFixtures extends Fixture implements DependentFixtureInterface
             ],
         ];
 
-        foreach ($tasksDataAnthony as $projectIndex => $tasks) {
-            $project = $this->getReference('project_anthony_' . $projectIndex, Project::class);
+        foreach ($tasksDataAlice as $projectIndex => $tasks) {
+            $project = $this->getReference('project_alice_' . $projectIndex, Project::class);
 
             foreach ($tasks as $position => $taskData) {
                 $task = new Task();
@@ -59,7 +59,7 @@ class TaskFixtures extends Fixture implements DependentFixtureInterface
             }
         }
 
-        // 📋 Tâches pour les projets de Marie
+        // Tâches pour les projets de Marie 
         $tasksDataMarie = [
             // Projet 0 : Blog Cuisine
             0 => [
