@@ -3,8 +3,6 @@
 # Projet de certification DWWM
 # ============================================
 
-
-
 services:
   # ==========================================
   # SERVICE BACKEND - Symfony 7 + PHP 8.3
@@ -19,6 +17,9 @@ services:
     volumes:
       # Monte ton code Symfony dans le conteneur (hot-reload)
       - ./backend:/var/www/html
+      # Exclut le cache et les logs du montage Windows (volumes Docker natifs)
+      - backend-cache:/var/www/html/var/cache
+      - backend-logs:/var/www/html/var/log
     environment:
       # Variables d'environnement pour Symfony
       APP_ENV: dev
@@ -97,6 +98,10 @@ volumes:
   postgres-data:
     driver: local
   mongo-data:
+    driver: local
+  backend-cache:
+    driver: local
+  backend-logs:
     driver: local
 
 # ==========================================
