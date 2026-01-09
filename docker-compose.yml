@@ -15,29 +15,23 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      # Monte ton code Symfony dans le conteneur (hot-reload)
       - ./backend:/var/www/html
-      # Exclut le cache et les logs du montage Windows (volumes Docker natifs)
-      - backend-cache:/var/www/html/var/cache
-      - backend-logs:/var/www/html/var/log
     environment:
-      # Variables d'environnement pour Symfony
       APP_ENV: dev
       APP_SECRET: changeme_in_production
       DATABASE_URL: postgresql://ankode_user:ankode_password@postgres:5432/my_ankode?serverVersion=16&charset=utf8
       MONGODB_URL: mongodb://mongo:27017
       MONGODB_DB: my_ankode
     depends_on:
-      - postgres
-      - mongo
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
     networks:
       - my-ankode-network
     command: >
       sh -c "
-        composer install --no-scripts || true;
-        php bin/console cache:clear || true;
-        php bin/console doctrine:database:create --if-not-exists || true;
-        php bin/console doctrine:migrations:migrate --no-interaction || true;
+        composer install --no-scripts;
         php -S 0.0.0.0:8000 -t public
       "
       
@@ -54,10 +48,14 @@ services:
       POSTGRES_USER: ankode_user
       POSTGRES_PASSWORD: ankode_password
     volumes:
-      # Persistance des données PostgreSQL
       - postgres-data:/var/lib/postgresql/data
     networks:
       - my-ankode-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ankode_user -d my_ankode"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   # ==========================================
   # SERVICE BASE DE DONNÉES - MongoDB 6
@@ -68,10 +66,49 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      # Persistance des données MongoDB
       - mongo-data:/data/db
     networks:
       - my-ankode-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ==========================================
+  # SERVICE INTERFACE POSTGRESQL - pgAdmin 4
+  # ==========================================
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: my-ankode-pgadmin
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@myankode.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - my-ankode-network
+    depends_on:
+      - postgres
+
+  # ==========================================
+  # SERVICE INTERFACE MONGODB - Mongo Express
+  # ==========================================
+  mongo-express:
+    image: mongo-express:latest
+    container_name: my-ankode-mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://mongo:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin
+    networks:
+      - my-ankode-network
+    depends_on:
+      - mongo
 
   # ==========================================
   # SERVICE FRONTEND - Angular 18 (OPTIONNEL)
@@ -99,9 +136,7 @@ volumes:
     driver: local
   mongo-data:
     driver: local
-  backend-cache:
-    driver: local
-  backend-logs:
+  pgadmin-data:
     driver: local
 
 # ==========================================
