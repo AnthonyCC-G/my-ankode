@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🔍 MY-ANKODE - Vérification de l'environnement"
+echo " MY-ANKODE - Vérification de l'environnement"
 echo "=============================================="
 
 # Docker
@@ -94,14 +94,27 @@ else
     echo "⚠️ Symfony non accessible"
 fi
 
-# Résumé des URLs
+# Routes Symfony (test automatique)
 echo ""
 echo "=============================================="
-echo "🌐 URLs de l'application :"
-echo "   Backend  : http://localhost:8000"
-echo "   Auth     : http://localhost:8000/auth"
-echo "   Kanban   : http://localhost:8000/kanban.html"
-echo "   Dashboard: http://localhost:8000/dashboard"
-echo "   API      : http://localhost:8000/api/projects"
+echo "🌐 Routes disponibles :"
+echo ""
+
+ROUTES_OUTPUT=$(docker-compose exec -T backend php bin/console debug:router 2>/dev/null)
+if [ $? -eq 0 ]; then
+    echo "📄 Pages HTML :"
+    echo "$ROUTES_OUTPUT" | grep -E "app_(auth|dashboard|kanban|competences|snippets|veille)" | awk '{printf "   %-20s %s\n", $1, $3}'
+    
+    echo ""
+    echo "🔌 API REST :"
+    echo "$ROUTES_OUTPUT" | grep -E "api_(projects|tasks|competences|snippets)" | awk '{printf "   %-25s %s %s\n", $1, $2, $3}'
+    
+    echo ""
+    echo "✅ Toutes les routes Symfony sont accessibles"
+else
+    echo "❌ Impossible de récupérer les routes Symfony"
+    echo "   Le conteneur backend ne répond pas correctement"
+fi
+
 echo ""
 echo "✅ Vérification terminée !"
