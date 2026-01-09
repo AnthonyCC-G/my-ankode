@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Snippets - MY-ANKODE{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1 class="mb-4">Mes Snippets</h1>
+    
+    {% if snippets is empty %}
+        <div class="alert alert-info">
+            <p class="mb-0">Aucun snippet enregistré pour le moment.</p>
+            <small>Utilisez l'API <code>POST /api/snippets</code> pour ajouter des snippets de code.</small>
+        </div>
+    {% else %}
+        <p class="text-muted">{{ snippets|length }} snippet(s) enregistré(s)</p>
+        
+        <div class="row">
+            {% for snippet in snippets %}
+                <div class="col-md-6 mb-3">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">{{ snippet.title }}</h5>
+                            <span class="badge bg-secondary">{{ snippet.language }}</span>
+                        </div>
+                        <div class="card-body">
+                            {% if snippet.description %}
+                                <p class="card-text text-muted">{{ snippet.description }}</p>
+                            {% endif %}
+                            <pre class="bg-light p-3 rounded"><code>{{ snippet.code|slice(0, 200) }}{% if snippet.code|length > 200 %}...{% endif %}</code></pre>
+                            {% if snippet.tags %}
+                                <div class="mt-2">
+                                    {% for tag in snippet.tags %}
+                                        <span class="badge bg-info me-1">{{ tag }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted d-block mt-2">Créé le {{ snippet.createdAt|date('d/m/Y H:i') }}</small>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Kanban Board - MY-ANKODE{% endblock %}
+
+{% block body %}
+<div class="container-fluid mt-4">
+    <h1 class="mb-4">Kanban Board</h1>
+    
+    {% if projectsWithTasks is empty %}
+        <div class="alert alert-info">
+            <p class="mb-0">Aucun projet disponible pour le moment.</p>
+            <small>Utilisez l'API <code>POST /api/projects</code> pour créer des projets.</small>
+        </div>
+    {% else %}
+        <p class="text-muted">{{ projectsWithTasks|length }} projet(s)</p>
+        
+        {% for item in projectsWithTasks %}
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">{{ item.project.name }}</h3>
+                    {% if item.project.description %}
+                        <p class="mb-0 mt-2"><small>{{ item.project.description }}</small></p>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {# Colonne À FAIRE #}
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-header bg-secondary text-white">
+                                    <h5 class="mb-0">À faire ({{ item.tasks.todo|length }})</h5>
+                                </div>
+                                <div class="card-body p-2">
+                                    {% if item.tasks.todo is empty %}
+                                        <p class="text-muted text-center mb-0"><small>Aucune tâche</small></p>
+                                    {% else %}
+                                        {% for task in item.tasks.todo %}
+                                            <div class="card mb-2">
+                                                <div class="card-body p-2">
+                                                    <h6 class="card-title mb-1">{{ task.title }}</h6>
+                                                    {% if task.description %}
+                                                        <p class="card-text mb-0"><small>{{ task.description|slice(0, 100) }}{% if task.description|length > 100 %}...{% endif %}</small></p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Colonne EN COURS #}
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-header bg-warning text-dark">
+                                    <h5 class="mb-0">En cours ({{ item.tasks.in_progress|length }})</h5>
+                                </div>
+                                <div class="card-body p-2">
+                                    {% if item.tasks.in_progress is empty %}
+                                        <p class="text-muted text-center mb-0"><small>Aucune tâche</small></p>
+                                    {% else %}
+                                        {% for task in item.tasks.in_progress %}
+                                            <div class="card mb-2">
+                                                <div class="card-body p-2">
+                                                    <h6 class="card-title mb-1">{{ task.title }}</h6>
+                                                    {% if task.description %}
+                                                        <p class="card-text mb-0"><small>{{ task.description|slice(0, 100) }}{% if task.description|length > 100 %}...{% endif %}</small></p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Colonne TERMINÉ #}
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="mb-0">Terminé ({{ item.tasks.done|length }})</h5>
+                                </div>
+                                <div class="card-body p-2">
+                                    {% if item.tasks.done is empty %}
+                                        <p class="text-muted text-center mb-0"><small>Aucune tâche</small></p>
+                                    {% else %}
+                                        {% for task in item.tasks.done %}
+                                            <div class="card mb-2">
+                                                <div class="card-body p-2">
+                                                    <h6 class="card-title mb-1">{{ task.title }}</h6>
+                                                    {% if task.description %}
+                                                        <p class="card-text mb-0"><small>{{ task.description|slice(0, 100) }}{% if task.description|length > 100 %}...{% endif %}</small></p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

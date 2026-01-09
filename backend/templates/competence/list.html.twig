@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Compétences - MY-ANKODE{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1 class="mb-4">Mes Compétences</h1>
+    
+    {% if competences is empty %}
+        <div class="alert alert-info">
+            <p class="mb-0">Aucune compétence enregistrée pour le moment.</p>
+            <small>Utilisez l'API <code>POST /api/competences</code> pour ajouter des compétences.</small>
+        </div>
+    {% else %}
+        <p class="text-muted">{{ competences|length }} compétence(s) enregistrée(s)</p>
+        
+        <div class="list-group">
+            {% for competence in competences %}
+                <div class="list-group-item">
+                    <div class="d-flex w-100 justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">{{ competence.name }}</h5>
+                            {% if competence.notes %}
+                                <p class="mb-1 text-muted">{{ competence.notes }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <span class="badge bg-primary">Niveau {{ competence.level }}/5</span>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
