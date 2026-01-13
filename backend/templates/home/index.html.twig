@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ pageTitle }}{% endblock %}
+
+{% block body %}
+<div class="home-container">
+    {# Header avec logo et globe #}
+    <header class="home-header">
+        <div class="logo">
+            <a href="{{ app.user ? path('app_dashboard') : path('app_home') }}">
+                <img src="{{ asset('images/logo/logo-myankode.png') }}" alt="My Ankode Logo">
+            </a>
+        </div>
+        
+        <div class="globe-animation">
+            <img src="{{ asset('images/background/globe-earth.png') }}" alt="" class="globe-earth">
+        </div>
+    </header>
+    {# Contenu principal - Layout Grid asymétrique #}
+        <main class="home-main">
+            <div class="title-welcome">
+                <h1>{ Bienvenue sur }</h1>
+            </div>
+            
+            <div class="title-app">
+                <h2>{ My Ankode }</h2>
+            </div>
+            
+            <div class="cta-button">
+                <a href="{{ path('app_auth') }}">{ S'inscrire / Se Connecter }</a>
+            </div>
+            
+            <div class="hero-image">
+                <img src="{{ asset('images/hero-developer.png') }}" alt="Développeur travaillant sur My Ankode">
+            </div>
+        </main>
+    </div>
+{% endblock %}

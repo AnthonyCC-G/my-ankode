@@ -1,0 +1,563 @@
+/* ==================== MY-ANKODE - Styles globaux ==================== */
+
+/* ==================== RESET & BASE ==================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* CRITIQUE : Pas de scroll */
+    font-family: var(--font-main);
+    font-size: var(--font-size-base);
+    background: linear-gradient(180deg,var(--custom-dark-modal) 0%, var(--custom-border) 82%, var(--custom-border) 100%);
+    color: var(--text-primary);
+    transition: background var(--transition-slow), color var(--transition-base);
+}
+
+/* Mode Light - Dégradé clair */
+body:not(.dark-mode) {
+    background: linear-gradient(180deg, var(--neutral-50) 0%, var(--cyan-400) 82%, var(--cyan-300) 100%);
+    color: var(--text-primary);
+}
+
+
+/* ==================== HEADER & GLOBE ANIMÉ ==================== */
+
+/* ==================== LOGO ==================== */
+.logo {
+    position: fixed;
+    top: var(--spacing-md);
+    left: var(--spacing-md);
+    z-index: var(--z-header);
+}
+
+.logo a {
+    display: inline-block;
+    transition: transform var(--transition-base);
+}
+
+.logo a:hover {
+    transform: scale(1.05);
+}
+
+.logo img {
+    width: 8vw;
+    height: auto;
+    filter: drop-shadow(0 2px 8px rgba(0, 210, 255, 0.3));
+}
+
+body:not(.dark-mode) .logo img {
+    filter: drop-shadow(0 2px 8px rgba(0, 102, 204, 0.3));
+}
+
+
+.home-header {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 600px; /* Juste l'espace pour le globe */
+    height: 500px;
+    pointer-events: none; /* Ne bloque pas les clics */
+}
+
+/* Conteneur des globes */
+.globe-animation {
+    position: absolute;
+    top: -25vh; /* Déborde de 10% de la hauteur */
+    right: -16vw; /* Déborde de 10% de la largeur */
+    width: 37vw; /* 35% de la largeur viewport */
+    height: 37vw; /* Garde le ratio carré */
+    overflow: visible;
+    z-index: var(--z-base);
+    pointer-events: auto;
+}
+
+/* Globe Terre - Rotation lente horaire */
+.globe-earth {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    animation: rotate-clockwise 50s linear infinite;
+}
+
+/* Animations */
+@keyframes rotate-clockwise {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes rotate-counter-clockwise {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(-360deg); }
+}
+
+/* Optimisation performance GPU */
+.globe-earth {
+    will-change: transform;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
+/* ==================== CONTENU PRINCIPAL HOME ==================== */
+
+.home-container {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+.home-main {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 5px;
+    width: 100%;
+    height: calc(100vh - 80px); /* 100vh moins la hauteur du footer */
+    padding: var(--spacing-xl);
+    padding-bottom: calc(var(--spacing-xl) + 100px); /* Espace pour mascotte */
+}
+/* Div1 - "Bienvenue sur" */
+.title-welcome {
+    grid-column: span 2 / span 2;
+    grid-column-start: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* Style H1*/
+.title-welcome h1 {
+    font-family: var(--font-main);
+    font-size: clamp(1.5rem, 3vw, 3rem); /* 24px min → 3vw → 48px max */
+    font-weight: var(--font-weight-normal);
+    color: var(--text-primary);
+    margin: 0;
+    letter-spacing: 0.05em;
+}
+
+
+/* Div2 - "My Ankode" */
+.title-app {
+    grid-column: span 2 / span 2;
+    grid-column-start: 3;
+    grid-row-start: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Style H2*/
+.title-app h2 {
+    font-family: var(--font-main);
+    font-size: clamp(2.5rem, 5vw, 5rem); /* 40px min → 5vw → 80px max */
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin: 0;
+    letter-spacing: 0.05em;
+}
+
+
+/* Div3 - Bouton CTA */
+.cta-button {
+    grid-column: span 2 / span 2;
+    grid-column-start: 4;
+    grid-row-start: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cta-button a {
+    font-family: var(--font-main);
+    font-size: clamp(1.25rem, 2.5vw, 2.5rem); /* 20px min → 2.5vw → 40px max */
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-accent);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: all var(--transition-base);
+}
+
+.cta-button a:hover {
+    color: #FF8C42;
+    transform: translateY(-2px);
+    filter: drop-shadow(0 4px 12px rgba(253, 171, 94, 0.5));
+}
+
+/* Mode light */
+body:not(.dark-mode) .title-welcome h1,
+body:not(.dark-mode) .title-app h2 {
+    color: var(--text-primary);
+}
+
+
+/* Div4 - Image Hero */
+.hero-image {
+    grid-column: span 2 / span 2;
+    grid-row: span 3 / span 3;
+    grid-column-start: 1;
+    grid-row-start: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-image img {
+    width: 95%; /* 95% de sa cellule grid */
+    max-width: 45vw; /* Maximum 45% de la viewport */
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 15px 40px rgba(0, 194, 209, 0.4));
+}
+
+/* ==================== FOOTER STICKY ==================== */
+.footer-sticky {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(0,0,0,0.3);
+    backdrop-filter: blur(15px);
+    border-top: 1px solid var(--border-color);
+    padding: var(--spacing-sm) 0;
+    z-index: var(--z-sticky);
+}
+
+.footer-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.footer-link {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-size: var(--font-size-sm);
+    transition: color var(--transition-base);
+}
+
+.footer-link:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+}
+
+.footer-separator {
+    color: var(--color-primary);
+    margin: 0 var(--spacing-xs);
+}
+
+.footer-copyright {
+    text-align: center;
+    margin: var(--spacing-xs) 0 0;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+/* Footer en mode light */
+body:not(.dark-mode) .footer-sticky {
+    background: rgba(245, 249, 252, 0.3);
+    border-top: 1px solid var(--border-color);
+}
+
+body:not(.dark-mode) .footer-link {
+    color: #0066cc;
+}
+
+body:not(.dark-mode) .footer-link:hover {
+    color: var(--color-accent);
+}
+
+body:not(.dark-mode) .footer-copyright {
+    color: var(--text-primary);
+}
+
+/* ==================== MASCOTTE FIXE ==================== */
+.mascot-container {
+    position: fixed;
+    bottom: 90px;
+    right: var(--spacing-md);
+    z-index: calc(var(--z-sticky) - 1);
+    display: flex;
+    align-items: flex-end;
+    gap: var(--spacing-sm);
+}
+
+/* Ampoule - Switch theme */
+.lightbulb {
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    transition: filter var(--transition-base);
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
+}
+
+.lightbulb:hover {
+    filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.9));
+}
+
+/* Ampoule éteinte (light mode) */
+body:not(.dark-mode) .lightbulb {
+    filter: grayscale(100%) brightness(0.5);
+}
+
+body:not(.dark-mode) .lightbulb:hover {
+    filter: grayscale(100%) brightness(0.7);
+}
+
+/* Personnage */
+.character {
+    width: 120px;
+    height: auto;
+    transition: transform var(--transition-base);
+}
+
+/* ===== BULLE DE MESSAGE ===== */
+.bubble-container {
+    position: absolute;
+    left: -45px;
+    bottom: 55px;
+    width: 55px;
+    height: 55px;
+    cursor: pointer;
+}
+
+.bubble-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+.bubble-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    text-align: center;
+}
+
+.bubble-text-small {
+    font-size: var(--font-size-2xl);
+    margin: 0;
+    transition: opacity var(--transition-fast);
+}
+
+/* Bulle de texte qui apparaît au hover */
+.bubble-text-expanded {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: -210px;
+    background: linear-gradient(135deg, var(--color-accent) 0%, #FF8C42 100%);
+    border: 2px solid #FFC470;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    min-width: 180px;
+    max-width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-base);
+    box-shadow: 0 4px 12px rgba(253, 171, 94, 0.4);
+}
+
+.bubble-text-expanded::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: -8px;
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 8px solid #FF8C42;
+}
+
+.bubble-text-expanded p {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    line-height: 1.3;
+    color: var(--neutral-900);
+    font-weight: var(--font-weight-medium);
+}
+
+.bubble-text-expanded strong {
+    color: #0a1628;
+    display: block;
+    margin-bottom: 3px;
+}
+
+/* Affichage au hover */
+.bubble-container:hover .bubble-text-small {
+    opacity: 0;
+}
+
+.bubble-container:hover .bubble-text-expanded {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ==================== RESPONSIVE MOBILE ==================== */
+@media (max-width: 768px) {
+    body {
+        padding-bottom: 70px;
+    }
+
+
+
+/* ==================== LOGO ==================== */    
+    .logo {
+        top: var(--spacing-sm);
+        left: var(--spacing-sm);
+    }
+
+    .logo img {
+        width: 60px;
+    }
+
+
+/* ==================== GLOBE ==================== */
+@media (max-width: 768px) {
+    .home-header {
+        height: 350px;
+    }
+    
+    .globe-animation {
+        width: 320px;
+        height: 320px;
+        top: -80px;
+        right: -100px;
+    }
+}
+
+@media (max-width: 480px) {
+    .home-header {
+        height: 220px;
+    }
+    
+    .globe-animation {
+        width: 180px;
+        height: 180px;
+        top: -30px;
+        right: -60px;
+    }
+}
+
+/* ==================== HOME ==================== */
+
+@media (max-width: 1024px) {
+    .home-main {
+        flex-direction: column;
+        text-align: center;
+        gap: var(--spacing-2xl);
+    }
+    
+    .hero-illustration {
+        flex: 0 0 auto;
+        max-width: 500px;
+    }
+    
+    .hero-content {
+        align-items: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .welcome-title {
+        font-size: var(--font-size-2xl); /* 24px */
+    }
+    
+    .app-title {
+        font-size: var(--font-size-4xl); /* 40px */
+    }
+    
+    .btn-cta {
+        font-size: var(--font-size-2xl); /* 24px */
+    }
+    
+    .hero-illustration {
+        max-width: 400px;
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome-title {
+        font-size: var(--font-size-xl); /* 20px */
+    }
+    
+    .app-title {
+        font-size: var(--font-size-3xl); /* 32px */
+    }
+    
+    .btn-cta {
+        font-size: var(--font-size-xl); /* 20px */
+    }
+    
+    .hero-illustration {
+        max-width: 300px;
+    }
+    
+    .home-main {
+        padding-bottom: 120px;
+    }
+}
+
+/* ==================== Footer Character bulb et message ==================== */
+    .mascot-container {
+        right: var(--spacing-sm);
+        bottom: 80px;
+    }
+    
+    .character {
+        width: 80px;
+    }
+    
+    .lightbulb {
+        width: 30px;
+        height: 30px;
+        top: -35px;
+    }
+    
+    .bubble-container {
+        width: 50px;
+        height: 50px;
+        left: -70px;
+        bottom: 45px;
+    }
+    
+    .bubble-text-small {
+        font-size: var(--font-size-xl);
+    }
+    
+    .bubble-text-expanded {
+        min-width: 150px;
+        font-size: var(--font-size-xs);
+        padding: var(--spacing-xs);
+    }
+
+    .footer-nav {
+        gap: var(--spacing-xs);
+    }
+
+    .footer-link,
+    .footer-copyright {
+        font-size: var(--font-size-xs);
+    }
+}
