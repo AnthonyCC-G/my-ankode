@@ -1,0 +1,178 @@
+/* ===========================================
+   MY-ANKODE - Page d'accueil
+   Palette complète : Cyan + Orange + Statuts
+   ============================================ */
+
+/* ===== VARIABLES CSS ===== */
+:root {
+   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━
+   COULEURS - CYAN (Principale)
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+   --cyan-300: #7DD3DB;
+   --cyan-400: #B8E5EA;
+    --cyan-500: #00C2D1;      /* BASE */
+   --cyan-600: #00A3B0;
+   --cyan-700: #007A85;
+    --cyan-900: #003B4F;      /* Fond dark */
+   
+   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━
+   COULEURS - ORANGE (Accent)
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    --orange-500: #FDAB5E;    /* BASE */
+   
+   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━
+   COULEURS - ÉTATS
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    --red-500: #FF6B6B;       /* Erreur BASE */
+    --red-700: #D14949;       /* Erreur foncé */
+   
+    --green-500: #51CF66;     /* Succès BASE */
+    --green-700: #3B974C;     /* Succès foncé */
+   
+    --gold-500: #D4A574;      /* Warning BASE */
+    --gold-700: #BC8550;      /* Warning foncé */
+   
+   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━
+   COULEURS - NEUTRES (Gris)
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+   --neutral-50: #F8F9FA;
+   --neutral-100: #E9ECEF;
+   --neutral-300: #CED4DA;
+   --neutral-500: #6C757D;
+   --neutral-900: #1A1A1A;
+   
+   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━
+   COULEURS - CUSTOM (Nuances spéciales)
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+   --custom-dark-card: #004D63;
+   --custom-dark-modal: #00212c;
+   --custom-dark-input: #002b3f;
+   --custom-border: #006A85;
+   --custom-text-disabled: #4A7B87;
+   
+   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ALIAS SÉMANTIQUES (pour faciliter l'usage)
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+   --color-primary: var(--cyan-500);
+   --color-primary-light: var(--cyan-300);
+   --color-primary-lighter: var(--cyan-400);
+   --color-primary-dark: var(--cyan-700);
+   --color-primary-darker: var(--cyan-900);
+   
+   --color-accent: var(--orange-500);
+   
+   --color-error: var(--red-500);
+   --color-error-dark: var(--red-700);
+   
+   --color-success: var(--green-500);
+   --color-success-dark: var(--green-700);
+   
+   --color-warning: var(--gold-500);
+   --color-warning-dark: var(--gold-700);
+   
+   --color-text-light: var(--neutral-50);
+   --color-text-muted: var(--neutral-300);
+   --color-text-disabled: var(--custom-text-disabled);
+   
+   --color-bg-dark: var(--cyan-900);
+   --color-bg-card: var(--custom-dark-card);
+   --color-bg-modal: var(--custom-dark-modal);
+   --color-bg-input: var(--custom-dark-input);
+   
+   --color-border: var(--custom-border);
+   
+   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ESPACEMENTS (Spacing Scale)
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    --spacing-xs: 0.5rem;     /* 8px */
+    --spacing-sm: 1rem;       /* 16px */
+    --spacing-md: 1.5rem;     /* 24px */
+    --spacing-lg: 2rem;       /* 32px */
+    --spacing-xl: 3rem;       /* 48px */
+    --spacing-2xl: 4rem;      /* 64px */
+    --spacing-3xl: 6rem;      /* 96px */
+   
+   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━
+   BORDURES (Border Radius)
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    --radius-sm: 0.375rem;    /* 6px */
+    --radius-md: 0.75rem;     /* 12px */
+    --radius-lg: 1rem;        /* 16px */
+    --radius-xl: 1.5rem;      /* 24px */
+    --radius-full: 9999px;    /* Cercle parfait */
+   
+   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━
+   TYPOGRAPHIE
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+   --font-main: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+   --font-code: 'Fira Code', 'Consolas', 'Monaco', monospace;
+   
+    --font-size-xs: 0.75rem;   /* 12px */
+    --font-size-sm: 0.875rem;  /* 14px */
+    --font-size-base: 1rem;    /* 16px */
+    --font-size-lg: 1.125rem;  /* 18px */
+    --font-size-xl: 1.25rem;   /* 20px */
+    --font-size-2xl: 1.5rem;   /* 24px */
+    --font-size-3xl: 2rem;     /* 32px */
+    --font-size-4xl: 2.5rem;   /* 40px */
+    --font-size-5xl: 3rem;     /* 48px */
+   
+   --font-weight-normal: 400;
+   --font-weight-medium: 500;
+   --font-weight-semibold: 600;
+   --font-weight-bold: 700;
+   
+   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━
+   OMBRES (Shadows)
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+   --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+   --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.2);
+   --shadow-cyan: 0 4px 15px rgba(0, 194, 209, 0.3);
+   --shadow-cyan-hover: 0 6px 20px rgba(0, 194, 209, 0.4);
+   
+   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━
+   TRANSITIONS
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+   --transition-fast: 150ms ease;
+   --transition-base: 300ms ease;
+   --transition-slow: 500ms ease;
+   
+   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━
+   Z-INDEX (Gestion des couches)
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+   --z-base: 1;
+   --z-dropdown: 100;
+   --z-sticky: 200;
+   --z-header: 300;
+   --z-modal: 400;
+   --z-tooltip: 500;
+
+   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━
+   THÈMES - Dark/Light Mode
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    /* Variables dynamiques selon le mode */
+   --bg-primary: var(--cyan-900);
+   --bg-secondary: var(--custom-dark-card);
+   --bg-tertiary: var(--custom-dark-modal);
+   
+   --text-primary: var(--neutral-50);
+   --text-secondary: var(--neutral-300);
+   --text-muted: var(--custom-text-disabled);
+   
+   --border-color: var(--custom-border);
+}
+
+/* Mode Light */
+body:not(.dark-mode) {
+   --bg-primary: #e8f4f8;
+   --bg-secondary: #f5f9fc;
+   --bg-tertiary: #ffffff;
+   
+   --text-primary: var(--neutral-900);
+   --text-secondary: var(--neutral-500);
+   --text-muted: var(--neutral-300);
+   
+   --border-color: var(--neutral-300);
+}
