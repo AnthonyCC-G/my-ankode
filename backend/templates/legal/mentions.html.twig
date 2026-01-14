@@ -2,9 +2,242 @@
 
 {% block title %}Mentions légales - My Ankode{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/legal.css') }}">
+{% endblock %}
+
 {% block body %}
-<div class="container my-5">
-    <h1>Mentions légales</h1>
-    <p>Contenu à venir...</p>
+<div class="legal-container">
+    <h1 class="legal-title">Mentions Légales & FAQ</h1>
+    
+    {# Système de tabs #}
+    <div class="tabs-navigation">
+        <button class="tab-button {{ activeTab == 'mentions' ? 'active' : '' }}" data-tab="mentions">Mentions Légales</button>
+        <button class="tab-button {{ activeTab == 'faq' ? 'active' : '' }}" data-tab="faq">FAQ</button>
+    </div>
+
+    {# Tab 1 : Mentions Légales #}
+    <div class="tab-content {{ activeTab == 'mentions' ? 'active' : '' }}" id="mentions">
+        <section class="legal-section">
+            <h2>Editeur du site</h2>
+            <p>
+                <strong>Nom du site :</strong> My Ankode<br>
+                <strong>Propriétaire :</strong> Anthony Catan-Cavery<br>
+                <strong>Adresse :</strong> [Adresse à compléter]<br>
+                <strong>Email :</strong> a.catancavery@gmail.com
+            </p>
+        </section>
+
+        <section class="legal-section">
+            <h2>Hébergement</h2>
+            <p>
+                <strong>Hébergeur :</strong> IONOS (prévu)<br>
+                <strong>Adresse :</strong> [Adresse IONOS]<br>
+                <strong>Site web :</strong> <a href="https://www.ionos.fr" target="_blank" rel="noopener">www.ionos.fr</a>
+            </p>
+        </section>
+
+        <section class="legal-section">
+            <h2>Propriété intellectuelle</h2>
+            <p>
+                L'ensemble du contenu de ce site (structure, textes, logos, images) est la propriété exclusive de Anthony Catan-Cavery, sauf mention contraire.
+                Toute reproduction, distribution, modification, adaptation, retransmission ou publication de ces différents éléments est strictement interdite sans l'accord écrit de l'éditeur.
+            </p>
+            <p>
+                Ce site a été développé dans le cadre d'un projet de certification professionnelle DWWM (Développeur Web et Web Mobile).
+            </p>
+        </section>
+
+        <section class="legal-section">
+            <h2>Protection des données personnelles (RGPD)</h2>
+            
+            <h3>Données collectées</h3>
+            <p>
+                My Ankode collecte uniquement les données nécessaires à son fonctionnement :
+            </p>
+            <ul>
+                <li><strong>Données de compte :</strong> email, nom d'utilisateur, mot de passe (hashé)</li>
+                <li><strong>Données de projet :</strong> projets, tâches, snippets de code, compétences suivies</li>
+                <li><strong>Articles de veille :</strong> flux RSS agrégés pour votre veille technologique</li>
+            </ul>
+
+            <h3>Utilisation des données</h3>
+            <p>
+                Vos données sont utilisées exclusivement pour :
+            </p>
+            <ul>
+                <li>Permettre votre authentification et l'accès à votre compte</li>
+                <li>Sauvegarder vos projets, tâches et snippets</li>
+                <li>Personnaliser votre expérience utilisateur</li>
+            </ul>
+            <p>
+                <strong>Aucune donnée n'est vendue ou partagée avec des tiers.</strong>
+            </p>
+
+            <h3>Cookies et stockage local</h3>
+            <p>
+                My Ankode utilise uniquement des cookies et stockages essentiels au fonctionnement :
+            </p>
+            <ul>
+                <li><strong>PHPSESSID :</strong> Cookie de session PHP nécessaire à l'authentification (supprimé à la déconnexion)</li>
+                <li><strong>theme (localStorage) :</strong> Préférence du thème dark/light (stocké localement dans votre navigateur)</li>
+            </ul>
+            <p>
+                <strong>Aucun cookie de tracking ou publicitaire n'est utilisé.</strong>
+            </p>
+
+            <h3>Vos droits</h3>
+            <p>
+                Conformément au RGPD, vous disposez des droits suivants :
+            </p>
+            <ul>
+                <li><strong>Droit d'accès :</strong> consulter vos données via votre tableau de bord</li>
+                <li><strong>Droit de rectification :</strong> modifier vos informations de profil</li>
+                <li><strong>Droit à l'effacement :</strong> supprimer votre compte et toutes vos données</li>
+                <li><strong>Droit à la portabilité :</strong> exporter vos données (fonctionnalité prévue)</li>
+            </ul>
+            <p>
+                Pour exercer ces droits, contactez-nous à : <strong>[email à compléter]</strong>
+            </p>
+
+            <h3>Sécurité</h3>
+            <p>
+                Nous mettons en œuvre toutes les mesures techniques et organisationnelles pour protéger vos données :
+            </p>
+            <ul>
+                <li>Mots de passe hashés avec algorithme sécurisé (bcrypt)</li>
+                <li>Connexions HTTPS cryptées (en production)</li>
+                <li>Validation et sanitisation de toutes les entrées utilisateur</li>
+                <li>Séparation stricte des données entre utilisateurs</li>
+            </ul>
+        </section>
+
+        <section class="legal-section">
+            <h2>Responsabilité</h2>
+            <p>
+                L'éditeur s'efforce d'assurer au mieux la disponibilité et la fiabilité du site My Ankode.
+                Toutefois, ce site étant un projet éducatif, l'éditeur ne peut garantir une disponibilité continue du service.
+            </p>
+            <p>
+                L'éditeur décline toute responsabilité en cas de perte de données, bien que des sauvegardes régulières soient effectuées.
+            </p>
+        </section>
+    </div>
+
+    {# Tab 2 : FAQ #}
+    <div class="tab-content {{ activeTab == 'faq' ? 'active' : '' }}" id="faq">
+        <section class="faq-section">
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>Comment créer un compte sur My Ankode ?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>
+                        Pour créer un compte, cliquez sur le bouton "S'inscrire" en haut à droite de la page d'accueil.
+                        Renseignez votre email, choisissez un nom d'utilisateur et un mot de passe sécurisé.
+                        Une fois inscrit, vous serez automatiquement connecté et redirigé vers votre tableau de bord.
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>Qu'est-ce que la fonctionnalité Kanban / TODO List ?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>
+                        Le Kanban est un système de gestion de projets et de tâches visuel.
+                        Vous pouvez créer des projets, y ajouter des tâches et les organiser en colonnes (À faire, En cours, Terminé).
+                        Chaque tâche peut avoir une priorité, une date limite et une description détaillée.
+                        C'est l'outil idéal pour organiser vos projets de développement et suivre votre progression.
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>Qu'est-ce que la Veille Technologique ?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>
+                        La Veille Technologique est un module qui agrège automatiquement des articles et actualités
+                        provenant de sources tech reconnues (flux RSS). Vous pouvez consulter les dernières nouveautés
+                        en développement web, frameworks, langages et bonnes pratiques, le tout centralisé dans votre interface.
+                        Plus besoin de visiter 10 sites différents, My Ankode fait la veille pour vous !
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>Comment fonctionnent les Snippets de code ?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>
+                        Les Snippets sont votre bibliothèque de bouts de code réutilisables.
+                        Vous pouvez sauvegarder des morceaux de code que vous utilisez régulièrement (fonctions, classes, commandes),
+                        les organiser par langage et par catégorie, et les retrouver instantanément grâce à la recherche.
+                        Chaque snippet peut inclure une description, des tags et une coloration syntaxique.
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>À quoi sert le suivi des Compétences ?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>
+                        Le module Compétences vous aide à lutter contre le syndrome de l'imposteur !
+                        Vous pouvez lister toutes vos compétences techniques (langages, frameworks, outils),
+                        évaluer votre niveau dans chacune et suivre votre progression dans le temps.
+                        C'est un excellent outil pour visualiser concrètement vos acquis et identifier les domaines à approfondir.
+                        Parfait aussi pour préparer votre CV ou un entretien !
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>Mes données sont-elles sécurisées ?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>
+                        Oui, absolument. My Ankode met un point d'honneur sur la sécurité :
+                        les mots de passe sont hashés avec bcrypt (jamais stockés en clair),
+                        chaque utilisateur n'a accès qu'à ses propres données,
+                        toutes les entrées sont validées et protégées contre les injections SQL et XSS.
+                        Le site utilise HTTPS en production pour crypter toutes les communications.
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>Puis-je exporter mes données ?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>
+                        Conformément au RGPD, vous avez le droit à la portabilité de vos données.
+                        Une fonctionnalité d'export est prévue dans une future mise à jour.
+                        En attendant, vous pouvez contacter le support pour obtenir un export manuel de vos données au format JSON.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/legal.js') }}"></script>
 {% endblock %}

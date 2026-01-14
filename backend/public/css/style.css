@@ -12,7 +12,7 @@ body {
     height: 100vh;
     margin: 0;
     padding: 0;
-    overflow: hidden; /* CRITIQUE : Pas de scroll */
+    overflow: hidden; /* Pas de scroll sur desktop - esprit dashboard */
     font-family: var(--font-main);
     font-size: var(--font-size-base);
     background: linear-gradient(180deg,var(--custom-dark-modal) 0%, var(--custom-border) 82%, var(--custom-border) 100%);
@@ -26,6 +26,15 @@ body:not(.dark-mode) {
     color: var(--text-primary);
 }
 
+
+/* ==================== VISIBILITY HELPERS ==================== */
+.desktop-only {
+    display: block;
+}
+
+.mobile-only {
+    display: none;
+}
 
 /* ==================== HEADER & GLOBE ANIMÉ ==================== */
 
@@ -41,6 +50,7 @@ body:not(.dark-mode) {
     display: inline-block;
     transition: transform var(--transition-base);
 }
+
 
 .logo a:hover {
     transform: scale(1.05);
@@ -414,54 +424,60 @@ body:not(.dark-mode) .lightbulb:hover {
     visibility: visible;
 }
 
-/* ==================== RESPONSIVE MOBILE ==================== */
-@media (max-width: 768px) {
-    body {
-        padding-bottom: 70px;
-    }
-
-
-
-/* ==================== LOGO ==================== */    
-    .logo {
-        top: var(--spacing-sm);
-        left: var(--spacing-sm);
-    }
-
-    .logo img {
-        width: 60px;
-    }
-
-
-/* ==================== GLOBE ==================== */
-@media (max-width: 768px) {
-    .home-header {
-        height: 350px;
-    }
-    
-    .globe-animation {
-        width: 320px;
-        height: 320px;
-        top: -80px;
-        right: -100px;
-    }
+/* ==================== BOTTOM NAVIGATION BAR (MOBILE) ==================== */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background: rgba(10, 22, 40, 0.85); /* Dark semi-transparent */
+    backdrop-filter: blur(15px); /* Effet de flou sur ce qui est derrière */
+    border-top: 2px solid var(--border-color);
+    display: none; /* Caché par défaut */
+    justify-content: space-around;
+    align-items: center;
+    z-index: var(--z-header);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
 }
 
-@media (max-width: 480px) {
-    .home-header {
-        height: 220px;
-    }
-    
-    .globe-animation {
-        width: 180px;
-        height: 180px;
-        top: -30px;
-        right: -60px;
-    }
+/* Bottom nav pour le light mode */
+body:not(.dark-mode) .bottom-nav {
+    background: rgba(245, 249, 252, 0.85); /* Light semi-transparent */
+    backdrop-filter: blur(15px);
 }
 
-/* ==================== HOME ==================== */
 
+
+.bottom-nav-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+    border-radius: 50%;
+    text-decoration: none;
+}
+
+.bottom-nav-item:hover,
+.bottom-nav-item:active {
+    transform: scale(1.1);
+    background-color: var(--surface-secondary);
+}
+
+.bottom-nav-icon {
+    width: 35px;
+    height: 35px;
+    object-fit: contain;
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+
+/* ===== TABLETTE ===== */
 @media (max-width: 1024px) {
     .home-main {
         flex-direction: column;
@@ -479,17 +495,109 @@ body:not(.dark-mode) .lightbulb:hover {
     }
 }
 
+/* ===== MOBILE ===== */
 @media (max-width: 768px) {
+    
+    /* ===== VISIBILITY ===== */
+    .desktop-only {
+        display: none !important;
+    }
+    
+    .mobile-only {
+        display: flex;
+    }
+    
+    /* ===== BODY ===== */
+    body {
+        overflow-y: auto;
+        height: auto;
+        min-height: 100vh;
+        padding-top: 20px;
+        padding-bottom: 90px; /* Espace pour la bottom nav */
+    }
+    
+    /* ===== LOGO ===== */
+    .logo {
+        top: var(--spacing-sm);
+        left: var(--spacing-sm);
+    }
+
+    .logo img {
+        width: 60px;
+    }
+    
+    /* ===== GLOBE ===== */
+    .home-header {
+        height: 350px;
+    }
+    
+    .globe-animation {
+        width: 320px;
+        height: 320px;
+        top: -80px;
+        right: -100px;
+    }
+    
+    /* ===== FOOTER COMPACT ===== */
+    .footer-sticky {
+        padding: 0.5rem 1rem;
+        font-size: 0.75rem;
+    }
+    
+    .footer-nav {
+        gap: 0.5rem;
+    }
+    
+    .footer-link {
+        font-size: 0.8rem;
+    }
+    
+    .footer-separator {
+        font-size: 0.8rem;
+    }
+    
+    .footer-copyright {
+        font-size: 0.7rem;
+        margin-top: 0.25rem;
+    }
+    
+    /* ===== MASCOTTE COMPACTE ===== */
+    .mascot-container {
+        bottom: 80px;
+    }
+    
+    .lightbulb {
+        width: 40px;
+    }
+    
+    .character {
+        width: 80px;
+    }
+    
+    /* ===== TITRES ET CONTENU MOBILE ===== */
+    .mobile-title {
+        text-align: center;
+        font-size: 1.5rem;
+        padding: 1rem;
+        color: var(--text-primary);
+    }
+    
+    .mobile-content {
+        padding: 1rem;
+        text-align: center;
+    }
+    
+    /* ===== HOME RESPONSIVE ===== */
     .welcome-title {
-        font-size: var(--font-size-2xl); /* 24px */
+        font-size: var(--font-size-2xl);
     }
     
     .app-title {
-        font-size: var(--font-size-4xl); /* 40px */
+        font-size: var(--font-size-4xl);
     }
     
     .btn-cta {
-        font-size: var(--font-size-2xl); /* 24px */
+        font-size: var(--font-size-2xl);
     }
     
     .hero-illustration {
@@ -497,17 +605,18 @@ body:not(.dark-mode) .lightbulb:hover {
     }
 }
 
+/* ===== PETIT MOBILE ===== */
 @media (max-width: 480px) {
     .welcome-title {
-        font-size: var(--font-size-xl); /* 20px */
+        font-size: var(--font-size-xl);
     }
     
     .app-title {
-        font-size: var(--font-size-3xl); /* 32px */
+        font-size: var(--font-size-3xl);
     }
     
     .btn-cta {
-        font-size: var(--font-size-xl); /* 20px */
+        font-size: var(--font-size-xl);
     }
     
     .hero-illustration {
@@ -517,47 +626,15 @@ body:not(.dark-mode) .lightbulb:hover {
     .home-main {
         padding-bottom: 120px;
     }
-}
-
-/* ==================== Footer Character bulb et message ==================== */
-    .mascot-container {
-        right: var(--spacing-sm);
-        bottom: 80px;
+    
+    .home-header {
+        height: 220px;
     }
     
-    .character {
-        width: 80px;
-    }
-    
-    .lightbulb {
-        width: 30px;
-        height: 30px;
-        top: -35px;
-    }
-    
-    .bubble-container {
-        width: 50px;
-        height: 50px;
-        left: -70px;
-        bottom: 45px;
-    }
-    
-    .bubble-text-small {
-        font-size: var(--font-size-xl);
-    }
-    
-    .bubble-text-expanded {
-        min-width: 150px;
-        font-size: var(--font-size-xs);
-        padding: var(--spacing-xs);
-    }
-
-    .footer-nav {
-        gap: var(--spacing-xs);
-    }
-
-    .footer-link,
-    .footer-copyright {
-        font-size: var(--font-size-xs);
+    .globe-animation {
+        width: 180px;
+        height: 180px;
+        top: -30px;
+        right: -60px;
     }
 }

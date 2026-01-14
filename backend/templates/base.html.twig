@@ -1,23 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{% block title %}My Ankode{% endblock %}</title>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        
         {% block stylesheets %}
             <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
             <link rel="stylesheet" href="{{ asset('css/style.css') }}">
         {% endblock %}
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
+        {% block importmap %}{{ importmap('app') }}{% endblock %}
     </head>
     <body>
+        {# Logo desktop uniquement #}
+        <div class="logo desktop-only">
+            <a href="{{ app.user ? path('app_dashboard') : path('app_auth') }}">
+                <img src="{{ asset('images/logo/logo-myankode.png') }}" alt="My Ankode Logo">
+            </a>
+        </div>
+
+        {# Contenu spécifique à chaque page #}
         {% block body %}{% endblock %}
-        <div class="mascot-container">
+
+        {# Mascotte desktop avec theme-switcher #}
+        <div class="mascot-container desktop-only">
             <img src="{{ asset('images/lightbulb.png') }}" id="theme-switcher" class="lightbulb" alt="Changer le thème">
             <img src="{{ asset('images/character-happy.png') }}" id="character" class="character" alt="Mascotte My Ankode">
             <div class="bubble-container">
@@ -26,24 +35,44 @@
                     <p class="bubble-text-small"></p>
                     <div class="bubble-text-expanded">
                         <p><strong>Astuce du jour :</strong></p>
-                        <p>Le dark mode, c'est LA religion des développeurs ! </p>
+                        <p>Le dark mode, c'est LA religion des développeurs !</p>
                     </div>
                 </div>
             </div>
         </div>
-        <footer class="footer-sticky">
+
+        {# Footer desktop #}
+        <footer class="footer-sticky desktop-only">
             <nav class="footer-nav">
                 <a href="{{ path('app_legal_mentions') }}" class="footer-link">Mentions légales</a>
-                <span class="footer-separator">|</span>
-                <a href="{{ path('app_legal_privacy') }}" class="footer-link">Confidentialité</a>
-                <span class="footer-separator">|</span>
-                <a href="{{ path('app_contact') }}" class="footer-link">Contact</a>
-                <span class="footer-separator">|</span>
-                <a href="{{ path('app_faq') }}" class="footer-link">FAQ</a>
+                {# TODO: Afficher le lien FAQ uniquement pour les utilisateurs connectés #}
+                {# {% if app.user %}
+                    <span class="footer-separator">|</span>
+                    <a href="{{ path('app_faq') }}" class="footer-link">FAQ</a>
+                {% endif %} #}
             </nav>
             <p class="footer-copyright">© 2026 My Ankode - Anthony Catan-Cavery</p>
+        </footer>
+
+        {# Bottom Navigation Bar - Mobile uniquement #}
+        <nav class="bottom-nav mobile-only">
+            <a href="{{ app.user ? path('app_dashboard') : path('app_home') }}" class="bottom-nav-item">
+                <img src="{{ asset('images/logo/logo-myankode.png') }}" alt="Accueil" class="bottom-nav-icon">
+            </a>
+            <button id="theme-switcher-mobile" class="bottom-nav-item">
+                <img src="{{ asset('images/lightbulb.png') }}" alt="Thème" class="bottom-nav-icon">
+            </button>
+            <a href="{{ path('app_legal_mentions') }}" class="bottom-nav-item">
+                <img src="{{ asset('images/badge-icon.png') }}" alt="Mentions légales" class="bottom-nav-icon">
+            </a>
+            {# TODO: Ajouter l'icône News/Veille quand le module sera prêt #}
+            {# <a href="{{ path('app_veille') }}" class="bottom-nav-item">
+                <img src="{{ asset('images/bubble-icon.png') }}" alt="Veille" class="bottom-nav-icon">
+            </a> #}
         </nav>
-    </footer>
-    <script src="{{ asset('js/theme-switcher.js') }}"></script>
+
+        {% block javascripts %}
+            <script src="{{ asset('js/theme-switcher.js') }}"></script>
+        {% endblock %}
     </body>
 </html>
