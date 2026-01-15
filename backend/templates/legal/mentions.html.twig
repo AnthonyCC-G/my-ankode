@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mentions légales - My Ankode{% endblock %}
+{% block title %}Mentions légales & FAQ - My Ankode{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -9,121 +9,80 @@
 
 {% block body %}
 <div class="legal-container">
-    <h1 class="legal-title">Mentions Légales & FAQ</h1>
+        <h1 class="legal-title">Mentions Légales & FAQ</h1>
+        
+        {# Système de tabs #}
+        <div class="tabs-navigation">
+            <button class="tab-button {{ activeTab == 'mentions' ? 'active' : '' }}" data-tab="mentions">Mentions Légales</button>
+            <button class="tab-button {{ activeTab == 'faq' ? 'active' : '' }}" data-tab="faq">FAQ</button>
+        </div>
+
+        <div class="tab-content {{ activeTab == 'mentions' ? 'active' : '' }}" id="mentions">
+        
+        <div class="legal-grid">
+            {# Colonne gauche #}
+            <div>
+                <section class="legal-section compact">
+                    <h2>Éditeur du site</h2>
+                    <p>
+                        <strong>My Ankode</strong> - Anthony Catan-Cavery<br>
+                        Email : a.catancavery@gmail.com
+                    </p>
+                </section>
+
+                <section class="legal-section compact">
+                    <h2>Hébergement</h2>
+                    <p>
+                        <strong>IONOS</strong> (prévu)<br>
+                        <a href="https://www.ionos.fr" target="_blank" rel="noopener">www.ionos.fr</a>
+                    </p>
+                </section>
+
+                <section class="legal-section compact">
+                    <h2>Propriété intellectuelle</h2>
+                    <p>
+                        Contenu © Anthony Catan-Cavery. Projet de certification DWWM. 
+                        Reproduction interdite sans autorisation écrite.
+                    </p>
+                </section>
+            </div>
+
+            {# Colonne droite #}
+            <div>
+                <section class="legal-section compact">
+                    <h2>Protection des données (RGPD)</h2>
+                    
+                    <p>
+                        <strong>Données :</strong> email, username, projets, tâches, snippets, compétences.
+                    </p>
+                    
+                    <p>
+                        <strong>Utilisation :</strong> authentification et sauvegarde. Aucune vente à des tiers.
+                    </p>
+                    
+                    <p>
+                        <strong>Cookies :</strong> PHPSESSID (session) + localStorage (thème). Pas de tracking.
+                    </p>
+                    
+                    <p>
+                        <strong>Droits :</strong> accès, rectification, effacement, portabilité via votre dashboard.
+                    </p>
+                    
+                    <p>
+                        <strong>Sécurité :</strong> mots de passe hashés (bcrypt), HTTPS, validation des entrées, données isolées par utilisateur.
+                    </p>
+                </section>
+
+                <section class="legal-section compact">
+                    <h2>Responsabilité</h2>
+                    <p>
+                        Projet éducatif. Disponibilité non garantie. Sauvegardes régulières effectuées.
+                    </p>
+                </section>
+            </div>
+        </div>
     
-    {# Système de tabs #}
-    <div class="tabs-navigation">
-        <button class="tab-button {{ activeTab == 'mentions' ? 'active' : '' }}" data-tab="mentions">Mentions Légales</button>
-        <button class="tab-button {{ activeTab == 'faq' ? 'active' : '' }}" data-tab="faq">FAQ</button>
-    </div>
-
-    {# Tab 1 : Mentions Légales #}
-    <div class="tab-content {{ activeTab == 'mentions' ? 'active' : '' }}" id="mentions">
-        <section class="legal-section">
-            <h2>Editeur du site</h2>
-            <p>
-                <strong>Nom du site :</strong> My Ankode<br>
-                <strong>Propriétaire :</strong> Anthony Catan-Cavery<br>
-                <strong>Adresse :</strong> [Adresse à compléter]<br>
-                <strong>Email :</strong> a.catancavery@gmail.com
-            </p>
-        </section>
-
-        <section class="legal-section">
-            <h2>Hébergement</h2>
-            <p>
-                <strong>Hébergeur :</strong> IONOS (prévu)<br>
-                <strong>Adresse :</strong> [Adresse IONOS]<br>
-                <strong>Site web :</strong> <a href="https://www.ionos.fr" target="_blank" rel="noopener">www.ionos.fr</a>
-            </p>
-        </section>
-
-        <section class="legal-section">
-            <h2>Propriété intellectuelle</h2>
-            <p>
-                L'ensemble du contenu de ce site (structure, textes, logos, images) est la propriété exclusive de Anthony Catan-Cavery, sauf mention contraire.
-                Toute reproduction, distribution, modification, adaptation, retransmission ou publication de ces différents éléments est strictement interdite sans l'accord écrit de l'éditeur.
-            </p>
-            <p>
-                Ce site a été développé dans le cadre d'un projet de certification professionnelle DWWM (Développeur Web et Web Mobile).
-            </p>
-        </section>
-
-        <section class="legal-section">
-            <h2>Protection des données personnelles (RGPD)</h2>
-            
-            <h3>Données collectées</h3>
-            <p>
-                My Ankode collecte uniquement les données nécessaires à son fonctionnement :
-            </p>
-            <ul>
-                <li><strong>Données de compte :</strong> email, nom d'utilisateur, mot de passe (hashé)</li>
-                <li><strong>Données de projet :</strong> projets, tâches, snippets de code, compétences suivies</li>
-                <li><strong>Articles de veille :</strong> flux RSS agrégés pour votre veille technologique</li>
-            </ul>
-
-            <h3>Utilisation des données</h3>
-            <p>
-                Vos données sont utilisées exclusivement pour :
-            </p>
-            <ul>
-                <li>Permettre votre authentification et l'accès à votre compte</li>
-                <li>Sauvegarder vos projets, tâches et snippets</li>
-                <li>Personnaliser votre expérience utilisateur</li>
-            </ul>
-            <p>
-                <strong>Aucune donnée n'est vendue ou partagée avec des tiers.</strong>
-            </p>
-
-            <h3>Cookies et stockage local</h3>
-            <p>
-                My Ankode utilise uniquement des cookies et stockages essentiels au fonctionnement :
-            </p>
-            <ul>
-                <li><strong>PHPSESSID :</strong> Cookie de session PHP nécessaire à l'authentification (supprimé à la déconnexion)</li>
-                <li><strong>theme (localStorage) :</strong> Préférence du thème dark/light (stocké localement dans votre navigateur)</li>
-            </ul>
-            <p>
-                <strong>Aucun cookie de tracking ou publicitaire n'est utilisé.</strong>
-            </p>
-
-            <h3>Vos droits</h3>
-            <p>
-                Conformément au RGPD, vous disposez des droits suivants :
-            </p>
-            <ul>
-                <li><strong>Droit d'accès :</strong> consulter vos données via votre tableau de bord</li>
-                <li><strong>Droit de rectification :</strong> modifier vos informations de profil</li>
-                <li><strong>Droit à l'effacement :</strong> supprimer votre compte et toutes vos données</li>
-                <li><strong>Droit à la portabilité :</strong> exporter vos données (fonctionnalité prévue)</li>
-            </ul>
-            <p>
-                Pour exercer ces droits, contactez-nous à : <strong>[email à compléter]</strong>
-            </p>
-
-            <h3>Sécurité</h3>
-            <p>
-                Nous mettons en œuvre toutes les mesures techniques et organisationnelles pour protéger vos données :
-            </p>
-            <ul>
-                <li>Mots de passe hashés avec algorithme sécurisé (bcrypt)</li>
-                <li>Connexions HTTPS cryptées (en production)</li>
-                <li>Validation et sanitisation de toutes les entrées utilisateur</li>
-                <li>Séparation stricte des données entre utilisateurs</li>
-            </ul>
-        </section>
-
-        <section class="legal-section">
-            <h2>Responsabilité</h2>
-            <p>
-                L'éditeur s'efforce d'assurer au mieux la disponibilité et la fiabilité du site My Ankode.
-                Toutefois, ce site étant un projet éducatif, l'éditeur ne peut garantir une disponibilité continue du service.
-            </p>
-            <p>
-                L'éditeur décline toute responsabilité en cas de perte de données, bien que des sauvegardes régulières soient effectuées.
-            </p>
-        </section>
-    </div>
+</div>
 
     {# Tab 2 : FAQ #}
     <div class="tab-content {{ activeTab == 'faq' ? 'active' : '' }}" id="faq">
