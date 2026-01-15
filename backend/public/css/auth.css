@@ -1,161 +1,58 @@
 /* ============================================
    MY-ANKODE - Page Authentification
-   Palette : Cyan (#00C2D1) + Orange (#FDAB5E)
+   Utilise les variables de variables.css
+   Style "Code" pour développeurs
    ============================================ */
 
-/* ===== VARIABLES ===== */
-:root {
-    --primary-cyan: #00C2D1;
-    --light-cyan: #7DD3DB;
-    --dark-cyan: #007A85;
-    --darker-cyan: #003B4F;
-    --accent-orange: #FF6B35;
-    --bg-dark: #0A1828;
-    --text-light: #E8F4F8;
-    --error-red: #FF4757;
-    --success-green: #2ED573;
-    
-    /* Espacements */
-    --spacing-xs: 0.5rem;
-    --spacing-sm: 1rem;
-    --spacing-md: 1.5rem;
-    --spacing-lg: 2rem;
-    --spacing-xl: 3rem;
-    
-    /* Bordures */
-    --radius-sm: 0.375rem;
-    --radius-md: 0.75rem;
-    --radius-lg: 1rem;
-}
-
-/* ===== RESET ===== */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Inter', 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, var(--bg-dark) 0%, var(--darker-cyan) 100%);
-    color: var(--text-light);
-    min-height: 100vh;
-    overflow-x: hidden;
-}
-
-/* ============================================
-   LAYOUT GRID PRINCIPAL (Desktop)
-   ============================================ */
-.auth-page {
+/* ===== CONTAINER PRINCIPAL ===== */
+.auth-container {
     display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    grid-template-rows: auto auto 1fr auto;
-    gap: var(--spacing-lg);
-    padding: var(--spacing-lg);
-    min-height: 100vh;
-    
-    grid-template-areas:
-        "header header header header header header header header header header header header"
-        "messages messages messages messages messages messages messages messages messages messages messages messages"
-        "dev dev dev register register register login login login login . ."
-        "dev dev dev register register register login login login login mascot mascot";
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-xl);
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing-xl);
+    min-height: calc(100vh - 180px);
 }
 
-.auth-header {
-    grid-area: header;
-    text-align: center;
-    padding: var(--spacing-lg) 0;
-}
-
-.message {
-    grid-area: messages;
-}
-
-.auth-block--register {
-    grid-area: register;
-}
-
-.illustration-developer {
-    grid-area: dev;
-}
-
-.auth-block--login {
-    grid-area: login;
-}
-
-.mascot {
-    grid-area: mascot;
-    align-self: end;
-    justify-self: end;
-}
-
-/* ============================================
-   HEADER (Logo + Titre)
-   ============================================ */
-.logo-temp {
-    display: flex;
-    justify-content: center;
-    gap: var(--spacing-xs);
-    margin-bottom: var(--spacing-md);
-}
-
-.logo-leaf {
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, var(--primary-cyan), var(--light-cyan));
-    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-    animation: float 3s ease-in-out infinite;
-}
-
-.logo-leaf:nth-child(2) {
-    animation-delay: 0.5s;
-}
-
-.logo-leaf:nth-child(3) {
-    animation-delay: 1s;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-}
-
-.auth-title {
-    font-size: clamp(1.5rem, 4vw, 2.5rem);
-    font-weight: 700;
-    color: var(--primary-cyan);
-    letter-spacing: 0.05em;
-}
-
-/* ============================================
-   MESSAGES FLASH
-   ============================================ */
-.message {
+/* ===== MESSAGES FLASH ===== */
+.flash-message {
+    grid-column: 1 / -1;
     padding: var(--spacing-md);
     border-radius: var(--radius-md);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: var(--spacing-md);
     animation: slideDown 0.3s ease-out;
 }
 
-.message--success {
-    background: rgba(46, 213, 115, 0.2);
-    border-left: 4px solid var(--success-green);
+.flash-message--success {
+    background-color: rgba(81, 207, 102, 0.15);
+    border-left: 4px solid var(--color-success);
+    color: var(--color-success);
 }
 
-.message--error {
-    background: rgba(255, 71, 87, 0.2);
-    border-left: 4px solid var(--error-red);
+.flash-message--error {
+    background-color: rgba(255, 107, 107, 0.15);
+    border-left: 4px solid var(--color-error);
+    color: var(--color-error);
 }
 
-.message__close {
+.flash-message__close {
     background: none;
     border: none;
     color: inherit;
-    font-size: 1.5rem;
+    font-size: var(--font-size-2xl);
     cursor: pointer;
     padding: 0 var(--spacing-sm);
+    line-height: 1;
+    opacity: 0.7;
+    transition: opacity var(--transition-fast);
+}
+
+.flash-message__close:hover {
+    opacity: 1;
 }
 
 @keyframes slideDown {
@@ -169,207 +66,349 @@ body {
     }
 }
 
-/* ============================================
-   BLOCS AUTHENTIFICATION
-   ============================================ */
+/* ===== BLOCS AUTHENTIFICATION ===== */
 .auth-block {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(0, 194, 209, 0.2);
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
     padding: var(--spacing-xl);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    flex-direction: column;
 }
 
-.block-title {
-    font-size: clamp(1.2rem, 3vw, 1.8rem);
-    color: var(--primary-cyan);
+.auth-block__title {
+    color: var(--color-primary);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-semibold);
     margin-bottom: var(--spacing-lg);
-    font-weight: 600;
-    font-family: 'Fira Code', monospace;
+    font-family: var(--font-code);
 }
 
-/* ============================================
-   FORMULAIRES
-   ============================================ */
+.auth-block__closing {
+    color: var(--color-primary);
+    font-size: var(--font-size-xl);
+    font-family: var(--font-code);
+    margin-top: var(--spacing-md);
+    opacity: 0.7;
+}
+
+/* ===== FORMULAIRES ===== */
 .auth-form {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);
+    flex: 1;
 }
 
-.form-field {
+.form-group {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-xs);
 }
 
-.form-inline {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: var(--spacing-sm);
-    align-items: center;
+.form-label {
+    color: var(--text-primary);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-sm);
+    font-family: var(--font-code);
 }
 
-.field-label {
-    color: var(--light-cyan);
-    font-weight: 500;
-    font-size: 0.95rem;
-    white-space: nowrap;
-    font-family: 'Fira Code', monospace;
-}
-
-.field-input {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(0, 194, 209, 0.3);
+.form-input {
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
     padding: var(--spacing-sm) var(--spacing-md);
-    color: var(--text-light);
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    width: 100%;
+    color: var(--text-primary);
+    font-size: var(--font-size-base);
+    font-family: var(--font-code);
+    transition: all var(--transition-fast);
 }
 
-.field-input:focus {
+.form-input:focus {
     outline: none;
-    border-color: var(--primary-cyan);
-    background: rgba(255, 255, 255, 0.12);
+    border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(0, 194, 209, 0.1);
 }
 
-.field-input::placeholder {
-    color: rgba(232, 244, 248, 0.4);
+.form-input::placeholder {
+    color: var(--text-muted);
+    opacity: 0.7;
 }
 
-.field-error {
-    color: var(--error-red);
-    font-size: 0.85rem;
-    min-height: 1.2em;
+/* Erreurs de validation */
+.form-error {
+    color: var(--color-error);
+    font-size: var(--font-size-sm);
+    min-height: 1.2rem;
 }
 
-/* ===== Checkboxes ===== */
-.form-field--checkbox {
+.form-error ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.form-error li {
+    margin-top: var(--spacing-xs);
+}
+
+/* ===== NUMÉROS DE LIGNE (pour les deux blocs) ===== */
+
+/* Applique padding et numéros à TOUS les form-group sauf checkbox et spacer */
+.auth-block .form-group:not(.form-group--checkbox):not(.form-group--spacer) {
+    position: relative;
+    padding-left: 3rem;
+}
+
+.auth-block .form-group:not(.form-group--checkbox):not(.form-group--spacer)::before {
+    content: counter(line-number) " │";
+    counter-increment: line-number;
+    position: absolute;
+    left: 0;
+    top: 1.6rem;
+    color: var(--text-muted);
+    font-family: var(--font-code);
+    font-size: var(--font-size-sm);
+    opacity: 0.5;
+    user-select: none;
+}
+
+/* Initialise le compteur pour inscription */
+.auth-block--register .auth-form {
+    counter-reset: line-number;
+}
+
+/* Réinitialise le compteur pour connexion (recommence à 1) */
+.auth-block--login .auth-form {
+    counter-reset: line-number;
+}
+
+/* ===== SPACER INVISIBLE (côté connexion uniquement) ===== */
+.form-group--spacer {
+    visibility: hidden;
+    height: 0;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* Le spacer ne doit PAS avoir de numéro ni incrémenter */
+.form-group--spacer::before {
+    display: none;
+}
+
+/* ===== STYLE "CODE" - INSCRIPTION ===== */
+.auth-block--register .form-label::before {
+    content: "const ";
+    color: var(--color-accent);
+    font-weight: var(--font-weight-bold);
+}
+
+.auth-block--register .form-label::after {
+    content: ' = "';
+    color: var(--text-muted);
+}
+
+.auth-block--register .form-input {
+    border-left: 3px solid var(--color-primary);
+}
+
+/* ===== STYLE "CODE" - CONNEXION ===== */
+.auth-block--login .form-label::after {
+    content: " =";
+    color: var(--text-muted);
+    margin-left: 0.2rem;
+}
+
+.auth-block--login .form-input {
+    border-left: 3px solid var(--color-accent);
+}
+
+/* Curseur clignotant pour inputs vides */
+.auth-block--login .form-input:not(:focus):placeholder-shown {
+    background-image: linear-gradient(
+        to right, 
+        transparent calc(100% - 2px), 
+        var(--color-primary) calc(100% - 2px)
+    );
+    background-repeat: no-repeat;
+    background-position: calc(var(--spacing-md) + 1ch) center;
+    background-size: 2px 1.2em;
+    animation: blink-cursor 1s step-end infinite;
+}
+
+@keyframes blink-cursor {
+    0%, 49% { 
+        background-image: linear-gradient(
+            to right, 
+            transparent calc(100% - 2px), 
+            var(--color-primary) calc(100% - 2px)
+        );
+    }
+    50%, 100% { 
+        background-image: none;
+    }
+}
+
+/* ===== CHECKBOX (CGU et Remember me) ===== */
+.form-group--checkbox {
     flex-direction: row;
     align-items: center;
     gap: var(--spacing-sm);
 }
 
-.field-checkbox {
-    width: 20px;
-    height: 20px;
-    accent-color: var(--primary-cyan);
+.form-checkbox {
+    width: 18px;
+    height: 18px;
     cursor: pointer;
+    accent-color: var(--color-primary);
 }
 
-.field-label-checkbox {
-    color: var(--text-light);
-    font-size: 0.9rem;
+.form-label-checkbox {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
     cursor: pointer;
+    font-family: var(--font-main);
+    font-weight: var(--font-weight-normal);
 }
 
-/* ============================================
-   BOUTONS
-   ============================================ */
+/* Pas de style "code" pour les checkbox labels */
+.form-label-checkbox::before,
+.form-label-checkbox::after {
+    content: none;
+}
+
+/* ===== ALIGNEMENT VERTICAL (boutons et checkboxes) ===== */
+
+/* Groupe checkbox + bouton poussés vers le bas */
+.auth-block--register .form-group--checkbox,
+.auth-block--login .form-group--checkbox {
+    margin-top: auto;
+}
+
+/* Bouton collé à la checkbox */
+.auth-block .btn {
+    margin-top: var(--spacing-md);
+}
+
+/* Ferme l'accolade alignée */
+.auth-block__closing {
+    margin-top: auto;
+}
+
+/* ===== BOUTONS ===== */
 .btn {
-    padding: var(--spacing-md) var(--spacing-xl);
+    padding: var(--spacing-sm) var(--spacing-lg);
     border: none;
     border-radius: var(--radius-md);
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
     cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: lowercase;
-    font-family: 'Fira Code', monospace;
+    transition: all var(--transition-base);
+    text-transform: capitalize;
 }
 
 .btn--primary {
-    background: linear-gradient(135deg, var(--primary-cyan), var(--light-cyan));
-    color: var(--bg-dark);
-    box-shadow: 0 4px 15px rgba(0, 194, 209, 0.3);
+    background: linear-gradient(135deg, var(--color-primary), var(--cyan-600));
+    color: white;
+    box-shadow: var(--shadow-cyan);
 }
 
 .btn--primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 194, 209, 0.4);
+    box-shadow: var(--shadow-cyan-hover);
 }
 
 .btn--primary:active {
     transform: translateY(0);
 }
 
-/* ============================================
-   ILLUSTRATIONS
-   ============================================ */
-.illustration-developer,
-.mascot {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.illustration-img,
-.mascot-img {
-    max-width: 100%;
-    height: auto;
-    filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
-}
-
-.mascot-img {
-    max-width: 150px;
-}
-
-/* ============================================
-   RESPONSIVE - TABLETTE (< 1024px)
-   ============================================ */
+/* ===== RESPONSIVE - TABLETTE ===== */
 @media (max-width: 1024px) {
-    .auth-page {
-        grid-template-columns: repeat(6, 1fr);
-        grid-template-areas:
-            "header header header header header header"
-            "messages messages messages messages messages messages"
-            "register register register register register register"
-            "dev dev dev login login login"
-            "dev dev dev login login login"
-            "mascot mascot mascot mascot mascot mascot";
-        gap: var(--spacing-md);
+    .auth-container {
+        gap: var(--spacing-lg);
+        padding: var(--spacing-lg);
     }
-}
 
-/* ============================================
-   RESPONSIVE - MOBILE (< 640px)
-   ============================================ */
-@media (max-width: 640px) {
-    .auth-page {
-        grid-template-columns: 1fr;
-        grid-template-areas:
-            "header"
-            "messages"
-            "register"
-            "login"
-            "dev"
-            "mascot";
-        padding: var(--spacing-sm);
-        gap: var(--spacing-sm);
+    .auth-block {
+        padding: var(--spacing-lg);
+    }
+
+    .auth-block__title {
+        font-size: var(--font-size-xl);
     }
     
+    .auth-block .form-group:not(.form-group--checkbox):not(.form-group--spacer) {
+        padding-left: 2.5rem;
+    }
+    
+    .auth-block .form-group:not(.form-group--checkbox):not(.form-group--spacer)::before {
+        font-size: 0.7rem;
+    }
+}
+
+/* ===== RESPONSIVE - MOBILE ===== */
+@media (max-width: 768px) {
+    .auth-container {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+        padding: var(--spacing-md);
+        min-height: calc(100vh - 140px);
+    }
+
     .auth-block {
         padding: var(--spacing-md);
     }
-    
-    .form-inline {
-        grid-template-columns: 1fr;
+
+    .auth-block__title {
+        font-size: var(--font-size-lg);
+        margin-bottom: var(--spacing-md);
+    }
+
+    .form-group {
         gap: var(--spacing-xs);
     }
-    
-    .field-label {
-        font-size: 0.85rem;
+
+    .btn {
+        width: 100%;
     }
     
-    .block-title {
-        font-size: 1.2rem;
+    /* Simplifie les numéros de ligne sur mobile */
+    .auth-block .form-group:not(.form-group--checkbox):not(.form-group--spacer) {
+        padding-left: 2rem;
     }
     
-    .mascot-img {
-        max-width: 100px;
+    .auth-block .form-group:not(.form-group--checkbox):not(.form-group--spacer)::before {
+        font-size: 0.65rem;
+        top: 1.4rem;
     }
+}
+
+/* ===== MODE LIGHT - Ajustements spécifiques ===== */
+body:not(.dark-mode) .flash-message--success {
+    background-color: rgba(81, 207, 102, 0.1);
+    color: var(--green-700);
+}
+
+body:not(.dark-mode) .flash-message--error {
+    background-color: rgba(255, 107, 107, 0.1);
+    color: var(--red-700);
+}
+
+body:not(.dark-mode) .form-input {
+    border-color: var(--neutral-300);
+}
+
+body:not(.dark-mode) .form-input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 194, 209, 0.15);
+}
+
+/* Fix placeholder en light mode - Meilleur contraste */
+body:not(.dark-mode) .form-input::placeholder {
+    color: var(--neutral-500);
+    opacity: 1;
 }
