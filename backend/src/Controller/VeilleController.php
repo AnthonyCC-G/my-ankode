@@ -20,7 +20,6 @@ class VeilleController extends AbstractController
     #[Route('/veille', name: 'app_veille', methods: ['GET'])]
     public function index(): Response
     {
-        // Template simple que JavaScript va remplir dynamiquement
         return $this->render('veille/list.html.twig');
     }
 
@@ -33,7 +32,7 @@ class VeilleController extends AbstractController
     {
         // Pagination
         $page = max(1, (int) $request->query->get('page', 1));
-        $limit = 20;  // 20 articles par page
+        $limit = 20;
         $offset = ($page - 1) * $limit;
 
         // Recupere l'utilisateur connecte
@@ -48,7 +47,7 @@ class VeilleController extends AbstractController
 
         $articles = $qb->getQuery()->execute()->toArray();
 
-        // Compte total pour calculer le nombre de pages
+        // Compte total
         $totalArticles = $dm->createQueryBuilder(Article::class)
             ->field('userId')->equals((string) $user->getId())
             ->count()
@@ -57,21 +56,9 @@ class VeilleController extends AbstractController
 
         $totalPages = (int) ceil($totalArticles / $limit);
 
-        // Transformation en tableau JSON
-        $data = [];
-        foreach ($articles as $article) {
-            $data[] = [
-                'id' => $article->getId(),
-                'title' => $article->getTitle(),
-                'url' => $article->getUrl(),
-                'description' => $article->getDescription(),
-                'source' => $article->getSource(),
-                'publishedAt' => $article->getPublishedAt()?->format('d/m/Y H:i'),
-                'isRead' => $article->isRead(),
-            ];
-        }
+        // Transformation en JSON
+        $data = $this->transformArticlesToJson($articles);
 
-        // Reponse JSON avec metadonnees de pagination
         return $this->json([
             'articles' => $data,
             'pagination' => [
@@ -82,4 +69,184 @@ class VeilleController extends AbstractController
             ]
         ]);
     }
+
+    /**
+     * API REST - Recherche d'articles par mot-cle
+     * GET /api/articles/search?q=react
+     */
+    #[Route('/api/articles/search', name: 'api_articles_search', methods: ['GET'])]
+    public function searchArticles(Request $request, DocumentManager $dm): JsonResponse
+    {
+        $keyword = trim($request->query->get('q', ''));
+        
+        if (empty($keyword)) {
+            return $this->json([
+                'articles' => [],
+                'message' => 'Veuillez saisir un mot-cle'
+            ]);
+        }
+
+        $user = $this->getUser();
+
+        // Recherche MongoDB avec regex (insensible à la casse)
+        $qb = $dm->createQueryBuilder(Article::class)
+            ->field('userId')->equals((string) $user->getId())
+            ->addOr(
+                $dm->createQueryBuilder(Article::class)->expr()->field('title')->equals(new \MongoDB\BSON\Regex($keyword, 'i'))
+            )
+            ->addOr(
+                $dm->createQueryBuilder(Article::class)->expr()->field('description')->equals(new \MongoDB\BSON\Regex($keyword, 'i'))
+            )
+            ->addOr(
+                $dm->createQueryBuilder(Article::class)->expr()->field('source')->equals(new \MongoDB\BSON\Regex($keyword, 'i'))
+            )
+            ->sort('publishedAt', 'DESC')
+            ->limit(50); // Max 50 resultats
+
+        $articles = $qb->getQuery()->execute()->toArray();
+        $data = $this->transformArticlesToJson($articles);
+
+        return $this->json([
+            'articles' => $data,
+            'keyword' => $keyword,
+            'count' => count($data)
+        ]);
+    }
+
+    /**
+     * API REST - Marquer un article comme lu
+     * PATCH /api/articles/{id}/mark-read
+     */
+    #[Route('/api/articles/{id}/mark-read', name: 'api_articles_mark_read', methods: ['PATCH'])]
+    public function markAsRead(string $id, DocumentManager $dm): JsonResponse
+    {
+        $user = $this->getUser();
+        
+        // Recupere l'article
+        $article = $dm->getRepository(Article::class)->find($id);
+
+        if (!$article) {
+            return $this->json(['error' => 'Article non trouve'], 404);
+        }
+
+        // Verifie ownership
+        if ($article->getUserId() !== (string) $user->getId()) {
+            return $this->json(['error' => 'Acces refuse'], 403);
+        }
+
+        // Toggle isRead
+        $article->setIsRead(!$article->isRead());
+        $dm->flush();
+
+        return $this->json([
+            'success' => true,
+            'isRead' => $article->isRead()
+        ]);
+    }
+
+    /**
+     * API REST - Ajouter un article aux favoris
+     * POST /api/articles/{id}/favorite
+     */
+    #[Route('/api/articles/{id}/favorite', name: 'api_articles_add_favorite', methods: ['POST'])]
+    public function addToFavorites(string $id, DocumentManager $dm): JsonResponse
+    {
+        $user = $this->getUser();
+        
+        $article = $dm->getRepository(Article::class)->find($id);
+
+        if (!$article) {
+            return $this->json(['error' => 'Article non trouve'], 404);
+        }
+
+        // Verifie ownership
+        if ($article->getUserId() !== (string) $user->getId()) {
+            return $this->json(['error' => 'Acces refuse'], 403);
+        }
+
+        $article->setIsFavorite(true);
+        $dm->flush();
+
+        return $this->json([
+            'success' => true,
+            'isFavorite' => true
+        ]);
+    }
+
+    /**
+     * API REST - Retirer un article des favoris
+     * DELETE /api/articles/{id}/favorite
+     */
+    #[Route('/api/articles/{id}/favorite', name: 'api_articles_remove_favorite', methods: ['DELETE'])]
+    public function removeFromFavorites(string $id, DocumentManager $dm): JsonResponse
+    {
+        $user = $this->getUser();
+        
+        $article = $dm->getRepository(Article::class)->find($id);
+
+        if (!$article) {
+            return $this->json(['error' => 'Article non trouve'], 404);
+        }
+
+        // Verifie ownership
+        if ($article->getUserId() !== (string) $user->getId()) {
+            return $this->json(['error' => 'Acces refuse'], 403);
+        }
+
+        $article->setIsFavorite(false);
+        $dm->flush();
+
+        return $this->json([
+            'success' => true,
+            'isFavorite' => false
+        ]);
+    }
+
+    /**
+     * API REST - Liste des articles favoris
+     * GET /api/articles/favorites
+     */
+    #[Route('/api/articles/favorites', name: 'api_articles_favorites', methods: ['GET'])]
+    public function getFavorites(DocumentManager $dm): JsonResponse
+    {
+        $user = $this->getUser();
+
+        // Recupere les favoris
+        $articles = $dm->createQueryBuilder(Article::class)
+            ->field('userId')->equals((string) $user->getId())
+            ->field('isFavorite')->equals(true)
+            ->sort('publishedAt', 'DESC')
+            ->getQuery()
+            ->execute()
+            ->toArray();
+
+        $data = $this->transformArticlesToJson($articles);
+
+        return $this->json([
+            'favorites' => $data,
+            'count' => count($data)
+        ]);
+    }
+
+    /**
+     * Transforme les articles en tableau JSON
+     */
+    private function transformArticlesToJson(array $articles): array
+    {
+        $data = [];
+        foreach ($articles as $article) {
+            $data[] = [
+                'id' => $article->getId(),
+                'title' => $article->getTitle(),
+                'url' => $article->getUrl(),
+                'description' => $article->getDescription(),
+                'source' => $article->getSource(),
+                'publishedAt' => $article->getPublishedAt()?->format('d/m/Y H:i'),
+                'isRead' => $article->isRead(),
+                'isFavorite' => $article->isFavorite(),
+            ];
+        }
+        return $data;
+    }
 }
+

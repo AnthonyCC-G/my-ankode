@@ -49,6 +49,7 @@ class ArticleFixtures extends Fixture
             $article->setPublishedAt($data['publishedAt']);
             $article->setUserId((string) $currentUser->getId());
             $article->setIsRead(false);
+            $article->setIsFavorite(false);
 
             $manager->persist($article);
             $count++;

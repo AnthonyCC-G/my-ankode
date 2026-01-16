@@ -2,30 +2,77 @@
 
 {% block title %}Veille Technologique - MY-ANKODE{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/veille.css') }}">
+{% endblock %}
+
 {% block body %}
-<div class="container mt-5">
-    <h1 class="mb-4">Veille Technologique</h1>
-    
-    {% if articles is empty %}
-        <div class="alert alert-info">
-            <p class="mb-0">Aucun article disponible pour le moment.</p>
-            <small>Lancez la commande <code>php bin/console app:fetch-rss</code> pour récupérer les articles.</small>
-        </div>
-    {% else %}
-        <p class="text-muted">{{ articles|length }} article(s) récent(s)</p>
+<div class="veille-container">
+    <!-- ZONE 4 : CONFIGURER VEILLE -->
+    <div class="config-veille">
+        <h4><i class="bi bi-search"></i> Configurer Veille</h4>
         
-        <div class="list-group">
-            {% for article in articles %}
-                <a href="{{ article.url }}" target="_blank" class="list-group-item list-group-item-action">
-                    <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{{ article.title }}</h5>
-                        <small class="text-muted">{{ article.publishedAt|date('d/m/Y H:i') }}</small>
-                    </div>
-                    <p class="mb-1">{{ article.description|striptags|slice(0, 150) }}...</p>
-                    <small class="text-muted">Source : {{ article.source }}</small>
-                </a>
-            {% endfor %}
+        <div class="row g-2">
+            <div class="col-md-8">
+                <input 
+                    type="text" 
+                    id="search-input" 
+                    class="form-control" 
+                    placeholder="Rechercher par mot-cle (ex: React, Symfony, Docker...)"
+                >
+            </div>
+            <div class="col-md-4">
+                <button id="search-btn" class="btn btn-primary me-2">
+                    <i class="bi bi-search"></i> Rechercher
+                </button>
+                <button id="reset-btn" class="btn btn-secondary">
+                    <i class="bi bi-arrow-counterclockwise"></i> Reset
+                </button>
+            </div>
         </div>
-    {% endif %}
+        
+        <!-- Messages flash / erreurs -->
+        <div id="search-feedback"></div>
+        
+        <!-- Filtres -->
+        <div class="mt-3">
+            <button id="show-all-btn" class="btn btn-sm btn-outline-primary active me-2">
+                Tous les articles
+            </button>
+            <button id="show-favorites-btn" class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-heart-fill"></i> Mes favoris
+            </button>
+        </div>
+    </div>
+    
+    <!-- ZONE 5 : FAVORIS -->
+    <div class="favoris-sidebar">
+        <h5><i class="bi bi-heart-fill"></i> Favoris</h5>
+        <div id="favorites-sidebar" class="favoris-list">
+            <p class="text-white-50 small">Chargement...</p>
+        </div>
+    </div>
+    
+    <!-- ZONE 6 : RESULTATS -->
+    <div class="resultats-zone">
+        <h3 id="articles-title">Tous les articles</h3>
+        <div id="articles-container">
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Chargement...</span>
+                </div>
+                <p class="mt-3">Chargement des articles...</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- PAGINATION -->
+    <div id="pagination-container" class="pagination-zone"></div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/veille.js') }}"></script>
 {% endblock %}

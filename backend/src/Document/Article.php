@@ -37,6 +37,9 @@ class Article
     #[MongoDB\Field(type: 'bool')]
     private bool $isRead = false;
 
+    #[MongoDB\Field(type: 'bool')]
+    private bool $isFavorite = false;  // ← AJOUTÉ ICI
+
     #[MongoDB\Field(type: 'string')]
     private ?string $userId = null;
 
@@ -134,6 +137,18 @@ class Article
         return $this;
     }
 
+    // GETTERS/SETTERS POUR isFavorite (AJOUTÉS ICI)
+    public function isFavorite(): bool
+    {
+        return $this->isFavorite;
+    }
+
+    public function setIsFavorite(bool $isFavorite): self
+    {
+        $this->isFavorite = $isFavorite;
+        return $this;
+    }
+
     public function getUserId(): ?string
     {
         return $this->userId;
@@ -144,5 +159,4 @@ class Article
         $this->userId = $userId;
         return $this;
     }
-
 }
