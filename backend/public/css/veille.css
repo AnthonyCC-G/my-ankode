@@ -1,0 +1,321 @@
+/* Styles pour la page Veille Technologique */
+
+/* IMPORTANT : Layout dashboard fixe SANS scroll de page */
+body.veille-page {
+    overflow: hidden;  /* Pas de scroll sur la page ! */
+    height: 100vh;
+}
+
+/* Grid layout principal - Occupe toute la hauteur disponible */
+.veille-container {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: auto 1fr auto;  /* Config auto, Contenu flexible, Pagination auto */
+    gap: 8px;
+    padding: 20px;
+    padding-top: 120px;  /* Espace pour le logo fixe en haut */
+    padding-bottom: 100px;  /* Espace pour le footer fixe en bas */
+    height: 100vh;  /* Occupe toute la hauteur du viewport */
+    box-sizing: border-box;
+}
+
+/* Zone 1 - CONFIGURER VEILLE (Rangée du haut) */
+.config-veille {
+    grid-column: 1 / 5;  /* Colonnes 1 à 4 */
+    grid-row: 1;
+    background: var(--bs-light);
+    padding: 20px;
+    border-radius: 8px;
+    overflow: visible;  /* Pas de scroll ici */
+}
+
+.config-veille h4 {
+    color: var(--bs-primary);
+    margin-bottom: 1rem;
+}
+
+/* Zone 2 - FAVORIS (Sidebar droite - hauteur flexible) */
+.favoris-sidebar {
+    grid-column: 5 / 7;  /* Colonnes 5 et 6 */
+    grid-row: 1 / 3;  /* S'étend sur rows 1 et 2 */
+    background: var(--bs-danger);
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;  /* Contient le scroll interne */
+}
+
+.favoris-sidebar h5 {
+    color: white;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    flex-shrink: 0;  /* Ne rétrécit pas */
+}
+
+/* Liste favoris avec scroll INTERNE */
+.favoris-list {
+    flex: 1;  /* Prend tout l'espace disponible */
+    overflow-y: auto;  /* Scroll INTERNE uniquement */
+    overflow-x: hidden;
+    padding-right: 5px;
+}
+
+/* Scrollbar personnalisée pour favoris */
+.favoris-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.favoris-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.favoris-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+.favoris-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* Items favoris */
+.favorite-item {
+    padding: 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    margin-bottom: 8px;
+    transition: background 0.2s;
+}
+
+.favorite-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.favorite-item a {
+    color: white !important;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: block;
+    word-wrap: break-word;
+}
+
+.favorite-item a:hover {
+    text-decoration: underline;
+}
+
+/* Zone 3 - RÉSULTATS (Zone centrale flexible) */
+.resultats-zone {
+    grid-column: 1 / 5;  /* Colonnes 1 à 4 */
+    grid-row: 2;  /* Rangée centrale */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;  /* Contient le scroll interne */
+    min-height: 0;  /* Important pour flex + overflow */
+}
+
+.resultats-zone h3 {
+    color: var(--bs-primary);
+    margin-bottom: 1rem;
+    flex-shrink: 0;  /* Ne rétrécit pas */
+}
+
+/* Container des articles avec scroll INTERNE */
+#articles-container {
+    flex: 1;  /* Prend tout l'espace disponible */
+    overflow-y: auto;  /* Scroll INTERNE uniquement */
+    overflow-x: hidden;
+    padding-right: 10px;
+}
+
+/* Scrollbar personnalisée pour articles */
+#articles-container::-webkit-scrollbar {
+    width: 10px;
+}
+
+#articles-container::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 5px;
+}
+
+#articles-container::-webkit-scrollbar-thumb {
+    background: var(--bs-primary);
+    border-radius: 5px;
+}
+
+#articles-container::-webkit-scrollbar-thumb:hover {
+    background: var(--bs-primary-dark);
+}
+
+/* Grid des articles */
+#articles-container .row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+/* Cards articles */
+.article-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    height: 100%;
+}
+
+.article-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Article lu - opacite reduite */
+.article-card.read-article {
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+}
+
+.article-card.read-article:hover {
+    opacity: 0.8;
+}
+
+/* Boutons actions articles */
+.article-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.article-actions button {
+    padding: 0.25rem 0.5rem;
+    font-size: 1.2rem;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.article-actions button:hover {
+    transform: scale(1.2);
+}
+
+/* Zone 4 - PAGINATION (Rangée du bas) */
+.pagination-zone {
+    grid-column: 1 / 7;  /* Toutes les colonnes */
+    grid-row: 3;  /* Dernière rangée */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding-top: 1rem;
+}
+
+/* Messages feedback recherche */
+#search-feedback {
+    min-height: 30px;
+}
+
+#search-feedback .alert {
+    margin-bottom: 0;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+/* Boutons filtres */
+.btn-sm.active {
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Animation loader */
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+/* Responsive - Tablet */
+@media (max-width: 1200px) {
+    #articles-container .row {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+}
+
+/* Responsive - Mobile */
+@media (max-width: 992px) {
+    body.veille-page {
+        overflow-y: auto;  /* Sur mobile, on autorise le scroll de page */
+        height: auto;
+        min-height: 100vh;
+    }
+    
+    .veille-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto 1fr auto;
+        padding: 10px;
+        padding-top: 90px;
+        padding-bottom: 90px;
+        height: auto;
+        min-height: 100vh;
+    }
+    
+    .config-veille {
+        grid-column: 1;
+        grid-row: 1;
+    }
+    
+    .favoris-sidebar {
+        grid-column: 1;
+        grid-row: 2;
+        max-height: 300px;
+    }
+    
+    .favoris-list {
+        max-height: 200px;
+    }
+    
+    .resultats-zone {
+        grid-column: 1;
+        grid-row: 3;
+        min-height: 400px;
+    }
+    
+    #articles-container {
+        max-height: none;
+    }
+    
+    .pagination-zone {
+        grid-column: 1;
+        grid-row: 4;
+    }
+    
+    #articles-container .row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Responsive - Petit mobile */
+@media (max-width: 576px) {
+    .veille-container {
+        padding: 5px;
+        padding-top: 80px;
+        padding-bottom: 80px;
+        gap: 5px;
+    }
+    
+    .config-veille,
+    .favoris-sidebar {
+        padding: 15px;
+    }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+    .config-veille {
+        background: rgba(255, 255, 255, 0.05);
+        color: white;
+    }
+    
+    .config-veille h4 {
+        color: var(--bs-info);
+    }
+}
