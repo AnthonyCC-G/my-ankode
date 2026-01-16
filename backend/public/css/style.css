@@ -57,8 +57,8 @@ body:not(.dark-mode) {
 }
 
 .logo img {
-    width: 8vw;
-    height: auto;
+    width: auto;
+    height: 80px;
     filter: drop-shadow(0 2px 8px rgba(0, 210, 255, 0.3));
 }
 
@@ -425,54 +425,187 @@ body:not(.dark-mode) .lightbulb:hover {
 }
 
 /* ==================== BOTTOM NAVIGATION BAR (MOBILE) ==================== */
+/* ===== Header Mobile Fixe ===== */
+.mobile-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    
+    display: none; /* Caché par défaut, visible sur mobile */
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--spacing-md);
+    
+    background: rgba(10, 22, 40, 0.85);
+    backdrop-filter: blur(15px);
+    border-bottom: 2px solid var(--border-color);
+    z-index: var(--z-header);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+body:not(.dark-mode) .mobile-header {
+    background: rgba(245, 249, 252, 0.85);
+}
+
+.mobile-header__logo img {
+    width: 50px;
+    height: auto;
+}
+
+/* Container pour les actions (Legal + Theme) */
+.mobile-header__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+/* Bouton Legal/Info */
+.mobile-header__legal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    text-decoration: none;
+}
+
+.mobile-header__legal svg {
+    width: 24px;
+    height: 24px;
+    color: var(--cyan-500);
+    stroke-width: 2;
+}
+
+.mobile-header__legal:hover,
+.mobile-header__legal:active {
+    transform: scale(1.1);
+    border-color: var(--cyan-500);
+    background: rgba(0, 194, 209, 0.1);
+}
+
+body:not(.dark-mode) .mobile-header__legal svg {
+    color: #0066cc;
+}
+
+body:not(.dark-mode) .mobile-header__legal:hover {
+    border-color: #0066cc;
+    background: rgba(0, 102, 204, 0.1);
+}
+
+.mobile-header__theme {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: var(--spacing-xs);
+    transition: transform var(--transition-base);
+}
+
+.mobile-header__theme:hover {
+    transform: scale(1.1);
+}
+
+.mobile-header__theme img {
+    width: 35px;
+    height: 35px;
+}
+
+/* ===== Bottom Navigation ===== */
 .bottom-nav {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 70px;
-    background: rgba(10, 22, 40, 0.85); /* Dark semi-transparent */
-    backdrop-filter: blur(15px); /* Effet de flou sur ce qui est derrière */
+    height: 80px;
+    
+    background: rgba(10, 22, 40, 0.9);
+    backdrop-filter: blur(15px);
     border-top: 2px solid var(--border-color);
-    display: none; /* Caché par défaut */
+    
+    display: none; /* Caché par défaut, visible sur mobile */
     justify-content: space-around;
     align-items: center;
+    padding: var(--spacing-xs) 0;
+    
     z-index: var(--z-header);
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
 }
 
-/* Bottom nav pour le light mode */
 body:not(.dark-mode) .bottom-nav {
-    background: rgba(245, 249, 252, 0.85); /* Light semi-transparent */
-    backdrop-filter: blur(15px);
+    background: rgba(245, 249, 252, 0.9);
 }
 
-
-
+/* ===== Items de la bottom-nav ===== */
 .bottom-nav-item {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 60px;
-    height: 60px;
+    gap: var(--spacing-xs);
+    
+    width: 70px;
+    height: 65px;
+    
     background: transparent;
     border: none;
-    cursor: pointer;
-    transition: transform 0.2s ease, background-color 0.2s ease;
-    border-radius: 50%;
+    border-radius: var(--radius-md);
+    
     text-decoration: none;
+    cursor: pointer;
+    
+    transition: all var(--transition-base);
 }
 
 .bottom-nav-item:hover,
 .bottom-nav-item:active {
-    transform: scale(1.1);
-    background-color: var(--surface-secondary);
+    transform: translateY(-4px);
+    background: rgba(0, 194, 209, 0.1);
 }
 
+/* ===== Icônes SVG ===== */
 .bottom-nav-icon {
-    width: 35px;
-    height: 35px;
-    object-fit: contain;
+    width: 28px;
+    height: 28px;
+    color: var(--cyan-500); /* Cyan par défaut */
+    stroke-width: 2;
+}
+
+/* État ACTIVE - Icône orange */
+.bottom-nav-item.active .bottom-nav-icon {
+    color: var(--orange-500); /* Orange pour l'active */
+    transform: scale(1.15);
+}
+
+/* ===== Labels sous les icônes ===== */
+.bottom-nav-label {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.bottom-nav-item.active .bottom-nav-label {
+    color: var(--orange-500);
+    font-weight: var(--font-weight-semibold);
+}
+
+/* Mode Light */
+body:not(.dark-mode) .bottom-nav-icon {
+    color: #0066cc;
+}
+
+body:not(.dark-mode) .bottom-nav-item.active .bottom-nav-icon {
+    color: var(--orange-500);
+}
+
+body:not(.dark-mode) .bottom-nav-label {
+    color: var(--neutral-500);
 }
 
 /* ==================== RESPONSIVE DESIGN ==================== */
@@ -507,13 +640,22 @@ body:not(.dark-mode) .bottom-nav {
         display: flex;
     }
     
+    /* ===== ACTIVATION de la mobile-header et bottom-nav ===== */
+    .mobile-header {
+        display: flex; /* Active le header mobile */
+    }
+    
+    .bottom-nav {
+        display: flex; /* Active la bottom-nav */
+    }
+    
     /* ===== BODY ===== */
     body {
         overflow-y: auto;
         height: auto;
         min-height: 100vh;
-        padding-top: 20px;
-        padding-bottom: 90px; /* Espace pour la bottom nav */
+        padding-top: 70px; /* Espace pour la mobile-header */
+        padding-bottom: 90px; /* Espace pour la bottom-nav */
     }
     
     /* ===== LOGO ===== */
