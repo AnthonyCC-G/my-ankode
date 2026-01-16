@@ -23,5 +23,10 @@ services:
             - '../src/Document/'
             - '../src/Kernel.php'
 
+    # Configuration des fixtures MongoDB
+    # Auto-taggue toutes les classes dans src/DataFixtures/ pour MongoDB
+    App\DataFixtures\ArticleFixtures:
+        tags: ['doctrine.fixture.odm.mongodb']
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
