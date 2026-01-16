@@ -10,22 +10,74 @@
         {% block stylesheets %}
             <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
             <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+            <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
         {% endblock %}
-
-        {# {% block importmap %}{{ importmap('app') }}{% endblock %} #}
     </head>
     <body>
-        {# Logo desktop uniquement #}
+        {# ===== DESKTOP : Logo top-left ===== #}
         <div class="logo desktop-only">
             <a href="{{ app.user ? path('app_dashboard') : path('app_auth') }}">
                 <img src="{{ asset('images/logo/logo-myankode.png') }}" alt="My Ankode Logo">
             </a>
         </div>
 
-        {# Contenu spécifique à chaque page #}
-        {% block body %}{% endblock %}
+        {# ===== DESKTOP : Navbar horizontale top-right (si connecté) ===== #}
+        {% if app.user %}
+        <nav class="navbar-horizontal desktop-only">
+            <a href="{{ path('app_dashboard') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_dashboard' %}active{% endif %}">
+                Dashboard
+            </a>
+            <a href="{{ path('app_veille') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_veille' %}active{% endif %}">
+                Veille
+            </a>
+            <a href="{{ path('app_kanban') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_kanban' %}active{% endif %}">
+                Kanban
+            </a>
+            <a href="{{ path('app_snippets') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_snippets' %}active{% endif %}">
+                Snippets
+            </a>
+            <a href="{{ path('app_competences') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_competences' %}active{% endif %}">
+                Compétences
+            </a>
+            <a href="{{ path('app_logout') }}" class="nav-link nav-link--logout">
+                Déconnexion
+            </a>
+        </nav>
+        {% endif %}
 
-        {# Mascotte desktop avec theme-switcher #}
+        {# ===== MOBILE : Header fixe (Logo + Ampoule + Legal) ===== #}
+        <header class="mobile-header mobile-only">
+            <a href="{{ app.user ? path('app_dashboard') : path('app_auth') }}" class="mobile-header__logo">
+                <img src="{{ asset('images/logo/logo-myankode.png') }}" alt="My Ankode">
+            </a>
+            
+            <div class="mobile-header__actions">
+                <a href="{{ path('app_legal_mentions') }}" class="mobile-header__legal">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                </a>
+                
+                <button id="theme-switcher-mobile" class="mobile-header__theme">
+                    <img src="{{ asset('images/lightbulb.png') }}" alt="Changer le thème">
+                </button>
+            </div>
+        </header>
+
+        {# ===== Contenu principal (scrollable sur mobile) ===== #}
+        <main class="main-content">
+            {% block body %}{% endblock %}
+
+            {# Footer scrollable sur mobile, sticky sur desktop #}
+            <footer class="footer-sticky">
+                <nav class="footer-nav">
+                    <a href="{{ path('app_legal_mentions') }}" class="footer-link">Mentions légales</a>
+                </nav>
+                <p class="footer-copyright">© 2026 My Ankode - Anthony Catan-Cavery</p>
+            </footer>
+        </main>
+
+        {# ===== DESKTOP : Mascotte avec theme-switcher ===== #}
         <div class="mascot-container desktop-only">
             <img src="{{ asset('images/lightbulb.png') }}" id="theme-switcher" class="lightbulb" alt="Changer le thème">
             <img src="{{ asset('images/character-happy.png') }}" id="character" class="character" alt="Mascotte My Ankode">
@@ -41,35 +93,35 @@
             </div>
         </div>
 
-        {# Footer desktop #}
-        <footer class="footer-sticky desktop-only">
-            <nav class="footer-nav">
-                <a href="{{ path('app_legal_mentions') }}" class="footer-link">Mentions légales</a>
-                {# TODO: Afficher le lien FAQ uniquement pour les utilisateurs connectés #}
-                {# {% if app.user %}
-                    <span class="footer-separator">|</span>
-                    <a href="{{ path('app_faq') }}" class="footer-link">FAQ</a>
-                {% endif %} #}
-            </nav>
-            <p class="footer-copyright">© 2026 My Ankode - Anthony Catan-Cavery</p>
-        </footer>
-
-        {# Bottom Navigation Bar - Mobile uniquement #}
+        {# ===== MOBILE : Bottom Navigation (4 icônes) ===== #}
+        {% if app.user %}
         <nav class="bottom-nav mobile-only">
-            <a href="{{ app.user ? path('app_dashboard') : path('app_home') }}" class="bottom-nav-item">
-                <img src="{{ asset('images/logo/logo-myankode.png') }}" alt="Accueil" class="bottom-nav-icon">
+            <a href="{{ path('app_dashboard') }}" class="bottom-nav-item {% if app.request.attributes.get('_route') == 'app_dashboard' %}active{% endif %}">
+                <svg class="bottom-nav-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <span class="bottom-nav-label">Dashboard</span>
             </a>
-            <button id="theme-switcher-mobile" class="bottom-nav-item">
-                <img src="{{ asset('images/lightbulb.png') }}" alt="Thème" class="bottom-nav-icon">
-            </button>
-            <a href="{{ path('app_legal_mentions') }}" class="bottom-nav-item">
-                <img src="{{ asset('images/badge-icon.png') }}" alt="Mentions légales" class="bottom-nav-icon">
+            <a href="{{ path('app_veille') }}" class="bottom-nav-item {% if app.request.attributes.get('_route') == 'app_veille' %}active{% endif %}">
+                <svg class="bottom-nav-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                </svg>
+                <span class="bottom-nav-label">Veille</span>
             </a>
-            {# TODO: Ajouter l'icône News/Veille quand le module sera prêt #}
-            {# <a href="{{ path('app_veille') }}" class="bottom-nav-item">
-                <img src="{{ asset('images/bubble-icon.png') }}" alt="Veille" class="bottom-nav-icon">
-            </a> #}
+            <a href="{{ path('app_competences') }}" class="bottom-nav-item {% if app.request.attributes.get('_route') == 'app_competences' %}active{% endif %}">
+                <svg class="bottom-nav-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                </svg>
+                <span class="bottom-nav-label">Compétences</span>
+            </a>
+            <a href="{{ path('app_desktop_only') }}" class="bottom-nav-item {% if app.request.attributes.get('_route') == 'app_desktop_only' %}active{% endif %}">
+                <svg class="bottom-nav-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <span class="bottom-nav-label">Desktop</span>
+            </a>
         </nav>
+        {% endif %}
 
         {% block javascripts %}
             <script src="{{ asset('js/theme-switcher.js') }}"></script>
