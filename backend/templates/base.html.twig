@@ -11,15 +11,22 @@
             <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
             <link rel="stylesheet" href="{{ asset('css/style.css') }}">
             <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
+            <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
         {% endblock %}
     </head>
-    <body>
+    <body class="{% if app.user %}with-sidebar{% endif %}">
         {# ===== DESKTOP : Logo top-left ===== #}
         <div class="logo desktop-only">
             <a href="{{ app.user ? path('app_dashboard') : path('app_auth') }}">
                 <img src="{{ asset('images/logo/logo-myankode.png') }}" alt="My Ankode Logo">
             </a>
         </div>
+        {# ===== DESKTOP : Aside utilisateur (sidebar gauche) ===== #}
+        {% if app.user %}
+            <aside class="user-sidebar desktop-only">
+                <p class="user-greeting">Hello {{ app.user.username }}</p>
+            </aside>
+        {% endif %}
 
         {# ===== DESKTOP : Navbar horizontale top-right (si connecté) ===== #}
         {% if app.user %}
@@ -51,6 +58,12 @@
                 <img src="{{ asset('images/logo/logo-myankode.png') }}" alt="My Ankode">
             </a>
             
+            {% if app.user %}
+                <div class="mobile-header__user">
+                    Hello {{ app.user.username }}
+                </div>
+            {% endif %}
+
             <div class="mobile-header__actions">
                 <a href="{{ path('app_legal_mentions') }}" class="mobile-header__legal">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
