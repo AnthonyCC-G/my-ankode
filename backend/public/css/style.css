@@ -58,7 +58,7 @@ body:not(.dark-mode) {
 
 .logo img {
     width: auto;
-    height: 80px;
+    height: 90px;
     filter: drop-shadow(0 2px 8px rgba(0, 210, 255, 0.3));
 }
 
@@ -452,6 +452,25 @@ body:not(.dark-mode) .mobile-header {
 .mobile-header__logo img {
     width: 50px;
     height: auto;
+}
+
+/* Username au centre du header mobile */
+.mobile-header__user {
+    flex: 1; /* Prend l'espace disponible entre logo et actions */
+    text-align: center;
+    
+    font-size: var(--font-size-sm); /* Petite taille pour que ça rentre */
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    
+    white-space: nowrap; /* Empêche retour à la ligne */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Ajoute ... si trop long */
+}
+
+/* Mode Light */
+body:not(.dark-mode) .mobile-header__user {
+    color: var(--neutral-900);
 }
 
 /* Container pour les actions (Legal + Theme) */
