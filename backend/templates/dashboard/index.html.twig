@@ -46,11 +46,21 @@
             </div>
             <h2 class="card-title">Kanban</h2>
             <div class="card-content">
-                {# TODO: Remplacer par vraies stats depuis controller #}
-                {% set projectCount = 0 %}
-                {% set taskCount = 0 %}
                 {% if projectCount > 0 %}
-                    <p class="card-stat">{{ projectCount }} projets | {{ taskCount }} tâches</p>
+                    <div class="card-stats-group">
+                        <p class="card-stat">{{ projectCount }} projet{{ projectCount > 1 ? 's' : '' }} | {{ taskCount }} tâche{{ taskCount > 1 ? 's' : '' }}</p>
+                        
+                        {% if latestTasks|length > 0 %}
+                            <ul class="card-mini-list">
+                                {% for task in latestTasks %}
+                                    <li class="card-mini-item">
+                                        <span class="mini-item-badge badge-{{ task.status }}"></span>
+                                        {{ task.title }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
                 {% else %}
                     <p class="card-empty">Aucun projet pour le moment, allons-y pour le premier ?</p>
                 {% endif %}
