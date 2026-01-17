@@ -78,4 +78,36 @@ class ArticleRepository extends DocumentRepository
             ->getQuery()
             ->execute();
     }
+
+    /**
+     * Compte le nombre d'articles favoris
+     * 
+     * @param User $user Utilisateur connecté
+     * @return int
+     */
+    public function countFavoritesByUser(User $user): int
+    {
+        return $this->createQueryBuilder()
+            ->field('userId')->equals((string) $user->getId())
+            ->field('isFavorite')->equals(true)
+            ->count()
+            ->getQuery()
+            ->execute();
+    }
+
+    /**
+     * Compte le nombre d'articles lus
+     * 
+     * @param User $user Utilisateur connecté
+     * @return int
+     */
+    public function countReadByUser(User $user): int
+    {
+        return $this->createQueryBuilder()
+            ->field('userId')->equals((string) $user->getId())
+            ->field('isRead')->equals(true)
+            ->count()
+            ->getQuery()
+            ->execute();
+    }
 }
