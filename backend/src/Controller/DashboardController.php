@@ -32,6 +32,10 @@ final class DashboardController extends AbstractController
         $projectCount = $projectRepository->count(['owner' => $user]);
         $taskCount = $taskRepository->countByUser($user);
         $latestTasks = $taskRepository->findLatestByUser($user, 3);
+
+        // STATS SNIPPETS (MongoDB)
+        $snippetRepository = $documentManager->getRepository(\App\Document\Snippet::class);
+        $snippetCount = $snippetRepository->countByUser($user);
         
         return $this->render('dashboard/index.html.twig', [
             'favoritesCount' => $favoritesCount,
@@ -39,7 +43,11 @@ final class DashboardController extends AbstractController
             'projectCount' => $projectCount,
             'taskCount' => $taskCount,
             'latestTasks' => $latestTasks,
+            'snippetCount' => $snippetCount, 
         ]);
+
+
+
     }
 }
 

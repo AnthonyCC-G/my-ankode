@@ -4,17 +4,16 @@ namespace App\DataFixtures;
 
 use App\Document\Snippet;
 use App\Entity\User;
-use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Common\DataFixtures\DependentFixtureInterface;
+use Doctrine\Bundle\MongoDBBundle\Fixture\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
 
-class SnippetFixtures extends Fixture implements DependentFixtureInterface
+class SnippetFixtures extends Fixture
 {
     public function __construct(
         private DocumentManager $dm,
-        private EntityManagerInterface $em  // AJOUTER
+        private EntityManagerInterface $em
     ) {}
 
     public function load(ObjectManager $manager): void
@@ -35,7 +34,7 @@ class SnippetFixtures extends Fixture implements DependentFixtureInterface
         // ========================================
         
         $snippet1 = new Snippet();
-        $snippet1->setUserId($anthony->getId());
+        $snippet1->setUserId((string) $anthony->getId());
         $snippet1->setTitle('Docker Compose restart');
         $snippet1->setLanguage('other');
         $snippet1->setCode('docker-compose restart && docker exec myankode-backend php bin/console cache:clear');
@@ -44,7 +43,7 @@ class SnippetFixtures extends Fixture implements DependentFixtureInterface
         $this->dm->persist($snippet1);
 
         $snippet2 = new Snippet();
-        $snippet2->setUserId($anthony->getId());
+        $snippet2->setUserId((string) $anthony->getId());
         $snippet2->setTitle('Query MongoDB userId');
         $snippet2->setLanguage('php');
         $snippet2->setCode('$this->createQueryBuilder()->field(\'userId\')->equals($user->getId())->getQuery()->execute();');
@@ -53,7 +52,7 @@ class SnippetFixtures extends Fixture implements DependentFixtureInterface
         $this->dm->persist($snippet2);
 
         $snippet3 = new Snippet();
-        $snippet3->setUserId($anthony->getId());
+        $snippet3->setUserId((string) $anthony->getId());
         $snippet3->setTitle('Twig truncate title');
         $snippet3->setLanguage('other');
         $snippet3->setCode('{{ snippet.title|length > 15 ? snippet.title|slice(0, 15) ~ \'...\' : snippet.title }}');
@@ -66,7 +65,7 @@ class SnippetFixtures extends Fixture implements DependentFixtureInterface
         // ========================================
         
         $snippet4 = new Snippet();
-        $snippet4->setUserId($alice->getId());
+        $snippet4->setUserId((string) $alice->getId());
         $snippet4->setTitle('Valider un email PHP');
         $snippet4->setLanguage('php');
         $snippet4->setCode('if (filter_var($email, FILTER_VALIDATE_EMAIL)) { return true; }');
@@ -75,7 +74,7 @@ class SnippetFixtures extends Fixture implements DependentFixtureInterface
         $this->dm->persist($snippet4);
 
         $snippet5 = new Snippet();
-        $snippet5->setUserId($alice->getId());
+        $snippet5->setUserId((string) $alice->getId());
         $snippet5->setTitle('Debounce function');
         $snippet5->setLanguage('javascript');
         $snippet5->setCode('const debounce = (func, delay) => { let timeout; return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func(...args), delay); }; };');
@@ -84,7 +83,7 @@ class SnippetFixtures extends Fixture implements DependentFixtureInterface
         $this->dm->persist($snippet5);
 
         $snippet6 = new Snippet();
-        $snippet6->setUserId($alice->getId());
+        $snippet6->setUserId((string) $alice->getId());
         $snippet6->setTitle('Flexbox center');
         $snippet6->setLanguage('css');
         $snippet6->setCode('.container { display: flex; justify-content: center; align-items: center; min-height: 100vh; }');
@@ -93,7 +92,7 @@ class SnippetFixtures extends Fixture implements DependentFixtureInterface
         $this->dm->persist($snippet6);
 
         $snippet7 = new Snippet();
-        $snippet7->setUserId($alice->getId());
+        $snippet7->setUserId((string) $alice->getId());
         $snippet7->setTitle('JOIN avec COUNT');
         $snippet7->setLanguage('sql');
         $snippet7->setCode('SELECT u.name, COUNT(p.id) as total FROM users u LEFT JOIN projects p ON u.id = p.owner_id GROUP BY u.id;');
@@ -106,7 +105,7 @@ class SnippetFixtures extends Fixture implements DependentFixtureInterface
         // ========================================
         
         $snippet8 = new Snippet();
-        $snippet8->setUserId($marie->getId());
+        $snippet8->setUserId((string) $marie->getId());
         $snippet8->setTitle('Array map en JS');
         $snippet8->setLanguage('javascript');
         $snippet8->setCode('const doubled = numbers.map(n => n * 2);');
@@ -115,7 +114,7 @@ class SnippetFixtures extends Fixture implements DependentFixtureInterface
         $this->dm->persist($snippet8);
 
         $snippet9 = new Snippet();
-        $snippet9->setUserId($marie->getId());
+        $snippet9->setUserId((string) $marie->getId());
         $snippet9->setTitle('Route Symfony GET');
         $snippet9->setLanguage('php');
         $snippet9->setCode('#[Route(\'/api/items\', name: \'api_items_list\', methods: [\'GET\'])]');
@@ -124,7 +123,7 @@ class SnippetFixtures extends Fixture implements DependentFixtureInterface
         $this->dm->persist($snippet9);
 
         $snippet10 = new Snippet();
-        $snippet10->setUserId($marie->getId());
+        $snippet10->setUserId((string) $marie->getId());
         $snippet10->setTitle('Grid responsive 3 cols');
         $snippet10->setLanguage('css');
         $snippet10->setCode('.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }');
@@ -133,7 +132,7 @@ class SnippetFixtures extends Fixture implements DependentFixtureInterface
         $this->dm->persist($snippet10);
 
         $snippet11 = new Snippet();
-        $snippet11->setUserId($marie->getId());
+        $snippet11->setUserId((string) $marie->getId());
         $snippet11->setTitle('HTML form template');
         $snippet11->setLanguage('html');
         $snippet11->setCode('<form method="POST" action="/submit"><input type="text" name="title" required><button type="submit">Envoyer</button></form>');
@@ -141,16 +140,11 @@ class SnippetFixtures extends Fixture implements DependentFixtureInterface
         $snippet11->setTags(['html', 'form', 'template']);
         $this->dm->persist($snippet11);
 
-        // Flush MongoDB EXPLICITEMENT
+        // Flush MongoDB 
         $this->dm->flush();
         
-        echo "✅ " . ($this->dm->getRepository(Snippet::class)->createQueryBuilder()->count()->getQuery()->execute()) . " snippets chargés dans MongoDB\n";
+        echo " 11 snippets de demo charges dans MongoDB\n";
+        echo " Repartition : Anthony (3), Alice (4), Marie (4)\n";
     }
 
-    public function getDependencies(): array
-    {
-        return [
-            UserFixtures::class,
-        ];
-    }
 }

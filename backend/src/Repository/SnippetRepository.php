@@ -14,7 +14,7 @@ class SnippetRepository extends DocumentRepository
     public function countByUser(User $user): int
     {
         return $this->createQueryBuilder()
-            ->field('userId')->equals($user->getId())
+            ->field('userId')->equals((string) $user->getId())
             ->count()
             ->getQuery()
             ->execute();
@@ -26,7 +26,7 @@ class SnippetRepository extends DocumentRepository
     public function findLatestByUser(User $user, int $limit = 3): array
     {
         return $this->createQueryBuilder()
-            ->field('userId')->equals($user->getId())
+            ->field('userId')->equals((string) $user->getId())
             ->sort('createdAt', 'DESC')
             ->limit($limit)
             ->getQuery()
