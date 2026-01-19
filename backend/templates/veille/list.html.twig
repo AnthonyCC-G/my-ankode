@@ -8,67 +8,91 @@
 {% endblock %}
 
 {% block body %}
-<div class="veille-container">
-    <!-- ZONE 4 : CONFIGURER VEILLE -->
-    <div class="config-veille">
-        <h4><i class="bi bi-search"></i> Configurer Veille</h4>
+{# ===== MINI-HEADER : Titre + Accroche ===== #}
+<div class="veille-header">
+    <h1 class="veille-title">Veille Technologique</h1>
+    <p class="veille-subtitle">Reste à jour avec les dernières tendances tech et découvre des ressources qui feront évoluer tes compétences</p>
+</div>
+
+{# ===== GRILLE PRINCIPALE 2x2 ===== #}
+<div class="veille-grid">
+    
+    {# ===== BLOC 1 : RECHERCHE (Ligne 1, Colonne 1) ===== #}
+    <div class="veille-search">
+        <h3 class="block-title">Recherche</h3>
         
-        <div class="row g-2">
-            <div class="col-md-8">
+        <div class="search-controls">
+            <div class="search-input-group">
                 <input 
                     type="text" 
                     id="search-input" 
-                    class="form-control" 
-                    placeholder="Rechercher par mot-cle (ex: React, Symfony, Docker...)"
+                    class="search-input" 
+                    placeholder="Mots-clés (ex: React, Symfony, Docker...)"
                 >
-            </div>
-            <div class="col-md-4">
-                <button id="search-btn" class="btn btn-primary me-2">
-                    <i class="bi bi-search"></i> Rechercher
+                <button id="search-btn" class="search-btn" title="Rechercher">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
                 </button>
-                <button id="reset-btn" class="btn btn-secondary">
-                    <i class="bi bi-arrow-counterclockwise"></i> Reset
+                <button id="reset-btn" class="reset-btn" title="Réinitialiser">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+            </div>
+            
+            {# Filtres #}
+            <div class="search-filters">
+                <button id="show-all-btn" class="filter-btn active">Tous les articles</button>
+                <button id="show-favorites-btn" class="filter-btn filter-btn--favorites">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+                    </svg>
+                    Mes favoris
                 </button>
             </div>
         </div>
         
-        <!-- Messages flash / erreurs -->
-        <div id="search-feedback"></div>
+        {# Messages flash / erreurs #}
+        <div id="search-feedback" class="search-feedback"></div>
+    </div>
+    
+    {# ===== BLOC 2 : FAVORIS (Ligne 1, Colonne 2) ===== #}
+    <div class="veille-favorites">
+        <button id="favorites-toggle" class="favorites-header">
+            <h3 class="block-title">Favoris</h3>
+            <svg class="accordion-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+        </button>
         
-        <!-- Filtres -->
-        <div class="mt-3">
-            <button id="show-all-btn" class="btn btn-sm btn-outline-primary active me-2">
-                Tous les articles
-            </button>
-            <button id="show-favorites-btn" class="btn btn-sm btn-outline-danger">
-                <i class="bi bi-heart-fill"></i> Mes favoris
-            </button>
-        </div>
-    </div>
-    
-    <!-- ZONE 5 : FAVORIS -->
-    <div class="favoris-sidebar">
-        <h5><i class="bi bi-heart-fill"></i> Favoris</h5>
-        <div id="favorites-sidebar" class="favoris-list">
-            <p class="text-white-50 small">Chargement...</p>
-        </div>
-    </div>
-    
-    <!-- ZONE 6 : RESULTATS -->
-    <div class="resultats-zone">
-        <h3 id="articles-title">Tous les articles</h3>
-        <div id="articles-container">
-            <div class="text-center py-5">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Chargement...</span>
-                </div>
-                <p class="mt-3">Chargement des articles...</p>
+        <div id="favorites-accordion" class="favorites-accordion">
+            <div id="favorites-list" class="favorites-list">
+                <p class="favorites-empty">Chargement...</p>
             </div>
         </div>
     </div>
     
-    <!-- PAGINATION -->
-    <div id="pagination-container" class="pagination-zone"></div>
+    {# ===== BLOC 3 : ARTICLES (Ligne 2, Colonne 1) ===== #}
+    <div class="veille-articles">
+        <h3 id="articles-title" class="block-title">Tous les articles</h3>
+        
+        <div id="articles-container" class="articles-container">
+            <div class="articles-loading">
+                <div class="spinner"></div>
+                <p>Chargement des articles...</p>
+            </div>
+        </div>
+        
+        {# Pagination #}
+        <div id="pagination-container" class="pagination-container"></div>
+    </div>
+    
+    {# ===== BLOC 4 : VIDE (Ligne 2, Colonne 2) ===== #}
+    <div class="veille-empty">
+        {# Vide pour le moment #}
+    </div>
+    
 </div>
 {% endblock %}
 
