@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\CompetenceRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\TaskRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -18,7 +19,8 @@ final class DashboardController extends AbstractController
     public function index(
         DocumentManager $documentManager,
         ProjectRepository $projectRepository,
-        TaskRepository $taskRepository
+        TaskRepository $taskRepository,
+        CompetenceRepository $competenceRepository
     ): Response
     {
         $user = $this->getUser();
@@ -36,6 +38,10 @@ final class DashboardController extends AbstractController
         // STATS SNIPPETS (MongoDB)
         $snippetRepository = $documentManager->getRepository(\App\Document\Snippet::class);
         $snippetCount = $snippetRepository->countByUser($user);
+
+        // STATS COMPETENCES (PostgreSQL) 
+        $competenceCount = $competenceRepository->count(['owner' => $user]);
+
         
         return $this->render('dashboard/index.html.twig', [
             'favoritesCount' => $favoritesCount,
@@ -43,7 +49,8 @@ final class DashboardController extends AbstractController
             'projectCount' => $projectCount,
             'taskCount' => $taskCount,
             'latestTasks' => $latestTasks,
-            'snippetCount' => $snippetCount, 
+            'snippetCount' => $snippetCount,
+            'competenceCount' => $competenceCount, 
         ]);
 
 
