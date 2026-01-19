@@ -36,12 +36,12 @@
     margin-right: auto;
     padding-left: var(--spacing-sm);
     padding-right: var(--spacing-lg);
-    padding-bottom: 120px; /* Gap avant le footer */
+    padding-bottom: 160px;
     
     display: grid;
-    grid-template-columns: 1fr 1fr; /* 2 colonnes egales */
-    grid-template-rows: 200px 1fr; /* Ligne 1: 200px, Ligne 2: hauteur restante */
-    gap: var(--spacing-md); /* 24px */
+    grid-template-columns: 1fr 1fr; /* 2 colonnes egales TOUJOURS */
+    grid-template-rows: 200px 1fr;
+    gap: var(--spacing-md);
     
     min-height: calc(100vh - 360px);
 }
@@ -156,49 +156,6 @@ body:not(.dark-mode) .veille-articles {
     color: #ffffff;
 }
 
-/* Filtres */
-.search-filters {
-    display: flex;
-    gap: var(--spacing-xs);
-}
-
-.filter-btn {
-    padding: var(--spacing-xs) var(--spacing-sm);
-    font-family: var(--font-main);
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    color: var(--text-secondary);
-    background: transparent;
-    border: 2px solid var(--border-color);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: all var(--transition-base);
-    white-space: nowrap;
-}
-
-.filter-btn:hover {
-    background: rgba(0, 194, 209, 0.1);
-    color: var(--text-primary);
-}
-
-.filter-btn.active {
-    background: var(--color-primary);
-    color: var(--cyan-900);
-    border-color: var(--color-primary);
-    font-weight: var(--font-weight-semibold);
-}
-
-.filter-btn--favorites {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-}
-
-.filter-btn--favorites svg {
-    width: 16px;
-    height: 16px;
-}
-
 /* Messages feedback */
 .search-feedback {
     min-height: 30px;
@@ -217,9 +174,15 @@ body:not(.dark-mode) .veille-articles {
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 .veille-favorites {
     grid-column: 2;
-    grid-row: 1;
+    grid-row: 1; /* Par defaut ligne 1 uniquement */
     padding: 0;
     overflow: visible;
+    transition: grid-row var(--transition-base);
+}
+
+/* Quand etendu, Favoris DESCEND (prend les 2 lignes) */
+.veille-grid.favorites-expanded .veille-favorites {
+    grid-row: 1 / 3; /* S'etend de ligne 1 a ligne 3 (donc lignes 1 et 2) */
 }
 
 /* Header cliquable */
@@ -256,13 +219,13 @@ body:not(.dark-mode) .veille-articles {
 
 /* Contenu accordeon */
 .favorites-accordion {
-    max-height: 0;
+    max-height: 120px; /* Hauteur pour 2 favoris (60px chacun environ) */
     overflow: hidden;
     transition: max-height var(--transition-base);
 }
 
 .favorites-accordion.open {
-    max-height: calc(100vh - 420px);
+    max-height: calc(100vh - 420px); /* S'etend completement */
     overflow-y: auto;
 }
 
@@ -279,13 +242,19 @@ body:not(.dark-mode) .veille-articles {
     margin: 0;
 }
 
-/* Item favori */
+/* Item favori - Structure avec lien et bouton */
 .favorite-item {
     padding: var(--spacing-sm);
     background: rgba(0, 194, 209, 0.1);
     border-radius: var(--radius-sm);
     margin-bottom: var(--spacing-xs);
     transition: all var(--transition-base);
+    
+    /* Flexbox pour aligner lien et bouton */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-xs);
 }
 
 .favorite-item:hover {
@@ -293,15 +262,48 @@ body:not(.dark-mode) .veille-articles {
     transform: translateX(4px);
 }
 
-.favorite-item a {
+/* Lien favori */
+.favorite-link {
     font-size: var(--font-size-sm);
     color: var(--text-primary);
     text-decoration: none;
-    display: block;
+    flex: 1; /* Prend toute la place disponible */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.favorite-item a:hover {
+.favorite-link:hover {
     color: var(--color-primary);
+}
+
+/* Bouton defavoris (X) */
+.btn-unfavorite {
+    flex-shrink: 0; /* Ne se reduit jamais */
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all var(--transition-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+}
+
+.btn-unfavorite:hover {
+    background: var(--red-500);
+    color: #ffffff;
+    transform: scale(1.1);
+}
+
+.btn-unfavorite svg {
+    width: 14px;
+    height: 14px;
+    stroke-width: 2.5;
 }
 
 /* Scrollbar pour favoris */
@@ -324,38 +326,162 @@ body:not(.dark-mode) .veille-articles {
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   BLOC 3 : ARTICLES (Ligne 2, Colonne 1)
+   BLOC 3 : ARTICLES (Ligne 2, Colonne 1) - CARROUSEL
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 .veille-articles {
-    grid-column: 1;
+    grid-column: 1 / 3; /* Par defaut prend toute la largeur */
     grid-row: 2;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    transition: grid-column var(--transition-base);
 }
 
+/* Header avec titre et compteur */
+.articles-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.articles-counter {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    font-style: italic;
+    margin: 0;
+}
+
+
+/* Quand Favoris est etendu, Articles SE REDUIT */
+.veille-grid.favorites-expanded .veille-articles {
+    grid-column: 1 / 2; /* Ne prend QUE la colonne 1 */
+}
+
+/* Wrapper pour carrousel + boutons navigation */
+.carousel-wrapper {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+/* Gradient gauche : indique qu'il y a du contenu avant */
+.carousel-wrapper::before {
+    content: '';
+    position: absolute;
+    left: 56px; /* Largeur bouton (48px) + gap (8px) */
+    top: 0;
+    bottom: 0;
+    width: 80px;
+    background: linear-gradient(to right, rgba(0, 77, 99, 0.6), transparent);
+    pointer-events: none;
+    z-index: 5;
+    opacity: var(--gradient-left-opacity, 0);
+    transition: opacity var(--transition-base);
+}
+
+/* Gradient droit : indique qu'il y a du contenu apres */
+.carousel-wrapper::after {
+    content: '';
+    position: absolute;
+    right: 56px; /* Largeur bouton (48px) + gap (8px) */
+    top: 0;
+    bottom: 0;
+    width: 80px;
+    background: linear-gradient(to left, rgba(0, 77, 99, 0.6), transparent);
+    pointer-events: none;
+    z-index: 5;
+    opacity: var(--gradient-right-opacity, 1);
+    transition: opacity var(--transition-base);
+}
+
+/* Mode light */
+body:not(.dark-mode) .carousel-wrapper::before {
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.8), transparent);
+}
+
+body:not(.dark-mode) .carousel-wrapper::after {
+    background: linear-gradient(to left, rgba(255, 255, 255, 0.8), transparent);
+}
+
+
+/* Boutons navigation carrousel */
+.carousel-nav {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    background: var(--color-primary);
+    border: 2px solid var(--color-primary);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.carousel-nav svg {
+    width: 24px;
+    height: 24px;
+    color: var(--cyan-900);
+}
+
+.carousel-nav:hover:not(:disabled) {
+    background: var(--cyan-600);
+    border-color: var(--cyan-600);
+    transform: scale(1.1);
+    box-shadow: var(--shadow-md);
+}
+
+.carousel-nav:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    background: var(--neutral-400);
+    border-color: var(--neutral-400);
+}
+
+/* Container articles scrollable */
 .articles-container {
     flex: 1;
-    overflow-y: auto;
+    overflow-x: auto;
+    overflow-y: hidden;
     padding: var(--spacing-sm) 0;
+    
+    /* Smooth scroll */
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    
+    /* Cache la scrollbar (on utilise les boutons) */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
 }
 
-/* Grid des cards : 4 colonnes × 2 lignes */
+.articles-container::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+
+/* Grid des cards : CARROUSEL horizontal */
 .articles-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    display: flex;
     gap: var(--spacing-md);
+    padding-right: var(--spacing-lg);
 }
 
-/* Card article */
+/* Card article - Largeur fixe */
 .article-card {
+    flex: 0 0 400px;
+    min-width: 400px;
     background: rgba(0, 194, 209, 0.05);
     border: 2px solid var(--border-color);
     border-radius: var(--radius-md);
-    padding: var(--spacing-md);
+    padding: var(--spacing-lg);
     transition: all var(--transition-base);
     display: flex;
     flex-direction: column;
+    gap: var(--spacing-sm);
 }
 
 .article-card:hover {
@@ -369,43 +495,97 @@ body:not(.dark-mode) .veille-articles {
 }
 
 .article-title {
-    font-size: var(--font-size-base);
+    font-size: var(--font-size-lg);
     font-weight: var(--font-weight-semibold);
     color: var(--text-primary);
-    margin: 0 0 var(--spacing-xs) 0;
+    margin: 0;
+    line-height: 1.4;
 }
 
 .article-source {
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-sm);
     color: var(--text-muted);
-    margin-bottom: var(--spacing-sm);
+    margin: 0;
 }
 
 .article-description {
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-base);
     color: var(--text-secondary);
-    margin-bottom: var(--spacing-sm);
+    margin: 0;
     flex: 1;
+    line-height: 1.6;
 }
 
 .article-actions {
     display: flex;
-    gap: var(--spacing-xs);
+    gap: var(--spacing-sm);
     margin-top: auto;
+    padding-top: var(--spacing-sm);
 }
 
 .article-actions button {
-    padding: var(--spacing-xs);
+    flex: 1;
+    padding: var(--spacing-sm);
     background: transparent;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
     cursor: pointer;
     transition: all var(--transition-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .article-actions button:hover {
     background: rgba(0, 194, 209, 0.1);
-    transform: scale(1.1);
+    transform: translateY(-2px);
+    border-color: var(--color-primary);
+}
+
+.article-actions button svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* Styles specifiques pour les boutons d'actions */
+.article-actions .btn-read {
+    border-color: var(--green-500);
+    color: var(--green-500);
+}
+
+.article-actions .btn-read:hover {
+    background: rgba(81, 207, 102, 0.1);
+    border-color: var(--green-700);
+}
+
+.article-actions .btn-favorite {
+    border-color: var(--red-500);
+    color: var(--red-500);
+}
+
+.article-actions .btn-favorite:hover {
+    background: rgba(255, 107, 107, 0.1);
+    border-color: var(--red-700);
+}
+
+.article-actions .btn-favorite.active {
+    background: var(--red-500);
+    color: #ffffff;
+    border-color: var(--red-500);
+}
+
+.article-actions .btn-favorite.active svg {
+    fill: currentColor;
+}
+
+.article-actions .btn-link {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.article-actions .btn-link:hover {
+    background: rgba(0, 194, 209, 0.1);
+    border-color: var(--cyan-600);
 }
 
 /* Loading state */
@@ -431,32 +611,17 @@ body:not(.dark-mode) .veille-articles {
     to { transform: rotate(360deg); }
 }
 
-/* Scrollbar articles */
-.articles-container::-webkit-scrollbar {
-    width: 10px;
-}
-
-.articles-container::-webkit-scrollbar-track {
-    background: rgba(0, 194, 209, 0.05);
-    border-radius: var(--radius-sm);
-}
-
-.articles-container::-webkit-scrollbar-thumb {
-    background: rgba(0, 194, 209, 0.3);
-    border-radius: var(--radius-sm);
-}
-
-.articles-container::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 194, 209, 0.5);
-}
-
-/* Pagination */
+/* Pagination - En dessous du carrousel */
 .pagination-container {
-    padding-top: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-md);
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: var(--spacing-xs);
+    gap: var(--spacing-sm);
+    background: rgba(0, 77, 99, 0.15);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
 }
 
 .pagination-btn {
@@ -485,15 +650,9 @@ body:not(.dark-mode) .veille-articles {
     cursor: not-allowed;
 }
 
-
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    RESPONSIVE (on s'en occupe plus tard)
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 @media (max-width: 768px) {
     /* Mobile a faire plus tard */
 }
-
-
-
-
-

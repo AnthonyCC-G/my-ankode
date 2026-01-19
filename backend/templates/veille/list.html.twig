@@ -41,16 +41,6 @@
                 </button>
             </div>
             
-            {# Filtres #}
-            <div class="search-filters">
-                <button id="show-all-btn" class="filter-btn active">Tous les articles</button>
-                <button id="show-favorites-btn" class="filter-btn filter-btn--favorites">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
-                    </svg>
-                    Mes favoris
-                </button>
-            </div>
         </div>
         
         {# Messages flash / erreurs #}
@@ -75,22 +65,37 @@
     
     {# ===== BLOC 3 : ARTICLES (Ligne 2, Colonne 1) ===== #}
     <div class="veille-articles">
-        <h3 id="articles-title" class="block-title">Tous les articles</h3>
-        
-        <div id="articles-container" class="articles-container">
-            <div class="articles-loading">
-                <div class="spinner"></div>
-                <p>Chargement des articles...</p>
-            </div>
+        <div class="articles-header">
+            <h3 id="articles-title" class="block-title">Tous les articles</h3>
+            <p class="articles-counter">Voici les premiers articles</p>
         </div>
         
-        {# Pagination #}
-        <div id="pagination-container" class="pagination-container"></div>
-    </div>
-    
-    {# ===== BLOC 4 : VIDE (Ligne 2, Colonne 2) ===== #}
-    <div class="veille-empty">
-        {# Vide pour le moment #}
+        {# Container carrousel avec boutons navigation #}
+        <div class="carousel-wrapper">
+            {# Bouton Precedent #}
+            <button id="carousel-prev" class="carousel-nav carousel-nav--prev" title="Articles precedents">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+            
+            {# Container articles (scrollable) #}
+            <div id="articles-container" class="articles-container">
+                <div class="articles-loading">
+                    <div class="spinner"></div>
+                    <p>Chargement des articles...</p>
+                </div>
+            </div>
+            
+            {# Bouton Suivant #}
+            <button id="carousel-next" class="carousel-nav carousel-nav--next" title="Articles suivants">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </button>
+        </div>
+        
+        
     </div>
     
 </div>
