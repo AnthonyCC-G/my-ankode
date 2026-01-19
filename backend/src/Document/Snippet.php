@@ -2,10 +2,11 @@
 
 namespace App\Document;
 
+use App\Repository\SnippetRepository;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use DateTimeImmutable;
 
-#[MongoDB\Document(collection: 'snippets')]
+#[MongoDB\Document(collection: 'snippets', repositoryClass: SnippetRepository::class)]
 class Snippet
 {
     #[MongoDB\Id]
@@ -29,8 +30,8 @@ class Snippet
     #[MongoDB\Field(type: 'date_immutable')]
     private ?DateTimeImmutable $createdAt = null;
 
-    #[MongoDB\Field(type: 'int')]
-    private ?int $userId = null;
+    #[MongoDB\Field(type: 'string')]
+    private ?string $userId = null;
 
     public function __construct()
     {
@@ -104,12 +105,12 @@ class Snippet
         return $this->createdAt;
     }
 
-    public function getUserId(): ?int
+    public function getUserId(): ?string  
     {
         return $this->userId;
     }
 
-    public function setUserId(int $userId): self
+    public function setUserId(string $userId): self
     {
         $this->userId = $userId;
         return $this;
