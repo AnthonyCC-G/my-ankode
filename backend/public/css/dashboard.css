@@ -328,7 +328,7 @@ body:not(.dark-mode) .card-snippets .card-link {
     gap: var(--spacing-md); /* Même gap que les cards */
     align-items: center;
     padding-top: var(--spacing-md);
-    padding-bottom: var(--spacing-md); /* Ajuste selon ce que tu as mis */
+    padding-bottom: var(--spacing-md); 
     margin-top: var(--spacing-md);
     border-top: 1px solid var(--border-color);
     max-width: 1400px; /* Même largeur max que dashboard-container */
@@ -337,6 +337,7 @@ body:not(.dark-mode) .card-snippets .card-link {
     width: 100%;
 }
 
+/*
 .footer-action-link {
     font-family: var(--font-main);
     font-size: var(--font-size-base);
@@ -352,22 +353,42 @@ body:not(.dark-mode) .card-snippets .card-link {
     color: var(--color-accent);
     text-decoration: underline;
 }
+*/
+
+.footer-action-warning {
+    padding: var(--spacing-sm) var(--spacing-md);
+    justify-self: start;
+    background: transparent;
+    padding-left: var(--spacing-lg);
+    color: gold;
+    border: 1px solid var(--gold-700);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    font-family: var(--font-main);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.footer-action-warning:hover {
+    background: #d97706; /* Doré plus foncé au hover */
+    transform: translateY(-2px);
+    color: white;
+}
 
 .footer-action-danger {
     padding: var(--spacing-sm) var(--spacing-md);
     justify-self: end;
     padding-right: var(--spacing-lg);
-
-    
     font-family: var(--font-main);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
-    
     background: transparent;
     color: var(--red-500);
     border: 1px solid var(--red-500);
     border-radius: var(--radius-md);
-    
     cursor: pointer;
     transition: all var(--transition-base);
 }
@@ -377,9 +398,6 @@ body:not(.dark-mode) .card-snippets .card-link {
     color: #ffffff;
     transform: translateY(-2px);
 }
-
-
-
 
 
 
