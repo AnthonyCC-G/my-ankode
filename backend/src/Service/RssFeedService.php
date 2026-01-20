@@ -20,11 +20,11 @@ class RssFeedService
      * Récupère et parse un flux RSS
      * 
      * @param string $url URL du flux RSS
-     * @param User $user Utilisateur propriétaire des articles
+     * @param User|null $user Utilisateur propriétaire (null = articles publics)
      * @param string $sourceName Nom de la source (ex: "Dev.to")
      * @return array{success: bool, count: int, error?: string}
      */
-    public function fetchFeed(string $url, User $user, string $sourceName): array
+    public function fetchFeed(string $url, ?User $user, string $sourceName): array
     {
         try {
             // Étape 1 : Télécharger le flux RSS
@@ -111,12 +111,12 @@ class RssFeedService
      * Sauvegarde les articles dans MongoDB
      * 
      * @param array $items Articles parsés depuis le flux RSS
-     * @param User $user Utilisateur propriétaire
+     * @param User|null $user Utilisateur propriétaire (null = articles publics)
      * @param string $sourceName Nom de la source
      * @param string $feedUrl URL du flux
      * @return int Nombre d'articles sauvegardés
      */
-    private function storeArticles(array $items, User $user, string $sourceName, string $feedUrl): int
+    private function storeArticles(array $items, ?User $user, string $sourceName, string $feedUrl): int
     {
         $count = 0;
 
@@ -134,9 +134,19 @@ class RssFeedService
             $article = new Article();
             $article->setTitle($item['title']);
             $article->setUrl($item['link']);
-            $article->setDescription($item['description']);
+            // NETTOYER la description : strip HTML + limiter à 200 caractères
+            $cleanDescription = strip_tags($item['description']); // Enlève HTML
+            $cleanDescription = preg_replace('/\s+/', ' ', $cleanDescription); // Espaces multiples → 1
+            $cleanDescription = trim($cleanDescription); // Trim
+            $cleanDescription = mb_substr($cleanDescription, 0, 250); // Max 250 caractères
+
+            $article->setDescription($cleanDescription);
             $article->setSource($sourceName);
-            $article->setUserId((string) $user->getId());
+            $article->setUserId(null);
+            $article->setSource($sourceName);
+            
+            // userId = null pour articles publics RSS
+            $article->setUserId(null);
 
             // Parser la date de publication
             if (!empty($item['pubDate'])) {

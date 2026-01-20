@@ -3,63 +3,49 @@
 namespace App\DataFixtures;
 
 use App\Document\Article;
-use App\Entity\User;
 use Doctrine\Bundle\MongoDBBundle\Fixture\Fixture;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
 
 /**
  * Fixtures pour charger des articles de demo dans MongoDB
  * Ces articles permettent de tester l'interface Veille sans connexion internet
  * 
+ * Les articles sont PUBLICS (userId = null)
+ * Tous les utilisateurs voient les mêmes articles, mais chacun peut avoir ses propres favoris/lectures
+ * 
  * Usage : php bin/console doctrine:mongodb:fixtures:load --append
  */
 class ArticleFixtures extends Fixture
 {
-    public function __construct(
-        private EntityManagerInterface $entityManager
-    ) {}
-
     public function load(ObjectManager $manager): void
     {
-        // Recupere TOUS les utilisateurs depuis PostgreSQL
-        $users = $this->entityManager->getRepository(User::class)->findAll();
-
-        if (empty($users)) {
-            echo " Aucun utilisateur trouve en PostgreSQL.\n";
-            echo "Lance d'abord : php bin/console doctrine:fixtures:load --append\n";
-            return;
-        }
-
         $demoArticles = $this->getDemoArticles();
 
         $count = 0;
-        $userIndex = 0;
         
-        // Repartit les articles entre les utilisateurs (round-robin)
+        // Tous les articles sont publics (userId = null)
         foreach ($demoArticles as $data) {
-            // Alterne entre les users (anthony, alice, marie, anthony, alice, marie...)
-            $currentUser = $users[$userIndex % count($users)];
-            
             $article = new Article();
             $article->setTitle($data['title']);
             $article->setUrl($data['url']);
             $article->setDescription($data['description']);
             $article->setSource($data['source']);
             $article->setPublishedAt($data['publishedAt']);
-            $article->setUserId((string) $currentUser->getId());
-            $article->setIsRead(false);
-            $article->setIsFavorite(false);
+            
+            // Articles publics RSS
+            $article->setUserId(null);
+            
+            // Les arrays readBy et favoritedBy sont initialisés vides par défaut
 
             $manager->persist($article);
             $count++;
-            $userIndex++;
         }
 
         $manager->flush();
 
-        echo "✅ {$count} articles de demo charges dans MongoDB\n";
-        echo "📊 Repartition : ~" . (int)($count / count($users)) . " articles par utilisateur\n";
+        echo " {$count} articles publics de demo chargés dans MongoDB\n";
+        echo " Ces articles sont visibles par TOUS les utilisateurs\n";
+        echo " Chaque utilisateur peut avoir ses propres favoris et états de lecture\n";
     }
 
     /**

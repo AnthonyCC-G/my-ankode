@@ -6,7 +6,6 @@ use App\Repository\ArticleRepository;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use DateTimeImmutable;
 
-
 #[MongoDB\Document(collection: 'articles', repositoryClass: ArticleRepository::class)]
 class Article
 {
@@ -34,12 +33,29 @@ class Article
     #[MongoDB\Field(type: 'date_immutable')]
     private ?DateTimeImmutable $createdAt = null;
 
-    #[MongoDB\Field(type: 'bool')]
-    private bool $isRead = false;
+    // ========================================
+    //  Arrays d'utilisateurs
+    // ========================================
+    
+    /**
+     * Liste des IDs des utilisateurs ayant lu cet article
+     * Exemple: ['user123', 'user456']
+     */
+    #[MongoDB\Field(type: 'collection')]
+    private array $readBy = [];
 
-    #[MongoDB\Field(type: 'bool')]
-    private bool $isFavorite = false;  // ← AJOUTÉ ICI
+    /**
+     * Liste des IDs des utilisateurs ayant mis cet article en favori
+     * Exemple: ['user123', 'user789']
+     */
+    #[MongoDB\Field(type: 'collection')]
+    private array $favoritedBy = [];
 
+    /**
+     * ID du propriétaire de l'article
+     * - NULL = article public RSS (visible par tous)
+     * - string = article personnel d'un utilisateur
+     */
     #[MongoDB\Field(type: 'string')]
     private ?string $userId = null;
 
@@ -48,7 +64,9 @@ class Article
         $this->createdAt = new DateTimeImmutable();
     }
 
-    // Getters et Setters
+    // ========================================
+    // Getters / Setters BASIQUES
+    // ========================================
 
     public function getId(): ?string
     {
@@ -126,29 +144,6 @@ class Article
         return $this->createdAt;
     }
 
-    public function isRead(): bool
-    {
-        return $this->isRead;
-    }
-
-    public function setIsRead(bool $isRead): self
-    {
-        $this->isRead = $isRead;
-        return $this;
-    }
-
-    // GETTERS/SETTERS POUR isFavorite (AJOUTÉS ICI)
-    public function isFavorite(): bool
-    {
-        return $this->isFavorite;
-    }
-
-    public function setIsFavorite(bool $isFavorite): self
-    {
-        $this->isFavorite = $isFavorite;
-        return $this;
-    }
-
     public function getUserId(): ?string
     {
         return $this->userId;
@@ -158,5 +153,155 @@ class Article
     {
         $this->userId = $userId;
         return $this;
+    }
+
+    // ========================================
+    //  GESTION LECTURE (isRead → readBy)
+    // ========================================
+
+    /**
+     * Récupère tous les utilisateurs ayant lu cet article
+     * @return array
+     */
+    public function getReadBy(): array
+    {
+        return $this->readBy;
+    }
+
+    /**
+     * Vérifie si un utilisateur a déjà lu cet article
+     * @param string $userId ID de l'utilisateur
+     * @return bool
+     */
+    public function isReadByUser(string $userId): bool
+    {
+        return in_array($userId, $this->readBy, true);
+    }
+
+    /**
+     * Marque l'article comme lu pour un utilisateur
+     * @param string $userId ID de l'utilisateur
+     * @return self
+     */
+    public function markAsReadByUser(string $userId): self
+    {
+        if (!$this->isReadByUser($userId)) {
+            $this->readBy[] = $userId;
+        }
+        return $this;
+    }
+
+    /**
+     * Marque l'article comme NON lu pour un utilisateur
+     * @param string $userId ID de l'utilisateur
+     * @return self
+     */
+    public function markAsUnreadByUser(string $userId): self
+    {
+        $this->readBy = array_values(
+            array_filter($this->readBy, fn($id) => $id !== $userId)
+        );
+        return $this;
+    }
+
+    /**
+     * Toggle l'état de lecture pour un utilisateur
+     * @param string $userId ID de l'utilisateur
+     * @return self
+     */
+    public function toggleReadByUser(string $userId): self
+    {
+        if ($this->isReadByUser($userId)) {
+            $this->markAsUnreadByUser($userId);
+        } else {
+            $this->markAsReadByUser($userId);
+        }
+        return $this;
+    }
+
+    // ========================================
+    //  GESTION FAVORIS (isFavorite → favoritedBy)
+    // ========================================
+
+    /**
+     * Récupère tous les utilisateurs ayant mis cet article en favori
+     * @return array
+     */
+    public function getFavoritedBy(): array
+    {
+        return $this->favoritedBy;
+    }
+
+    /**
+     * Vérifie si un utilisateur a mis cet article en favori
+     * @param string $userId ID de l'utilisateur
+     * @return bool
+     */
+    public function isFavoritedByUser(string $userId): bool
+    {
+        return in_array($userId, $this->favoritedBy, true);
+    }
+
+    /**
+     * Ajoute l'article aux favoris d'un utilisateur
+     * @param string $userId ID de l'utilisateur
+     * @return self
+     */
+    public function addToFavorites(string $userId): self
+    {
+        if (!$this->isFavoritedByUser($userId)) {
+            $this->favoritedBy[] = $userId;
+        }
+        return $this;
+    }
+
+    /**
+     * Retire l'article des favoris d'un utilisateur
+     * @param string $userId ID de l'utilisateur
+     * @return self
+     */
+    public function removeFromFavorites(string $userId): self
+    {
+        $this->favoritedBy = array_values(
+            array_filter($this->favoritedBy, fn($id) => $id !== $userId)
+        );
+        return $this;
+    }
+
+    /**
+     * Toggle l'état favori pour un utilisateur
+     * @param string $userId ID de l'utilisateur
+     * @return self
+     */
+    public function toggleFavorite(string $userId): self
+    {
+        if ($this->isFavoritedByUser($userId)) {
+            $this->removeFromFavorites($userId);
+        } else {
+            $this->addToFavorites($userId);
+        }
+        return $this;
+    }
+
+    // ========================================
+    //  MÉTHODES UTILITAIRES
+    // ========================================
+
+    /**
+     * Compte combien d'utilisateurs ont lu cet article
+     * @return int
+     */
+    public function getReadCount(): int
+    {
+        return count($this->readBy);
+    }
+
+    /**
+     * Compte combien d'utilisateurs ont mis cet article en favori
+     * @return int
+     */
+    public function getFavoritesCount(): int
+    {
+        return count($this->favoritedBy);
     }
 }
