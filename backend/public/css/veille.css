@@ -2,10 +2,12 @@
 
 /* ===== MINI-HEADER : Titre + Accroche ===== */
 .veille-header {
-    width: 100%;
+    width: calc(100% - 60px); /* MODIF : Soustrait la largeur sidebar */
     max-width: 1400px;
     margin: 0 auto;
+    margin-left: 60px; /* AJOUT : Décale de la largeur de la sidebar */
     padding-top: 120px;
+    padding-left: 60px; /* tentative de centrer le header du main-content  */
     padding-bottom: var(--spacing-lg);
     text-align: center;
 }
@@ -36,7 +38,7 @@
     margin-right: auto;
     padding-left: var(--spacing-sm);
     padding-right: var(--spacing-lg);
-    padding-bottom: 160px;
+    padding-bottom: 180px;
     
     display: grid;
     grid-template-columns: 1fr 1fr; /* 2 colonnes egales TOUJOURS */
@@ -95,11 +97,13 @@ body:not(.dark-mode) .veille-articles {
 .search-input-group {
     display: flex;
     gap: var(--spacing-xs);
+    align-items: center;
 }
 
 .search-input {
     flex: 1;
-    padding: var(--spacing-sm);
+    padding: 12px var(--spacing-sm); /* padding vertical fixe 12px  */
+    height: 48px; /* hauteur fixe */
     font-family: var(--font-main);
     font-size: var(--font-size-base);
     color: var(--text-primary);
@@ -122,9 +126,9 @@ body:not(.dark-mode) .veille-articles {
 /* Boutons Recherche et Reset */
 .search-btn,
 .reset-btn {
-    width: 44px;
-    height: 44px;
-    padding: var(--spacing-xs);
+    width: 48px; /* largeur = hauteur pour boutons carrés */
+    height: 48px;
+    padding: 0;
     background: var(--color-primary);
     border: none;
     border-radius: var(--radius-md);
@@ -133,6 +137,7 @@ body:not(.dark-mode) .veille-articles {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0; /* Empêche rétrécissement */
 }
 
 .search-btn svg,
@@ -192,6 +197,7 @@ body:not(.dark-mode) .veille-articles {
     align-items: center;
     justify-content: space-between;
     padding: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
     background: transparent;
     border: none;
     cursor: pointer;
@@ -231,7 +237,7 @@ body:not(.dark-mode) .veille-articles {
 
 /* Liste favoris */
 .favorites-list {
-    padding: 0 var(--spacing-md) var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md); /* MODIF : Padding-top ajouté */
 }
 
 .favorites-empty {
@@ -474,6 +480,7 @@ body:not(.dark-mode) .carousel-wrapper::after {
 .article-card {
     flex: 0 0 400px;
     min-width: 400px;
+    min-height: 450px; /* hauteur minimale augmentée */
     background: rgba(0, 194, 209, 0.05);
     border: 2px solid var(--border-color);
     border-radius: var(--radius-md);

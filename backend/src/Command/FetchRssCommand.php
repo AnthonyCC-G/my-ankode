@@ -2,9 +2,7 @@
 
 namespace App\Command;
 
-use App\Entity\User;
 use App\Service\RssFeedService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -19,8 +17,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class FetchRssCommand extends Command
 {
     public function __construct(
-        private RssFeedService $rssFeedService,
-        private EntityManagerInterface $em
+        private RssFeedService $rssFeedService
     ) {
         parent::__construct();
     }
@@ -44,29 +41,23 @@ class FetchRssCommand extends Command
         $url = $input->getArgument('url');
         $source = $input->getArgument('source');
 
-        // Récupération du premier utilisateur
-        $user = $this->em->getRepository(User::class)->findOneBy([]);
+        // Les articles RSS sont PUBLICS (userId = null)
 
-        if (!$user) {
-            $io->error('Aucun utilisateur trouvé en base de données. Crée un compte d\'abord !');
-            return Command::FAILURE;
-        }
-
-        $io->title('Récupération du flux RSS');
+        $io->title('Récupération du flux RSS PUBLIC');
         $io->info("URL : $url");
         $io->info("Source : $source");
-        $io->info("Utilisateur : {$user->getEmail()}");
+        $io->note('Ces articles seront visibles par TOUS les utilisateurs');
         $io->newLine();
 
-        // Appel du service RSS
+        // Appel du service RSS avec null (articles publics)
         $io->text('Téléchargement et parsing du flux...');
-        $result = $this->rssFeedService->fetchFeed($url, $user, $source);
+        $result = $this->rssFeedService->fetchFeed($url, null, $source);
 
         // Affichage du résultat
         if ($result['success']) {
             $io->success([
                 "Flux RSS récupéré avec succès !",
-                "{$result['count']} article(s) importé(s) dans MongoDB"
+                "{$result['count']} article(s) public(s) importé(s) dans MongoDB"
             ]);
             return Command::SUCCESS;
         } else {
