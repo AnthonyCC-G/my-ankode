@@ -69,6 +69,17 @@
             <h3 id="articles-title" class="block-title">Tous les articles</h3>
             <p class="articles-counter">Voici les premiers articles</p>
         </div>
+    
+        {# ===== TABS MOBILE UNIQUEMENT (cachés en desktop) ===== #}
+        <div class="articles-tabs">
+            <button id="tab-all" class="tab-btn active" data-tab="all">
+                Tous
+            </button>
+            <button id="tab-favorites" class="tab-btn" data-tab="favorites">
+                Favoris
+                <span id="favorites-badge" class="favorites-badge">0</span>
+            </button>
+        </div>
         
         {# Container carrousel avec boutons navigation #}
         <div class="carousel-wrapper">

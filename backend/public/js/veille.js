@@ -1,29 +1,68 @@
 // PAGE VEILLE - Gestion complete avec API REST
 
-document.addEventListener('DOMContentLoaded', function() {
-    
+    document.addEventListener('DOMContentLoaded', function() {
+        
     // ===== VARIABLES GLOBALES =====
-    let currentPage = 1;
-    let totalPages = 1;
-    let currentFilter = 'all'; // 'all' ou 'favorites'
-    let currentSearchKeyword = '';
-    
-    // ===== GESTION ACCORDEON FAVORIS =====
+        let currentPage = 1;
+        let totalPages = 1;
+        let currentFilter = 'all'; // 'all' ou 'favorites'
+        let currentSearchKeyword = '';
+        
+    // ===== GESTION ACCORDEON FAVORIS (Desktop uniquement) =====
     const favoritesToggle = document.getElementById('favorites-toggle');
     const favoritesAccordion = document.getElementById('favorites-accordion');
     const veilleGrid = document.querySelector('.veille-grid');
 
     if (favoritesToggle && favoritesAccordion && veilleGrid) {
         favoritesToggle.addEventListener('click', function() {
+            // Désactiver en mobile (≤ 768px)
+            if (window.innerWidth <= 768) return;
+            
             // Toggle accordéon
             this.classList.toggle('active');
             favoritesAccordion.classList.toggle('open');
             
-        // Toggle grille étendue
-        veilleGrid.classList.toggle('favorites-expanded');
-    });
-}
-    
+            // Toggle grille étendue
+            veilleGrid.classList.toggle('favorites-expanded');
+        });
+    }
+
+        // ===== GESTION TABS MOBILE (Tous / Favoris) =====
+    const tabAll = document.getElementById('tab-all');
+    const tabFavorites = document.getElementById('tab-favorites');
+    const favoritesBadge = document.getElementById('favorites-badge');
+
+    if (tabAll && tabFavorites) {
+        // Clic sur tab "Tous"
+        tabAll.addEventListener('click', function() {
+            if (this.classList.contains('active')) return; // Déjà actif
+            
+            // Switch tabs
+            tabAll.classList.add('active');
+            tabFavorites.classList.remove('active');
+            
+            // Charger tous les articles
+            currentFilter = 'all';
+            currentPage = 1;
+            currentSearchKeyword = '';
+            loadArticles(currentPage);
+        });
+        
+        // Clic sur tab "Favoris"
+        tabFavorites.addEventListener('click', function() {
+            if (this.classList.contains('active')) return; // Déjà actif
+            
+            // Switch tabs
+            tabFavorites.classList.add('active');
+            tabAll.classList.remove('active');
+            
+            // Charger les favoris
+            currentFilter = 'favorites';
+            loadFavoritesArticles();
+        });
+    }
+
+
     // ===== CHARGEMENT INITIAL =====
     loadArticles(currentPage);
     loadFavoritesSidebar();
@@ -127,21 +166,27 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // ===== FONCTION : CHARGER LA SIDEBAR FAVORIS =====
+    // ===== FONCTION : CHARGER LA SIDEBAR FAVORIS + METTRE A JOUR BADGE =====
     async function loadFavoritesSidebar() {
         try {
             const response = await fetch('/api/articles/favorites');
             const data = await response.json();
             
             const favoritesList = document.getElementById('favorites-list');
+            const favoritesBadge = document.getElementById('favorites-badge');
             
-            if (response.ok && data.favorites.length > 0) {
+            // Mettre à jour le badge (mobile)
+            if (favoritesBadge) {
+                favoritesBadge.textContent = data.favorites.length;
+            }
+            
+            // Mettre à jour la sidebar (desktop uniquement)
+            if (favoritesList && response.ok && data.favorites.length > 0) {
                 favoritesList.innerHTML = '';
                 data.favorites.slice(0, 10).forEach(article => {
                     const item = document.createElement('div');
                     item.className = 'favorite-item';
                     
-                    // Structure avec le lien et le bouton côte à côte
                     item.innerHTML = `
                         <a href="${article.url}" target="_blank" class="favorite-link">${article.title}</a>
                         <button class="btn-unfavorite" data-id="${article.id}" title="Retirer des favoris">
@@ -156,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 addUnfavoriteListeners();
                 
-            } else {
+            } else if (favoritesList) {
                 favoritesList.innerHTML = '<p class="favorites-empty">Aucun favori</p>';
             }
         } catch (error) {
