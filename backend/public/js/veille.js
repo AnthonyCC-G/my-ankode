@@ -236,6 +236,17 @@ document.addEventListener('DOMContentLoaded', function() {
         requestAnimationFrame(updateCarouselButtonsIfExists);
     }
     
+    // ===== FONCTION : NETTOYER LE TEXTE (enlever sauts de ligne) =====
+    function cleanText(text) {
+        if (!text) return '';
+        
+        return text
+            .replace(/\n+/g, ' ')      // Tous les sauts de ligne → 1 espace
+            .replace(/\r+/g, ' ')      // Retours chariot aussi
+            .replace(/\s{2,}/g, ' ')   // Espaces multiples → 1 seul espace
+            .trim();                   // Enlève espaces début/fin
+    }
+
     // ===== FONCTION : CREER UNE CARD =====
     function createArticleCard(article) {
         const card = document.createElement('div');
@@ -243,9 +254,9 @@ document.addEventListener('DOMContentLoaded', function() {
         card.dataset.articleId = article.id;
         
         card.innerHTML = `
-            <h4 class="article-title">${article.title}</h4>
+            <h4 class="article-title">${cleanText(article.title)}</h4>
             <p class="article-source">${article.source} - ${article.publishedAt}</p>
-            <p class="article-description">${article.description || 'Pas de description'}</p>
+            <p class="article-description">${cleanText(article.description) || 'Pas de description'}</p>
             <div class="article-actions">
                 <button class="btn-read" data-id="${article.id}" title="Marquer comme ${article.isRead ? 'non lu' : 'lu'}">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">

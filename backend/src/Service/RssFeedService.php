@@ -134,7 +134,15 @@ class RssFeedService
             $article = new Article();
             $article->setTitle($item['title']);
             $article->setUrl($item['link']);
-            $article->setDescription($item['description']);
+            // NETTOYER la description : strip HTML + limiter à 200 caractères
+            $cleanDescription = strip_tags($item['description']); // Enlève HTML
+            $cleanDescription = preg_replace('/\s+/', ' ', $cleanDescription); // Espaces multiples → 1
+            $cleanDescription = trim($cleanDescription); // Trim
+            $cleanDescription = mb_substr($cleanDescription, 0, 250); // Max 250 caractères
+
+            $article->setDescription($cleanDescription);
+            $article->setSource($sourceName);
+            $article->setUserId(null);
             $article->setSource($sourceName);
             
             // userId = null pour articles publics RSS
