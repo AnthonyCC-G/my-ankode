@@ -1,275 +1,926 @@
-/* ============================================
-KANBAN MY-ANKODE - CSS COMPLET
-   ============================================ */
+/**
+ * KANBAN.CSS - Styles de la page Kanban (Desktop uniquement)
+ * Description : Interface Kanban avec 2 blocs focus alterné (Projets + Tâches)
+ */
 
-/* === RESET & VARIABLES === */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* ==================== IMPORTS ET VARIABLES ==================== */
+/* Variables héritées de Variables.css (palette Cyan/Orange) */
+
+/* ==================== HEADER KANBAN ==================== */
+.kanban-header {
+    text-align: center;
+    padding: var(--spacing-xl) var(--spacing-lg);
+    margin-top: 80px; /* ← AJOUT : Espace pour la navbar fixe */
+    margin-bottom: var(--spacing-lg);
+    border-radius: var(--radius-lg);
 }
 
-:root {
-    --cyan-primary: #00C2D1;
-    --cyan-dark: #003B4F;
-    --orange-accent: #FDAB5E;
-    --grey-light: #E5E5E5;
-    --text-white: #FFFFFF;
-    --text-dark: #1E1E1E;
+.kanban-title {
+    font-family: var(--font-code);
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
 }
 
-/* === LAYOUT GÉNÉRAL === */
-body {
-    font-family: 'Arial', sans-serif;
-    display: grid;
-    grid-template-rows: auto auto 1fr;
-    height: 100vh;
-    background: var(--cyan-dark);
+.kanban-intro {
+    font-family: var(--font-main);
+    font-size: var(--font-size-base);
+    color: var(--text-secondary);
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 1.6;
 }
 
-/* === HEADER HORIZONTAL === */
-.main-header {
-    background: var(--cyan-primary);
-    padding: 15px 30px;
+/* ==================== MAIN KANBAN : 2 BLOCS ==================== */
+.kanban-main {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    height: calc(100vh - 300px); 
+    padding: 0 var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: 180px; 
 }
 
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.logo {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.main-header h1 {
-    color: var(--text-white);
-    font-size: 24px;
-    margin: 0;
-}
-
-.header-nav {
-    display: flex;
-    gap: 20px;
-}
-
-.header-nav a {
-    color: var(--text-white);
-    text-decoration: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    transition: background 0.3s;
-}
-
-.header-nav a:hover {
-    background: rgba(255, 255, 255, 0.2);
-}
-
-.nav-inactive {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-/* === BARRE PROJET === */
-.project-bar {
-    background: var(--grey-light);
-    padding: 15px 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.project-info {
-    font-size: 16px;
-    font-weight: bold;
-}
-
-.project-label {
-    color: var(--text-dark);
-}
-
-.project-name {
-    color: var(--cyan-primary);
-    margin-left: 10px;
-}
-
-.task-form-inline {
-    display: flex;
-    gap: 10px;
-}
-
-.task-form-inline input {
-    padding: 8px 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: 300px;
-    font-size: 14px;
-}
-
-.btn-add {
-    background: var(--orange-accent);
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.btn-add:hover {
-    transform: scale(1.05);
-}
-
-.btn-add img {
-    width: 20px;
-    height: 20px;
-}
-
-/* === CONTAINER PRINCIPAL === */
-.main-container {
-    display: grid;
-    grid-template-columns: 80px 1fr 120px;
-    gap: 0;
+/* ===== BLOC GÉNÉRIQUE (Projets + Tâches) ===== */
+.kanban-block {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
     overflow: hidden;
+    transition: all var(--transition-base);
 }
 
-/* === SIDEBAR GAUCHE === */
-.sidebar-left {
-    background: var(--cyan-dark);
+/* ===== ÉTATS : FOCUS vs REDUCED ===== */
+/* Par défaut, le bloc Projets est FOCUS et le bloc Tâches est REDUCED */
+.kanban-block--projects {
+    flex: 1; /* Occupe l'espace disponible */
+}
+
+.kanban-block--tasks {
+    flex: 0 0 60px; /* Réduit (juste le titre) */
+}
+
+/* Quand Projets est REDUCED et Tâches est FOCUS (géré par JS) */
+.kanban-block--projects.reduced {
+    flex: 0 0 60px;
+}
+
+.kanban-block--tasks.focus {
+    flex: 1;
+}
+
+/* ===== CONTENUS DES BLOCS ===== */
+.block-content--focus {
+    display: block;
+    padding: var(--spacing-md);
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.block-content--reduced {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    border-radius: var(--radius-sm);
+    min-height: 60px;
+}
+
+/* Hover : Effet visuel pour montrer que c'est cliquable */
+.block-content--reduced:hover {
+    background: rgba(0, 194, 209, 0.1);
+    transform: translateX(2px); /* Léger décalage pour effet "push" */
+    border-left: 3px solid var(--color-primary); /* Bordure cyan à gauche */
+}
+
+/* Effet actif au clic */
+.block-content--reduced:active {
+    transform: translateX(0);
+    background: rgba(0, 194, 209, 0.15);
+}
+
+/* ===== HEADER DE BLOC ===== */
+.block-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--border-color);
+}
+
+.block-title {
+    font-family: var(--font-code);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-primary);
+    margin: 0;
+}
+
+/* ===== ÉTAT REDUCED : Info + Bouton ===== */
+.block-reduced-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+/* Supprimer toutes les marges par défaut dans les zones réduites */
+.block-content--reduced * {
+    margin: 0;
+    line-height: 1.2; /* ← Réduit la hauteur de ligne pour compacter */
+}
+
+.reduced-label {
+    font-family: var(--font-main);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.reduced-value {
+    font-family: var(--font-code);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}
+
+.btn-change-project {
+    padding: 6px var(--spacing-md); /* ← Padding vertical fixe réduit */
+    background: transparent;
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    border-radius: var(--radius-md);
+    font-family: var(--font-main);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    flex-shrink: 0; /* ← Empêche le bouton de rétrécir */
+    line-height: 1; /* ← Réduit la hauteur de ligne */
+}
+
+.btn-change-project:hover {
+    background: var(--color-primary);
+    color: var(--cyan-900);
+}
+
+/* ==================== BLOC PROJETS ==================== */
+
+/* ===== BOUTON NOUVEAU PROJET ===== */
+.btn-new-project {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-md);
+    background: var(--color-primary);
+    color: var(--cyan-900);
+    border: none;
+    border-radius: var(--radius-md);
+    font-family: var(--font-main);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.btn-new-project:hover {
+    background: var(--cyan-400);
+    transform: translateY(-2px);
+}
+
+.btn-new-project svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* ===== FORMULAIRE PROJET ===== */
+.project-form-container {
+    margin-bottom: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: rgba(0, 194, 209, 0.05);
+    border: 1px solid var(--color-primary);
+    border-radius: var(--radius-md);
+}
+
+.project-form .form-group {
+    margin-bottom: var(--spacing-sm);
+}
+
+.project-form label {
+    display: block;
+    font-family: var(--font-main);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.project-form .form-input,
+.project-form .form-textarea {
+    width: 100%;
+    padding: var(--spacing-sm);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-main);
+    font-size: var(--font-size-base);
+    transition: border-color var(--transition-base);
+}
+
+.project-form .form-input:focus,
+.project-form .form-textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.project-form .form-textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+.form-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+}
+
+.btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    border-radius: var(--radius-md);
+    font-family: var(--font-main);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.btn-primary {
+    background: var(--color-primary);
+    color: var(--cyan-900);
+}
+
+.btn-primary:hover {
+    background: var(--cyan-400);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background: var(--bg-tertiary);
+}
+
+/* ===== LISTE DES PROJETS (avec scroll) ===== */
+.projects-list {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: var(--spacing-xs);
+}
+
+/* Scrollbar personnalisée */
+.projects-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.projects-list::-webkit-scrollbar-track {
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
+}
+
+.projects-list::-webkit-scrollbar-thumb {
+    background: var(--color-primary);
+    border-radius: var(--radius-sm);
+}
+
+.projects-list::-webkit-scrollbar-thumb:hover {
+    background: var(--cyan-400);
+}
+
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--text-secondary);
+    font-family: var(--font-main);
+    font-size: var(--font-size-base);
+}
+
+/* ===== CARD PROJET ===== */
+.project-card {
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+    background: var(--bg-primary);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.project-card:hover {
+    border-color: var(--color-primary);
+    transform: translateX(4px);
+}
+
+.project-card.selected {
+    border-color: var(--color-primary);
+    background: rgba(0, 194, 209, 0.1);
+}
+
+.project-card-title {
+    font-family: var(--font-code);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.project-card-description {
+    font-family: var(--font-main);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    
+    /* Tronquer avec ellipsis */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.project-card-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--border-color);
+}
+
+.btn-icon {
+    padding: var(--spacing-xs);
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-base);
     display: flex;
     align-items: center;
     justify-content: center;
-    border-right: 2px solid rgba(255, 255, 255, 0.1);
 }
 
-.vertical-text {
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-    color: var(--text-white);
-    font-size: 18px;
-    font-weight: bold;
-    letter-spacing: 2px;
+.btn-icon svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--text-secondary);
 }
 
-/* === KANBAN BOARD === */
+.btn-icon:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--color-primary);
+}
+
+.btn-icon:hover svg {
+    stroke: var(--color-primary);
+}
+
+.btn-icon--delete {
+    border-color: var(--red-500);
+}
+
+.btn-icon--delete svg {
+    stroke: var(--red-500);
+}
+
+.btn-icon--delete:hover {
+    background: var(--red-500);
+    border-color: var(--red-500);
+}
+
+.btn-icon--delete:hover svg {
+    stroke: #ffffff;
+}
+
+/* ===== BOUTON MODIFIER (crayon) ===== */
+.btn-icon--edit svg {
+    stroke: var(--color-primary);
+}
+
+.btn-icon--edit:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.btn-icon--edit:hover svg {
+    stroke: var(--cyan-900);
+}
+
+/* ===== BOUTON MODIFIER (crayon) ===== */
+.btn-icon--edit svg {
+    stroke: var(--color-primary);
+}
+
+.btn-icon--edit:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.btn-icon--edit:hover svg {
+    stroke: var(--cyan-900);
+}
+
+/* ===== MODE ÉDITION : CARD PROJET ===== */
+.project-card--editing {
+    border-color: var(--orange-500); /* Juste la border orange, rien de plus */
+    background: rgba(253, 171, 94, 0.05); /* Fond très léger */
+}
+
+/* Formulaire d'édition dans la card */
+.project-edit-form .form-group {
+    margin-bottom: var(--spacing-sm);
+}
+
+.project-edit-form label {
+    display: block;
+    font-family: var(--font-main);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.project-edit-form .form-input--edit,
+.project-edit-form .form-textarea--edit {
+    width: 100%;
+    padding: var(--spacing-sm);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--orange-500); /* Border orange fine */
+    border-radius: var(--radius-sm);
+    font-family: var(--font-main);
+    font-size: var(--font-size-base);
+    transition: border-color var(--transition-base);
+}
+
+.project-edit-form .form-input--edit:focus,
+.project-edit-form .form-textarea--edit:focus {
+    outline: none;
+    border-color: var(--orange-500);
+}
+
+.project-edit-form .form-textarea--edit {
+    resize: vertical;
+    min-height: 60px;
+}
+
+/* ==================== BLOC TÂCHES (KANBAN) ==================== */
+
+/* ===== MESSAGE SI AUCUN PROJET ===== */
+.tasks-empty-state {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--text-secondary);
+    font-family: var(--font-main);
+    font-size: var(--font-size-base);
+}
+
+/* ===== KANBAN BOARD : 3 COLONNES ===== */
 .kanban-board {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    padding: 20px;
-    background: var(--cyan-dark);
+    gap: var(--spacing-md);
+    flex: 1;
+    overflow: hidden;
 }
 
-.column {
+/* ===== COLONNE KANBAN ===== */
+.kanban-column {
     display: flex;
     flex-direction: column;
+    background: var(--bg-primary);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    overflow: hidden;
 }
 
+.kanban-column--todo {
+    border-top: 4px solid var(--orange-500);
+}
+
+.kanban-column--in-progress {
+    border-top: 4px solid var(--color-primary);
+}
+
+.kanban-column--done {
+    border-top: 4px solid var(--green-500);
+}
+
+/* ===== HEADER DE COLONNE ===== */
 .column-header {
-    background: var(--grey-light);
-    padding: 15px;
-    border-radius: 15px 15px 0 0;
-    text-align: center;
-    font-weight: bold;
-    font-size: 14px;
-    color: var(--text-dark);
-    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-color);
 }
 
-.task-list {
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    border-top: none;
-    border-radius: 0 0 15px 15px;
-    list-style: none;
-    padding: 15px;
-    min-height: 500px;
-    flex-grow: 1;
+.column-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-family: var(--font-code);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin: 0;
 }
 
-/* === CARTES DE TÂCHES === */
+.column-badge {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.badge-todo {
+    background: var(--neutral-400);
+}
+
+.badge-in-progress {
+    background: var(--color-primary);
+}
+
+.badge-done {
+    background: var(--green-500);
+}
+
+/* ===== BOUTON NOUVELLE TÂCHE (uniquement colonne TODO) ===== */
+.btn-new-task {
+    padding: var(--spacing-xs);
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-new-task svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--text-secondary);
+}
+
+.btn-new-task:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.btn-new-task:hover svg {
+    stroke: var(--cyan-900);
+}
+
+/* ===== FORMULAIRE TÂCHE (inline dans la colonne) ===== */
+.task-form-container {
+    padding: var(--spacing-sm);
+    background: rgba(0, 194, 209, 0.05);
+    border-bottom: 1px solid var(--color-primary);
+}
+
+.task-form .form-input--small,
+.task-form .form-textarea--small {
+    width: 100%;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-main);
+    font-size: var(--font-size-sm);
+    transition: border-color var(--transition-base);
+    margin-bottom: var(--spacing-xs);
+}
+
+.task-form .form-input--small:focus,
+.task-form .form-textarea--small:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.task-form .form-textarea--small {
+    resize: none;
+    min-height: 50px;
+}
+
+.form-actions--inline {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+.btn-sm {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
+}
+
+/* ===== CONTAINER TÂCHES (avec scroll) ===== */
+.tasks-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-sm);
+}
+
+/* Scrollbar personnalisée pour les colonnes */
+.tasks-container::-webkit-scrollbar {
+    width: 4px;
+}
+
+.tasks-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.tasks-container::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: var(--radius-sm);
+}
+
+.tasks-container::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+/* ===== CARD TÂCHE ===== */
 .task-card {
-    background: var(--grey-light);
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s;
+    padding: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-base);
+    cursor: pointer;
 }
 
 .task-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(0, 194, 209, 0.2);
 }
 
-.task-title {
-    font-weight: bold;
-    color: var(--text-dark);
-    margin-bottom: 8px;
-}
-
-.task-actions {
+.task-card-header {
     display: flex;
-    gap: 8px;
-    margin-top: 10px;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-xs);
 }
 
-.btn-move {
-    background: var(--cyan-primary);
-    color: var(--text-white);
-    border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 12px;
+.task-card-title {
+    font-family: var(--font-code);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    flex: 1;
+}
+
+.task-card-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.task-card-description {
+    font-family: var(--font-main);
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+    line-height: 1.4;
+    
+    /* Tronquer avec ellipsis (2 lignes) */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: var(--spacing-xs);
+}
+
+/* Accordéon pour description complète (géré en JS) */
+.task-card-description.expanded {
+    -webkit-line-clamp: unset;
+}
+
+/* ===== BOUTONS D'ACTION TÂCHE ===== */
+.task-btn {
+    padding: 4px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xs);
     cursor: pointer;
-    transition: background 0.3s;
-}
-
-.btn-move:hover {
-    background: var(--orange-accent);
-}
-
-.btn-move:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-}
-
-/* === ZONE DÉCO DROITE === */
-.deco-right {
-    background: var(--cyan-dark);
+    transition: all var(--transition-base);
     display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: flex-end;
-    padding-bottom: 30px;
-    gap: 20px;
+    justify-content: center;
 }
 
-.deco-bulb,
-.deco-avatar {
-    width: 60px;
-    height: 60px;
-    object-fit: contain;
+.task-btn svg {
+    width: 14px;
+    height: 14px;
 }
 
-/* === RESPONSIVE (BONUS) === */
+/* Bouton Modifier (crayon) */
+.task-btn--edit svg {
+    stroke: var(--color-primary);
+}
+
+.task-btn--edit:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.task-btn--edit:hover svg {
+    stroke: var(--cyan-900);
+}
+
+/* Bouton Terminer (check) */
+.task-btn--complete svg {
+    stroke: var(--green-500);
+}
+
+.task-btn--complete:hover {
+    background: var(--green-500);
+    border-color: var(--green-500);
+}
+
+.task-btn--complete:hover svg {
+    stroke: #ffffff;
+}
+
+/* Bouton Supprimer (poubelle) */
+.task-btn--delete svg {
+    stroke: var(--red-500);
+}
+
+.task-btn--delete:hover {
+    background: var(--red-500);
+    border-color: var(--red-500);
+}
+
+.task-btn--delete:hover svg {
+    stroke: #ffffff;
+}
+
+/* Bouton Démarrer (play) */
+.task-btn--start svg {
+    stroke: var(--color-primary);
+}
+
+.task-btn--start:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.task-btn--start:hover svg {
+    stroke: var(--cyan-900);
+}
+
+/* ===== MODE ÉDITION : TASK CARD ===== */
+.task-card--editing {
+    border-color: var(--orange-500); /* Border orange comme les projets */
+    background: rgba(253, 171, 94, 0.05);
+}
+
+/* Formulaire d'édition dans la task-card */
+.task-edit-form {
+    padding: var(--spacing-xs);
+}
+
+.task-edit-form .form-group {
+    margin-bottom: var(--spacing-xs);
+}
+
+.task-edit-form label {
+    display: block;
+    font-family: var(--font-main);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.task-edit-form .form-input--edit-task,
+.task-edit-form .form-textarea--edit-task {
+    width: 100%;
+    padding: var(--spacing-xs);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--orange-500); /* Border orange fine */
+    border-radius: var(--radius-sm);
+    font-family: var(--font-main);
+    font-size: var(--font-size-sm);
+    transition: border-color var(--transition-base);
+}
+
+.task-edit-form .form-input--edit-task:focus,
+.task-edit-form .form-textarea--edit-task:focus {
+    outline: none;
+    border-color: var(--orange-500);
+}
+
+.task-edit-form .form-textarea--edit-task {
+    resize: vertical;
+    min-height: 50px;
+}
+
+.task-edit-form .form-actions--inline {
+    display: flex;
+    gap: 4px;
+    margin-top: var(--spacing-xs);
+}
+
+.task-edit-form .btn-sm {
+    padding: 4px var(--spacing-xs);
+    font-size: var(--font-size-xs);
+}
+
+
+/* ==================== AJUSTEMENTS MASCOTTE POUR KANBAN ==================== */
+
+/**
+ * Sur la page Kanban UNIQUEMENT :
+ * - Personnage masqué (géré dans base.html.twig avec condition Twig)
+ * - Bulle masquée (géré dans base.html.twig avec condition Twig)  
+ * - Ampoule repositionnée en bas à droite au-dessus du footer
+ */
+
+/* Repositionner le conteneur entier */
+.mascot-container {
+    bottom: 90px;  /* Au-dessus du footer (ajuste selon hauteur de ton footer) */
+    right: 25px;    
+}
+
+/* Ampoule seule : retirer les transformations par défaut */
+.mascot-container .lightbulb {
+    position: static;  /* Retire le positionnement absolu (était relative au personnage) */
+    transform: none;   /* Retire translateX(-50%) ou autre */
+    top: auto;
+    left: auto;
+    width: 50px;       /* Taille visible et cliquable */
+    height: 50px;
+    cursor: pointer;
+    
+    /* Animation pulse douce pour attirer l'œil */
+    animation: gentle-glow 3s ease-in-out infinite;
+}
+
+/* Animation de glow subtil */
+@keyframes gentle-glow {
+    0%, 100% {
+        filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
+    }
+    50% {
+        filter: drop-shadow(0 0 18px rgba(255, 215, 0, 0.9));
+    }
+}
+
+/* Hover renforcé */
+.mascot-container .lightbulb:hover {
+    filter: drop-shadow(0 0 25px rgba(255, 215, 0, 1)) !important;
+    transform: scale(1.15);
+}
+
+/* Mode Light : ampoule éteinte (grise) - pas d'animation */
+body:not(.dark-mode) .mascot-container .lightbulb {
+    filter: grayscale(100%) brightness(0.5);
+    animation: none;
+}
+
+body:not(.dark-mode) .mascot-container .lightbulb:hover {
+    filter: grayscale(100%) brightness(0.7) !important;
+    transform: scale(1.1);
+}
+
+
+/* ==================== MODE DARK/LIGHT ==================== */
+/* Les variables CSS s'ajustent automatiquement via Variables.css */
+
+/* ==================== RESPONSIVE (Sécurité) ==================== */
+/* La page redirige les mobiles, mais on garde une sécurité CSS */
 @media (max-width: 768px) {
-    .kanban-board {
-        grid-template-columns: 1fr;
-    }
-    
-    .main-container {
-        grid-template-columns: 1fr;
-    }
-    
-    .sidebar-left,
-    .deco-right {
+    .kanban-main {
         display: none;
+    }
+    
+    .kanban-header::after {
+        content: "Cette page est optimisée pour desktop. Veuillez utiliser un ordinateur.";
+        display: block;
+        margin-top: var(--spacing-md);
+        padding: var(--spacing-md);
+        background: var(--color-accent);
+        color: var(--cyan-900);
+        border-radius: var(--radius-md);
+        font-weight: var(--font-weight-semibold);
     }
 }

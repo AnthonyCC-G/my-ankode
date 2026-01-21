@@ -1,107 +1,180 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Kanban Board - MY-ANKODE{% endblock %}
+{% block title %}Kanban - My Ankode{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/kanban.css') }}">
+{% endblock %}
 
 {% block body %}
-<div class="container-fluid mt-4">
-    <h1 class="mb-4">Kanban Board</h1>
+{# ===== HEADER KANBAN ===== #}
+<header class="kanban-header">
+    <h1 class="kanban-title">Kanban</h1>
+    <p class="kanban-intro">
+        Le Kanban est une méthode visuelle de gestion de projet qui permet de suivre l'avancement 
+        de tes tâches en temps réel. Crée tes projets, ajoute des tâches et fais-les progresser 
+        de "À faire" vers "Terminé" pour garder une vue d'ensemble de ton travail.
+    </p>
+</header>
+
+{# ===== MAIN KANBAN : 2 BLOCS AVEC FOCUS ALTERNÉ ===== #}
+<main class="kanban-main">
     
-    {% if projectsWithTasks is empty %}
-        <div class="alert alert-info">
-            <p class="mb-0">Aucun projet disponible pour le moment.</p>
-            <small>Utilisez l'API <code>POST /api/projects</code> pour créer des projets.</small>
-        </div>
-    {% else %}
-        <p class="text-muted">{{ projectsWithTasks|length }} projet(s)</p>
+    {# ========================================
+       BLOC 1 : PROJETS (Accordéon)
+       ======================================== #}
+    <section class="kanban-block kanban-block--projects" id="projects-block">
         
-        {% for item in projectsWithTasks %}
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">{{ item.project.name }}</h3>
-                    {% if item.project.description %}
-                        <p class="mb-0 mt-2"><small>{{ item.project.description }}</small></p>
-                    {% endif %}
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        {# Colonne À FAIRE #}
-                        <div class="col-md-4">
-                            <div class="card bg-light">
-                                <div class="card-header bg-secondary text-white">
-                                    <h5 class="mb-0">À faire ({{ item.tasks.todo|length }})</h5>
-                                </div>
-                                <div class="card-body p-2">
-                                    {% if item.tasks.todo is empty %}
-                                        <p class="text-muted text-center mb-0"><small>Aucune tâche</small></p>
-                                    {% else %}
-                                        {% for task in item.tasks.todo %}
-                                            <div class="card mb-2">
-                                                <div class="card-body p-2">
-                                                    <h6 class="card-title mb-1">{{ task.title }}</h6>
-                                                    {% if task.description %}
-                                                        <p class="card-text mb-0"><small>{{ task.description|slice(0, 100) }}{% if task.description|length > 100 %}...{% endif %}</small></p>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                        {% endfor %}
-                                    {% endif %}
-                                </div>
+        {# ÉTAT FOCUS : Affiche tout #}
+        <div class="block-content block-content--focus">
+            <div class="block-header">
+                <h2 class="block-title">Projets</h2>
+                <button class="btn-new-project" id="btn-new-project" title="Créer un nouveau projet">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Nouveau projet
+                </button>
+            </div>
+            
+            {# Formulaire création projet (caché par défaut) #}
+            <div class="project-form-container" id="project-form-container" style="display: none;">
+                <form class="project-form" id="project-form">
+                    <div class="form-group">
+                        <label for="project-title">Titre du projet</label>
+                        <input type="text" id="project-title" name="title" class="form-input" placeholder="Ex: Refonte du site" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="project-description">Description (optionnelle)</label>
+                        <textarea id="project-description" name="description" class="form-textarea" placeholder="Description détaillée..." rows="3"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Créer</button>
+                        <button type="button" class="btn btn-secondary" id="btn-cancel-project">Annuler</button>
+                    </div>
+                </form>
+            </div>
+            
+            {# Liste des projets (avec scroll interne si besoin) #}
+            <div class="projects-list" id="projects-list">
+                {# Sera rempli dynamiquement par JS #}
+                <p class="empty-state">Aucun projet pour le moment. Crée ton premier projet pour commencer !</p>
+            </div>
+        </div>
+        
+        {# ÉTAT REDUCED : Affiche seulement le projet actuel + bouton #}
+        <div class="block-content block-content--reduced" style="display: none;">
+            <div class="block-reduced-info">
+                <span class="reduced-label">Projet actuel :</span>
+                <span class="reduced-value" id="current-project-name">Aucun projet sélectionné</span>
+            </div>
+            <button class="btn-change-project" id="btn-change-project">
+                Changer de projet
+            </button>
+        </div>
+    </section>
+    
+    {# ========================================
+       BLOC 2 : TÂCHES (Kanban 3 colonnes)
+       ======================================== #}
+    <section class="kanban-block kanban-block--tasks" id="tasks-block">
+        
+        {# ÉTAT REDUCED : Affiche seulement le titre #}
+        <div class="block-content block-content--reduced">
+            <div class="block-reduced-info">
+                <span class="reduced-value">Tâches</span>
+            </div>
+        </div>
+        
+        {# ÉTAT FOCUS : Affiche tout le Kanban #}
+        <div class="block-content block-content--focus" style="display: none;">
+            <div class="block-header">
+                <h2 class="block-title" id="tasks-title">Tâches</h2>
+            </div>
+            
+            {# Message si aucun projet sélectionné #}
+            <div class="tasks-empty-state" id="tasks-empty-state">
+                <p>Sélectionne un projet dans la liste ci-dessus pour voir ses tâches.</p>
+            </div>
+            
+            {# Kanban 3 colonnes (caché si aucun projet) #}
+            <div class="kanban-board" id="kanban-board" style="display: none;">
+                
+                {# COLONNE 1 : TO DO #}
+                <div class="kanban-column kanban-column--todo">
+                    <div class="column-header">
+                        <h3 class="column-title">
+                            <span class="column-badge badge-todo"></span>
+                            À faire
+                        </h3>
+                        <button class="btn-new-task" id="btn-new-task-todo" data-status="todo" title="Nouvelle tâche">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    {# Formulaire création tâche (caché par défaut) #}
+                    <div class="task-form-container" id="task-form-todo" style="display: none;">
+                        <form class="task-form">
+                            <div class="form-group">
+                                <input type="text" name="title" class="form-input form-input--small" placeholder="Titre de la tâche" required>
                             </div>
-                        </div>
-
-                        {# Colonne EN COURS #}
-                        <div class="col-md-4">
-                            <div class="card bg-light">
-                                <div class="card-header bg-warning text-dark">
-                                    <h5 class="mb-0">En cours ({{ item.tasks.in_progress|length }})</h5>
-                                </div>
-                                <div class="card-body p-2">
-                                    {% if item.tasks.in_progress is empty %}
-                                        <p class="text-muted text-center mb-0"><small>Aucune tâche</small></p>
-                                    {% else %}
-                                        {% for task in item.tasks.in_progress %}
-                                            <div class="card mb-2">
-                                                <div class="card-body p-2">
-                                                    <h6 class="card-title mb-1">{{ task.title }}</h6>
-                                                    {% if task.description %}
-                                                        <p class="card-text mb-0"><small>{{ task.description|slice(0, 100) }}{% if task.description|length > 100 %}...{% endif %}</small></p>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                        {% endfor %}
-                                    {% endif %}
-                                </div>
+                            <div class="form-group">
+                                <textarea name="description" class="form-textarea form-textarea--small" placeholder="Description..." rows="2"></textarea>
                             </div>
-                        </div>
-
-                        {# Colonne TERMINÉ #}
-                        <div class="col-md-4">
-                            <div class="card bg-light">
-                                <div class="card-header bg-success text-white">
-                                    <h5 class="mb-0">Terminé ({{ item.tasks.done|length }})</h5>
-                                </div>
-                                <div class="card-body p-2">
-                                    {% if item.tasks.done is empty %}
-                                        <p class="text-muted text-center mb-0"><small>Aucune tâche</small></p>
-                                    {% else %}
-                                        {% for task in item.tasks.done %}
-                                            <div class="card mb-2">
-                                                <div class="card-body p-2">
-                                                    <h6 class="card-title mb-1">{{ task.title }}</h6>
-                                                    {% if task.description %}
-                                                        <p class="card-text mb-0"><small>{{ task.description|slice(0, 100) }}{% if task.description|length > 100 %}...{% endif %}</small></p>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                        {% endfor %}
-                                    {% endif %}
-                                </div>
+                            <div class="form-actions form-actions--inline">
+                                <button type="submit" class="btn btn-primary btn-sm">Créer</button>
+                                <button type="button" class="btn btn-secondary btn-sm btn-cancel-task">Annuler</button>
                             </div>
-                        </div>
+                        </form>
+                    </div>
+                    
+                    {# Liste des tâches TODO (avec scroll interne) #}
+                    <div class="tasks-container" id="tasks-todo">
+                        {# Sera rempli dynamiquement par JS #}
                     </div>
                 </div>
+                
+                {# COLONNE 2 : IN PROGRESS #}
+                <div class="kanban-column kanban-column--in-progress">
+                    <div class="column-header">
+                        <h3 class="column-title">
+                            <span class="column-badge badge-in-progress"></span>
+                            En cours
+                        </h3>
+                    </div>
+                    
+                    {# Liste des tâches IN PROGRESS #}
+                    <div class="tasks-container" id="tasks-in-progress">
+                        {# Sera rempli dynamiquement par JS #}
+                    </div>
+                </div>
+                
+                {# COLONNE 3 : DONE #}
+                <div class="kanban-column kanban-column--done">
+                    <div class="column-header">
+                        <h3 class="column-title">
+                            <span class="column-badge badge-done"></span>
+                            Terminé
+                        </h3>
+                    </div>
+                    
+                    {# Liste des tâches DONE #}
+                    <div class="tasks-container" id="tasks-done">
+                        {# Sera rempli dynamiquement par JS #}
+                    </div>
+                </div>
+                
             </div>
-        {% endfor %}
-    {% endif %}
-</div>
+        </div>
+    </section>
+    
+</main>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/kanban.js') }}"></script>
 {% endblock %}
