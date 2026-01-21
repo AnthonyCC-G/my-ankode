@@ -1,15 +1,5 @@
 /**
  * KANBAN.JS - Gestion du Kanban (Projets + Tâches)
- * Version MVP - JS Vanilla ES6+ avec Fetch API
- * Projet : MY-ANKODE - Certification DWWM
- * Auteur : Anthony
- * 
- * Fonctionnalités :
- * - CRUD Projets (Create, Read, Delete)
- * - CRUD Tâches (Create, Read, Update status, Delete)
- * - Fetch API avec gestion d'erreurs (try/catch)
- * - Manipulation DOM dynamique (innerHTML / createElement)
- * - Toggle focus entre blocs Projets et Tâches
  */
 
 // ===== 1. DÉTECTION MOBILE CÔTÉ CLIENT (Double sécurité avec le controller) =====
@@ -188,6 +178,22 @@ function createProjectCard(project) {
     const actions = document.createElement('div');
     actions.className = 'project-card-actions';
     
+    // ===== BOUTON MODIFIER (nouveau) =====
+    const editBtn = document.createElement('button');
+    editBtn.className = 'btn-icon btn-icon--edit';
+    editBtn.title = 'Modifier le projet';
+    editBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+    `;
+
+    // Event : Modifier projet
+    editBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Empêche la sélection du projet lors du clic sur modifier
+        handleEditProject(project);
+    });
+
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'btn-icon btn-icon--delete';
     deleteBtn.title = 'Supprimer le projet';
@@ -203,6 +209,8 @@ function createProjectCard(project) {
         handleDeleteProject(project.id);
     });
     
+    // Assembler les boutons
+    actions.appendChild(editBtn);
     actions.appendChild(deleteBtn);
     
     // Event : Sélectionner projet (clic sur la card)
@@ -392,6 +400,134 @@ async function handleDeleteProject(projectId) {
     } catch (error) {
         console.error('[KANBAN] Erreur suppression projet:', error);
         showError(error.message || 'Impossible de supprimer le projet');
+    }
+}
+
+    // ===== 14bis. ÉDITION D'UN PROJET (TRANSFORMATION CARD → FORMULAIRE) =====
+function handleEditProject(project) {
+    console.log(`[KANBAN] Édition du projet ID: ${project.id}`);
+    
+    // Récupérer la card du projet
+    const projectCard = document.querySelector(`.project-card[data-project-id="${project.id}"]`);
+    
+    if (!projectCard) {
+        console.error('[KANBAN] Card projet introuvable');
+        return;
+    }
+    
+    // Ajouter la classe d'édition (border orange)
+    projectCard.classList.add('project-card--editing');
+    
+    // Sauvegarder le contenu original (pour pouvoir annuler)
+    const originalContent = projectCard.innerHTML;
+    
+    // Créer le formulaire d'édition
+    projectCard.innerHTML = `
+        <form class="project-edit-form" data-project-id="${project.id}">
+            <div class="form-group">
+                <label for="edit-project-title-${project.id}">Titre du projet</label>
+                <input 
+                    type="text" 
+                    id="edit-project-title-${project.id}" 
+                    name="title" 
+                    class="form-input form-input--edit" 
+                    value="${project.name}" 
+                    required
+                >
+            </div>
+            <div class="form-group">
+                <label for="edit-project-description-${project.id}">Description</label>
+                <textarea 
+                    id="edit-project-description-${project.id}" 
+                    name="description" 
+                    class="form-textarea form-textarea--edit" 
+                    rows="3"
+                >${project.description || ''}</textarea>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-sm">Sauvegarder</button>
+                <button type="button" class="btn btn-secondary btn-sm btn-cancel-edit">Annuler</button>
+            </div>
+        </form>
+    `;
+    
+    // Event : Soumettre le formulaire
+    const form = projectCard.querySelector('.project-edit-form');
+    form.addEventListener('submit', (e) => {
+        handleUpdateProject(e, project.id);
+    });
+
+    // Empêcher la propagation du clic sur le formulaire
+    // Sinon, cliquer dans les inputs déclenche selectProject()
+    form.addEventListener('click', (e) => {
+        e.stopPropagation(); // Empêche le clic de remonter à la card
+    });
+    
+    // Event : Annuler l'édition
+    const cancelBtn = projectCard.querySelector('.btn-cancel-edit');
+    cancelBtn.addEventListener('click', () => {
+        // Restaurer le contenu original
+        projectCard.innerHTML = originalContent;
+        projectCard.classList.remove('project-card--editing');
+        
+        // Réattacher les event listeners (recréer la card complète)
+        loadProjects();
+    });
+    
+    // Focus sur le champ titre
+    document.getElementById(`edit-project-title-${project.id}`)?.focus();
+}
+
+// ===== 14ter. MISE À JOUR D'UN PROJET (FETCH PUT) =====
+async function handleUpdateProject(event, projectId) {
+    event.preventDefault(); // Empêche le rechargement de la page
+    
+    const form = event.target;
+    const titleInput = form.querySelector('input[name="title"]');
+    const descriptionInput = form.querySelector('textarea[name="description"]');
+    
+    const projectData = {
+        name: titleInput.value.trim(),
+        description: descriptionInput.value.trim() || null
+    };
+    
+    try {
+        console.log(`[KANBAN] Mise à jour du projet ID: ${projectId}`, projectData);
+        
+        // Appel API PUT /api/projects/{id}
+        const response = await fetch(`/api/projects/${projectId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(projectData)
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Erreur lors de la mise à jour');
+        }
+        
+        const result = await response.json();
+        console.log('[KANBAN] Projet mis à jour avec succès ✅', result);
+        
+        // Recharger la liste des projets pour afficher les modifications
+        await loadProjects();
+        
+        // Message de succès
+        showSuccess('Projet modifié avec succès !');
+        
+        // Si c'était le projet sélectionné, mettre à jour le nom dans le bloc réduit
+        if (currentProjectId === projectId) {
+            const currentProjectName = document.getElementById('current-project-name');
+            if (currentProjectName) {
+                currentProjectName.textContent = projectData.name;
+            }
+        }
+        
+    } catch (error) {
+        console.error('[KANBAN] Erreur mise à jour projet:', error);
+        showError(error.message || 'Impossible de mettre à jour le projet');
     }
 }
 

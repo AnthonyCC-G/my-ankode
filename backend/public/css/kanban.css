@@ -408,6 +408,78 @@
     stroke: #ffffff;
 }
 
+/* ===== BOUTON MODIFIER (crayon) ===== */
+.btn-icon--edit svg {
+    stroke: var(--color-primary);
+}
+
+.btn-icon--edit:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.btn-icon--edit:hover svg {
+    stroke: var(--cyan-900);
+}
+
+/* ===== BOUTON MODIFIER (crayon) ===== */
+.btn-icon--edit svg {
+    stroke: var(--color-primary);
+}
+
+.btn-icon--edit:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.btn-icon--edit:hover svg {
+    stroke: var(--cyan-900);
+}
+
+/* ===== MODE ÉDITION : CARD PROJET ===== */
+.project-card--editing {
+    border-color: var(--orange-500); /* Juste la border orange, rien de plus */
+    background: rgba(253, 171, 94, 0.05); /* Fond très léger */
+}
+
+/* Formulaire d'édition dans la card */
+.project-edit-form .form-group {
+    margin-bottom: var(--spacing-sm);
+}
+
+.project-edit-form label {
+    display: block;
+    font-family: var(--font-main);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.project-edit-form .form-input--edit,
+.project-edit-form .form-textarea--edit {
+    width: 100%;
+    padding: var(--spacing-sm);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--orange-500); /* Border orange fine */
+    border-radius: var(--radius-sm);
+    font-family: var(--font-main);
+    font-size: var(--font-size-base);
+    transition: border-color var(--transition-base);
+}
+
+.project-edit-form .form-input--edit:focus,
+.project-edit-form .form-textarea--edit:focus {
+    outline: none;
+    border-color: var(--orange-500);
+}
+
+.project-edit-form .form-textarea--edit {
+    resize: vertical;
+    min-height: 60px;
+}
+
 /* ==================== BLOC TÂCHES (KANBAN) ==================== */
 
 /* ===== MESSAGE SI AUCUN PROJET ===== */
