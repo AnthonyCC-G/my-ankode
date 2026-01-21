@@ -786,6 +786,66 @@
     stroke: var(--cyan-900);
 }
 
+/* ===== MODE ÉDITION : TASK CARD ===== */
+.task-card--editing {
+    border-color: var(--orange-500); /* Border orange comme les projets */
+    background: rgba(253, 171, 94, 0.05);
+}
+
+/* Formulaire d'édition dans la task-card */
+.task-edit-form {
+    padding: var(--spacing-xs);
+}
+
+.task-edit-form .form-group {
+    margin-bottom: var(--spacing-xs);
+}
+
+.task-edit-form label {
+    display: block;
+    font-family: var(--font-main);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.task-edit-form .form-input--edit-task,
+.task-edit-form .form-textarea--edit-task {
+    width: 100%;
+    padding: var(--spacing-xs);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--orange-500); /* Border orange fine */
+    border-radius: var(--radius-sm);
+    font-family: var(--font-main);
+    font-size: var(--font-size-sm);
+    transition: border-color var(--transition-base);
+}
+
+.task-edit-form .form-input--edit-task:focus,
+.task-edit-form .form-textarea--edit-task:focus {
+    outline: none;
+    border-color: var(--orange-500);
+}
+
+.task-edit-form .form-textarea--edit-task {
+    resize: vertical;
+    min-height: 50px;
+}
+
+.task-edit-form .form-actions--inline {
+    display: flex;
+    gap: 4px;
+    margin-top: var(--spacing-xs);
+}
+
+.task-edit-form .btn-sm {
+    padding: 4px var(--spacing-xs);
+    font-size: var(--font-size-xs);
+}
+
+
 /* ==================== AJUSTEMENTS MASCOTTE POUR KANBAN ==================== */
 
 /**

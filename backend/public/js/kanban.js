@@ -632,7 +632,7 @@ function createTaskCard(task) {
     const actions = document.createElement('div');
     actions.className = 'task-card-actions';
     
-    // Bouton Modifier (crayon) - TODO : À implémenter
+    // Bouton Modifier (crayon) - Maintenant fonctionnel !
     const editBtn = document.createElement('button');
     editBtn.className = 'task-btn task-btn--edit';
     editBtn.title = 'Modifier';
@@ -641,8 +641,9 @@ function createTaskCard(task) {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
         </svg>
     `;
-    editBtn.addEventListener('click', () => {
-        alert('Fonctionnalité "Modifier" à implémenter (bonus post-MVP)');
+    editBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Empêche la propagation (au cas où)
+        handleEditTask(task);
     });
     
     // BOUTON CONTEXTUEL selon le statut actuel
@@ -874,6 +875,127 @@ async function handleDeleteTask(taskId) {
         showError(error.message || 'Impossible de supprimer la tâche');
     }
 }
+
+// ===== 22bis. ÉDITION D'UNE TÂCHE (TRANSFORMATION CARD → FORMULAIRE) =====
+function handleEditTask(task) {
+    console.log(`[KANBAN] Édition de la tâche ID: ${task.id}`);
+    
+    // Récupérer la card de la tâche
+    const taskCard = document.querySelector(`.task-card[data-task-id="${task.id}"]`);
+    
+    if (!taskCard) {
+        console.error('[KANBAN] Card tâche introuvable');
+        return;
+    }
+    
+    // Ajouter la classe d'édition (border orange)
+    taskCard.classList.add('task-card--editing');
+    
+    // Sauvegarder le contenu original (pour pouvoir annuler)
+    const originalContent = taskCard.innerHTML;
+    
+    // Créer le formulaire d'édition
+    taskCard.innerHTML = `
+        <form class="task-edit-form" data-task-id="${task.id}">
+            <div class="form-group">
+                <label for="edit-task-title-${task.id}">Titre</label>
+                <input 
+                    type="text" 
+                    id="edit-task-title-${task.id}" 
+                    name="title" 
+                    class="form-input form-input--edit-task" 
+                    value="${task.title}" 
+                    required
+                >
+            </div>
+            <div class="form-group">
+                <label for="edit-task-description-${task.id}">Description</label>
+                <textarea 
+                    id="edit-task-description-${task.id}" 
+                    name="description" 
+                    class="form-textarea form-textarea--edit-task" 
+                    rows="3"
+                >${task.description || ''}</textarea>
+            </div>
+            <div class="form-actions form-actions--inline">
+                <button type="submit" class="btn btn-primary btn-sm">Sauvegarder</button>
+                <button type="button" class="btn btn-secondary btn-sm btn-cancel-edit-task">Annuler</button>
+            </div>
+        </form>
+    `;
+    
+    // Event : Soumettre le formulaire
+    const form = taskCard.querySelector('.task-edit-form');
+    form.addEventListener('submit', (e) => {
+        handleUpdateTask(e, task.id);
+    });
+    
+    // Event : Annuler l'édition
+    const cancelBtn = taskCard.querySelector('.btn-cancel-edit-task');
+    cancelBtn.addEventListener('click', () => {
+        // Restaurer le contenu original
+        taskCard.innerHTML = originalContent;
+        taskCard.classList.remove('task-card--editing');
+        
+        // Recharger les tâches pour réattacher les event listeners
+        loadTasks(currentProjectId);
+    });
+    
+    // Empêcher la propagation du clic sur le formulaire
+    form.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+    
+    // Focus sur le champ titre
+    document.getElementById(`edit-task-title-${task.id}`)?.focus();
+}
+
+// ===== 22ter. MISE À JOUR D'UNE TÂCHE (FETCH PUT) =====
+async function handleUpdateTask(event, taskId) {
+    event.preventDefault(); // Empêche le rechargement de la page
+    
+    const form = event.target;
+    const titleInput = form.querySelector('input[name="title"]');
+    const descriptionInput = form.querySelector('textarea[name="description"]');
+    
+    const taskData = {
+        title: titleInput.value.trim(),
+        description: descriptionInput.value.trim() || null
+    };
+    
+    try {
+        console.log(`[KANBAN] Mise à jour de la tâche ID: ${taskId}`, taskData);
+        
+        // Appel API PUT /api/tasks/{id}
+        const response = await fetch(`/api/tasks/${taskId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(taskData)
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Erreur lors de la mise à jour');
+        }
+        
+        const result = await response.json();
+        console.log('[KANBAN] Tâche mise à jour avec succès ✅', result);
+        
+        // Recharger les tâches pour afficher les modifications
+        await loadTasks(currentProjectId);
+        
+        // Message de succès
+        showSuccess('Tâche modifiée avec succès !');
+        
+    } catch (error) {
+        console.error('[KANBAN] Erreur mise à jour tâche:', error);
+        showError(error.message || 'Impossible de mettre à jour la tâche');
+    }
+}
+
+
 
 // ===== 23. VIDER L'AFFICHAGE DES TÂCHES =====
 function clearTasksDisplay() {
