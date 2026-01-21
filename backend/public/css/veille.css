@@ -677,7 +677,7 @@ body:not(.dark-mode) .carousel-wrapper::after {
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   BLOC 4 : SOURCES RSS (Version minimaliste)
+   BLOC 4 : SOURCES RSS
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 .veille-sources {
     grid-column: 1 / 3;  /* ← Occupe TOUTE la largeur (colonnes 1 et 2) */

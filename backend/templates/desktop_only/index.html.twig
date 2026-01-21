@@ -53,3 +53,7 @@
     </div>
 </div>
 {% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/desktop-only.js') }}"></script>
+{% endblock %}
