@@ -86,6 +86,7 @@ class ProjectControllerTest extends ApiTestCase
     /**
      * Test 3 : POST /api/projects
      * Doit créer un nouveau projet
+     * Protection CSRF
      */
     public function testCreateProjectSuccess(): void
     {
@@ -94,7 +95,8 @@ class ProjectControllerTest extends ApiTestCase
         
         // Act
         $this->loginUser($user);
-        $this->jsonRequest('POST', '/api/projects', [
+        // jsonRequest → apiRequest (avec CSRF automatique)
+        $this->apiRequest('POST', '/api/projects', [
             'name' => 'Nouveau Projet Test',
             'description' => 'Description du nouveau projet'
         ]);
@@ -113,6 +115,7 @@ class ProjectControllerTest extends ApiTestCase
     /**
      * Test 4 : PUT /api/projects/{id}
      * Doit modifier un projet existant
+     * Protection CSRF
      */
     public function testUpdateProjectSuccess(): void
     {
@@ -129,7 +132,8 @@ class ProjectControllerTest extends ApiTestCase
         
         // Act
         $this->loginUser($user);
-        $this->jsonRequest('PUT', '/api/projects/' . $project->getId(), [
+        //jsonRequest → apiRequest (avec CSRF automatique)
+        $this->apiRequest('PUT', '/api/projects/' . $project->getId(), [
             'name' => 'Nouveau Nom Modifié',
             'description' => 'Description modifiée'
         ]);
@@ -143,5 +147,43 @@ class ProjectControllerTest extends ApiTestCase
         $this->assertEquals('Projet modifié avec succès', $response['message']);
         $this->assertEquals('Nouveau Nom Modifié', $response['project']['name']);
         $this->assertEquals('Description modifiée', $response['project']['description']);
+    }
+
+    /**
+     * Test 5 : DELETE /api/projects/{id}
+     * Doit supprimer un projet
+     * Protection CSRF
+     */
+    public function testDeleteProjectSuccess(): void
+    {
+        // Arrange
+        $user = $this->createUser('project_deleter@test.com');
+        
+        $project = new Project();
+        $project->setName('Projet à supprimer');
+        $project->setDescription('Ce projet sera supprimé');
+        $project->setOwner($user);
+        $project->setCreatedAt(new \DateTime());
+        $this->entityManager->persist($project);
+        $this->entityManager->flush();
+        
+        $projectId = $project->getId();
+        
+        // Act
+        $this->loginUser($user);
+        // Utilisation de apiRequest pour DELETE avec CSRF
+        $this->apiRequest('DELETE', '/api/projects/' . $projectId);
+        
+        // Assert
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseStatusCodeSame(200);
+        
+        $response = $this->getJsonResponse();
+        $this->assertTrue($response['success']);
+        $this->assertEquals('Projet supprimé avec succès', $response['message']);
+        
+        // Vérifier que le projet a bien été supprimé de la BDD
+        $deletedProject = $this->entityManager->getRepository(Project::class)->find($projectId);
+        $this->assertNull($deletedProject);
     }
 }

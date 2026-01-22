@@ -11,11 +11,15 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * Contrôleur pour la veille technologique (articles)
+ * Protection CSRF gérée automatiquement par CsrfValidationSubscriber
+ */
 #[IsGranted('ROLE_USER')]
 class VeilleController extends AbstractController
 {
     /**
-     * Page HTML - Interface Veille (template que JavaScript va remplir)
+     * Page HTML - Interface Veille
      */
     #[Route('/veille', name: 'app_veille', methods: ['GET'])]
     public function index(): Response
@@ -25,10 +29,6 @@ class VeilleController extends AbstractController
 
     /**
      * API REST - Liste des articles avec pagination
-     * GET /api/articles?page=1
-     * 
-     * Récupère les articles PUBLICS (userId = null)
-     * Chaque user voit les mêmes articles mais avec SES favoris/lectures
      */
     #[Route('/api/articles', name: 'api_articles_list', methods: ['GET'])]
     public function getArticlesApi(Request $request, DocumentManager $dm): JsonResponse
@@ -38,20 +38,17 @@ class VeilleController extends AbstractController
         $limit = 20;
         $offset = ($page - 1) * $limit;
 
-        // Recupere l'utilisateur connecte
         $user = $this->getUser();
         $userId = (string) $user->getId();
         
-        // Requete MongoDB : Articles PUBLICS uniquement (userId = null)
         $qb = $dm->createQueryBuilder(Article::class)
-            ->field('userId')->equals(null)  // articles publics RSS
+            ->field('userId')->equals(null)
             ->sort('publishedAt', 'DESC')
             ->limit($limit)
             ->skip($offset);
 
         $articles = $qb->getQuery()->execute()->toArray();
 
-        // Compte total d'articles publics
         $totalArticles = $dm->createQueryBuilder(Article::class)
             ->field('userId')->equals(null) 
             ->count()
@@ -59,8 +56,6 @@ class VeilleController extends AbstractController
             ->execute();
 
         $totalPages = (int) ceil($totalArticles / $limit);
-
-        // Transformation en JSON avec contexte utilisateur
         $data = $this->transformArticlesToJson($articles, $userId);
 
         return $this->json([
@@ -75,10 +70,7 @@ class VeilleController extends AbstractController
     }
 
     /**
-     * API REST - Recherche d'articles par mot-cle
-     * GET /api/articles/search?q=react
-     * 
-     * Recherche dans les articles publics uniquement
+     * API REST - Recherche d'articles
      */
     #[Route('/api/articles/search', name: 'api_articles_search', methods: ['GET'])]
     public function searchArticles(Request $request, DocumentManager $dm): JsonResponse
@@ -95,9 +87,8 @@ class VeilleController extends AbstractController
         $user = $this->getUser();
         $userId = (string) $user->getId();
 
-        // Recherche MongoDB : Articles publics + regex insensible à la casse
         $qb = $dm->createQueryBuilder(Article::class)
-            ->field('userId')->equals(null)  // articles publics uniquement
+            ->field('userId')->equals(null)
             ->addOr(
                 $dm->createQueryBuilder(Article::class)->expr()->field('title')->equals(new \MongoDB\BSON\Regex($keyword, 'i'))
             )
@@ -108,7 +99,7 @@ class VeilleController extends AbstractController
                 $dm->createQueryBuilder(Article::class)->expr()->field('source')->equals(new \MongoDB\BSON\Regex($keyword, 'i'))
             )
             ->sort('publishedAt', 'DESC')
-            ->limit(50); // Max 50 resultats
+            ->limit(50);
 
         $articles = $qb->getQuery()->execute()->toArray();
         $data = $this->transformArticlesToJson($articles, $userId);
@@ -121,43 +112,36 @@ class VeilleController extends AbstractController
     }
 
     /**
-     * API REST - Marquer un article comme lu/non lu (toggle)
-     * PATCH /api/articles/{id}/mark-read
-     * 
-     * Utilise toggleReadByUser() au lieu de setIsRead()
+     * API REST - Marquer comme lu
+     * Protection CSRF
      */
     #[Route('/api/articles/{id}/mark-read', name: 'api_articles_mark_read', methods: ['PATCH'])]
-    public function markAsRead(string $id, DocumentManager $dm): JsonResponse
+    public function markAsRead(string $id, Request $request, DocumentManager $dm): JsonResponse
     {
         $user = $this->getUser();
         $userId = (string) $user->getId();
         
-        // Recupere l'article
         $article = $dm->getRepository(Article::class)->find($id);
 
         if (!$article) {
             return $this->json(['error' => 'Article non trouve'], 404);
         }
 
-
-        // Toggle l'état de lecture pour CET utilisateur uniquement
         $article->toggleReadByUser($userId);
         $dm->flush();
 
         return $this->json([
             'success' => true,
-            'isRead' => $article->isReadByUser($userId)  // ← État pour ce user
+            'isRead' => $article->isReadByUser($userId)
         ]);
     }
 
     /**
-     * API REST - Ajouter un article aux favoris
-     * POST /api/articles/{id}/favorite
-     * 
-     * Utilise addToFavorites() avec userId
+     * API REST - Ajouter aux favoris
+     * Protection CSRF
      */
     #[Route('/api/articles/{id}/favorite', name: 'api_articles_add_favorite', methods: ['POST'])]
-    public function addToFavorites(string $id, DocumentManager $dm): JsonResponse
+    public function addToFavorites(string $id, Request $request, DocumentManager $dm): JsonResponse
     {
         $user = $this->getUser();
         $userId = (string) $user->getId();
@@ -168,8 +152,6 @@ class VeilleController extends AbstractController
             return $this->json(['error' => 'Article non trouve'], 404);
         }
 
-        
-        //  Ajoute aux favoris de CET utilisateur
         $article->addToFavorites($userId);
         $dm->flush();
 
@@ -180,13 +162,11 @@ class VeilleController extends AbstractController
     }
 
     /**
-     * API REST - Retirer un article des favoris
-     * DELETE /api/articles/{id}/favorite
-     * 
-     * Utilise removeFromFavorites() avec userId
+     * API REST - Retirer des favoris
+     *  Protection CSRF
      */
     #[Route('/api/articles/{id}/favorite', name: 'api_articles_remove_favorite', methods: ['DELETE'])]
-    public function removeFromFavorites(string $id, DocumentManager $dm): JsonResponse
+    public function removeFromFavorites(string $id, Request $request, DocumentManager $dm): JsonResponse
     {
         $user = $this->getUser();
         $userId = (string) $user->getId();
@@ -197,8 +177,6 @@ class VeilleController extends AbstractController
             return $this->json(['error' => 'Article non trouve'], 404);
         }
 
-
-        // Retire des favoris de CET utilisateur
         $article->removeFromFavorites($userId);
         $dm->flush();
 
@@ -209,10 +187,7 @@ class VeilleController extends AbstractController
     }
 
     /**
-     * API REST - Liste des articles favoris de l'utilisateur connecté
-     * GET /api/articles/favorites
-     * 
-     * Filtre sur favoritedBy contenant l'userId
+     * API REST - Liste des favoris
      */
     #[Route('/api/articles/favorites', name: 'api_articles_favorites', methods: ['GET'])]
     public function getFavorites(DocumentManager $dm): JsonResponse
@@ -220,10 +195,9 @@ class VeilleController extends AbstractController
         $user = $this->getUser();
         $userId = (string) $user->getId();
 
-        // Recupere les articles publics qui sont dans les favoris de CET utilisateur
         $articles = $dm->createQueryBuilder(Article::class)
-            ->field('userId')->equals(null)  // Articles publics
-            ->field('favoritedBy')->in([$userId])  // user dans le tableau
+            ->field('userId')->equals(null)
+            ->field('favoritedBy')->in([$userId])
             ->sort('publishedAt', 'DESC')
             ->getQuery()
             ->execute()
@@ -238,13 +212,7 @@ class VeilleController extends AbstractController
     }
 
     /**
-     * Transforme les articles en tableau JSON
-     * 
-     * Ajoute le contexte userId pour vérifier lecture/favoris
-     * 
-     * @param array $articles Liste des articles MongoDB
-     * @param string $userId ID de l'utilisateur connecté
-     * @return array
+     * Transforme les articles en JSON
      */
     private function transformArticlesToJson(array $articles, string $userId): array
     {

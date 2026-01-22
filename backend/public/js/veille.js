@@ -224,11 +224,10 @@
     // ===== FONCTION : RETIRER UN FAVORI DEPUIS LA SIDEBAR =====
     async function removeFavoriteFromSidebar(articleId) {
         try {
-            const response = await fetch(`/api/articles/${articleId}/favorite`, {
-                method: 'DELETE'
-            });
+            // 🔒 Utilisation de API.delete avec CSRF automatique
+            const data = await API.delete(`/api/articles/${articleId}/favorite`);
             
-            if (response.ok) {
+            if (data.success) {
                 // Recharger la sidebar favoris
                 loadFavoritesSidebar();
                 
@@ -355,11 +354,10 @@
     // ===== FONCTION : TOGGLE READ STATUS =====
     async function toggleReadStatus(articleId) {
         try {
-            const response = await fetch(`/api/articles/${articleId}/mark-read`, {
-                method: 'PATCH'
-            });
+            // Utilisation de API.patch avec CSRF automatique
+            const data = await API.patch(`/api/articles/${articleId}/mark-read`);
             
-            if (response.ok) {
+            if (data.success) {
                 const card = document.querySelector(`[data-article-id="${articleId}"]`);
                 if (card) {
                     card.classList.toggle('read');
@@ -367,18 +365,22 @@
             }
         } catch (error) {
             console.error('Erreur toggle read:', error);
+            showFeedback('Erreur lors du marquage', 'error');
         }
     }
     
     // ===== FONCTION : TOGGLE FAVORITE =====
     async function toggleFavorite(articleId, isCurrentlyFavorite) {
         try {
-            const method = isCurrentlyFavorite ? 'DELETE' : 'POST';
-            const response = await fetch(`/api/articles/${articleId}/favorite`, {
-                method: method
-            });
+            // Utilisation de API.post ou API.delete avec CSRF automatique
+            let data;
+            if (isCurrentlyFavorite) {
+                data = await API.delete(`/api/articles/${articleId}/favorite`);
+            } else {
+                data = await API.post(`/api/articles/${articleId}/favorite`);
+            }
             
-            if (response.ok) {
+            if (data.success) {
                 const btn = document.querySelector(`.btn-favorite[data-id="${articleId}"]`);
                 const svg = btn.querySelector('svg');
                 
@@ -396,6 +398,7 @@
             }
         } catch (error) {
             console.error('Erreur toggle favorite:', error);
+            showFeedback('Erreur lors de la mise a jour', 'error');
         }
     }
     
