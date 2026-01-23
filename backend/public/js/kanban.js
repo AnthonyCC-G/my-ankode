@@ -8,6 +8,7 @@
     
     if (isMobile) {
         console.log('[KANBAN] Appareil mobile détecté - Redirection vers /desktop-only');
+        localStorage.setItem('lastDesktopPage', '/kanban');
         window.location.href = '/desktop-only';
         return;
     }
@@ -20,6 +21,7 @@
         resizeTimer = setTimeout(function() {
             if (window.innerWidth < 768) {
                 console.log('[KANBAN] Fenêtre réduite en mobile - Redirection');
+                localStorage.setItem('lastDesktopPage', '/kanban');
                 window.location.href = '/desktop-only';
             }
         }, 250);
@@ -41,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialiser les événements globaux
     initEventListeners();
     
-    console.log('[KANBAN] Script kanban.js chargé avec succès ✅');
+    console.log('[KANBAN] Script kanban.js chargé avec succès');
 });
 
 // ===== 4. INITIALISATION DES EVENT LISTENERS =====
@@ -94,7 +96,7 @@ function initEventListeners() {
         btnNewTaskTodo.addEventListener('click', showTaskForm);
     }
     
-    console.log('[KANBAN] Event listeners initialisés ✅');
+    console.log('[KANBAN] Event listeners initialisés ');
 }
 
 // ===== 5. CHARGEMENT DES PROJETS (FETCH API) =====
