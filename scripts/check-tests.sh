@@ -60,7 +60,7 @@ echo ""
 
 # Étape 3 : Rechargement des fixtures test
 echo -e "${CYAN}3️⃣ Rechargement fixtures test...${NC}"
-docker-compose exec backend php bin/console doctrine:fixtures:load --env=test --group=test -n > /dev/null 2>&1
+docker-compose exec backend php bin/console doctrine:fixtures:load --env=test -n > /dev/null 2>&1
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}✅ Fixtures test chargées${NC}"
 else
