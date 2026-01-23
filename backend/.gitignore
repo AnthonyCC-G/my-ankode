@@ -19,3 +19,7 @@
 /public/images/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+
+# Code Coverage Reports
+/coverage/
+/.phpunit.cache/

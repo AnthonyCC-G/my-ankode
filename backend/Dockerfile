@@ -14,7 +14,8 @@ RUN apk add --no-cache \
     postgresql-dev \
     icu-dev \
     libzip-dev \
-    oniguruma-dev
+    oniguruma-dev\
+    linux-headers
 
 # Installer les extensions PHP nécessaires
 RUN docker-php-ext-install \
@@ -29,6 +30,14 @@ RUN docker-php-ext-install \
 RUN apk add --no-cache $PHPIZE_DEPS && \
     pecl install mongodb && \
     docker-php-ext-enable mongodb
+
+# ============================================
+# XDEBUG - Code Coverage (Tests uniquement)
+# ============================================
+RUN pecl install xdebug && \
+    docker-php-ext-enable xdebug && \
+    echo "xdebug.mode=coverage" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
+    echo "xdebug.start_with_request=no" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
 # Installer Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
