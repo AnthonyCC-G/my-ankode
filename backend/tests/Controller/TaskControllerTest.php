@@ -136,6 +136,7 @@ class TaskControllerTest extends ApiTestCase
     /**
      * Test 4 : POST /api/projects/{id}/tasks
      * Doit créer une nouvelle tâche
+     * Protection CSRF
      */
     public function testCreateTaskSuccess(): void
     {
@@ -151,7 +152,8 @@ class TaskControllerTest extends ApiTestCase
         
         // Act
         $this->loginUser($user);
-        $this->jsonRequest('POST', '/api/projects/' . $project->getId() . '/tasks', [
+        // apiRequest (avec CSRF automatique)
+        $this->apiRequest('POST', '/api/projects/' . $project->getId() . '/tasks', [
             'title' => 'Nouvelle tâche',
             'description' => 'Description test',
             'status' => 'todo',
@@ -170,6 +172,7 @@ class TaskControllerTest extends ApiTestCase
     /**
      * Test 5 : PATCH /api/tasks/{id}/status
      * Doit changer le statut d'une tâche
+     * Protection CSRF
      */
     public function testUpdateTaskStatusSuccess(): void
     {
@@ -193,7 +196,8 @@ class TaskControllerTest extends ApiTestCase
         
         // Act
         $this->loginUser($user);
-        $this->jsonRequest('PATCH', '/api/tasks/' . $task->getId() . '/status', [
+        // apiRequest (avec CSRF automatique)
+        $this->apiRequest('PATCH', '/api/tasks/' . $task->getId() . '/status', [
             'status' => 'done'
         ]);
         
@@ -208,6 +212,7 @@ class TaskControllerTest extends ApiTestCase
     /**
      * Test 6 : PUT /api/tasks/{id}
      * Doit modifier une tâche complète
+     * Protection CSRF
      */
     public function testUpdateTaskSuccess(): void
     {
@@ -232,7 +237,8 @@ class TaskControllerTest extends ApiTestCase
         
         // Act
         $this->loginUser($user);
-        $this->jsonRequest('PUT', '/api/tasks/' . $task->getId(), [
+        // apiRequest (avec CSRF automatique)
+        $this->apiRequest('PUT', '/api/tasks/' . $task->getId(), [
             'title' => 'Tâche modifiée',
             'description' => 'Nouvelle description',
             'status' => 'in_progress',
@@ -251,6 +257,7 @@ class TaskControllerTest extends ApiTestCase
     /**
      * Test 7 : DELETE /api/tasks/{id}
      * Doit supprimer une tâche
+     * Protection CSRF
      */
     public function testDeleteTaskSuccess(): void
     {
@@ -276,7 +283,8 @@ class TaskControllerTest extends ApiTestCase
         
         // Act
         $this->loginUser($user);
-        $this->client->request('DELETE', '/api/tasks/' . $taskId);
+        // client->request → apiRequest (avec CSRF automatique)
+        $this->apiRequest('DELETE', '/api/tasks/' . $taskId);
         
         // Assert
         $this->assertResponseIsSuccessful();
