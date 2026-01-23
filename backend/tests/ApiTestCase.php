@@ -72,8 +72,45 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
-     * Helper pour faire une requête JSON (POST, PUT, PATCH)
-     * Simplifie l'envoi de données JSON (comme dans Postman)
+     * Helper pour faire une requête API avec gestion automatique du token CSRF
+     *
+     * Simule le comportement réel du frontend :
+     * 1. Le frontend appelle GET /api/csrf-token pour récupérer un token valide
+     * 2. Il l'envoie dans le header X-CSRF-TOKEN avec sa requête
+     *
+     * Cette approche est identique au comportement réel de l'application
+     */
+    protected function apiRequest(string $method, string $uri, array $data = [], array $headers = []): void
+    {
+        // Étape 1 : Récupérer le token CSRF via la route API (comme le frontend)
+        $this->client->request('GET', '/api/csrf-token');
+        $csrfResponse = json_decode($this->client->getResponse()->getContent(), true);
+        $csrfToken = $csrfResponse['token'];
+
+        // Étape 2 : Faire la requête API avec le token
+        $defaultHeaders = [
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_X_CSRF_TOKEN' => $csrfToken
+        ];
+
+        $allHeaders = array_merge($defaultHeaders, $headers);
+
+        $this->client->request(
+            $method,
+            $uri,
+            [],
+            [],
+            $allHeaders,
+            json_encode($data)
+        );
+    }
+
+    /**
+     * Helper pour faire une requête JSON simple (SANS CSRF)
+     * Gardé pour compatibilité ascendante et requêtes simples
+     * 
+     *  À ne PAS utiliser pour les nouvelles routes protégées par CSRF
+     * Utiliser apiRequest() à la place
      */
     protected function jsonRequest(string $method, string $uri, array $data = []): void
     {

@@ -316,92 +316,63 @@ function hideProjectForm() {
     }
 }
 
-// ===== 13. CRÉATION D'UN PROJET (FETCH POST) =====
-async function handleCreateProject(event) {
-    event.preventDefault(); // Empêche le rechargement de la page
-    
-    const titleInput = document.getElementById('project-title');
-    const descriptionInput = document.getElementById('project-description');
-    
-    const projectData = {
-        name: titleInput.value.trim(),
-        description: descriptionInput.value.trim() || null
-    };
-    
-    try {
-        console.log('[KANBAN] Création du projet:', projectData);
+    // ===== 13. CRÉATION D'UN PROJET (API POST avec CSRF) =====
+    async function handleCreateProject(event) {
+        event.preventDefault();
         
-        // Appel API POST /api/projects
-        const response = await fetch('/api/projects', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(projectData)
-        });
+        const titleInput = document.getElementById('project-title');
+        const descriptionInput = document.getElementById('project-description');
         
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Erreur lors de la création');
+        const projectData = {
+            name: titleInput.value.trim(),
+            description: descriptionInput.value.trim() || null
+        };
+        
+        try {
+            console.log('[KANBAN] Création du projet:', projectData);
+            
+            // 🔒 Utilisation de API.post avec CSRF automatique
+            const result = await API.post('/api/projects', projectData);
+            
+            console.log('[KANBAN] Projet créé avec succès ✅', result);
+            
+            hideProjectForm();
+            await loadProjects();
+            showSuccess('Projet créé avec succès !');
+            
+        } catch (error) {
+            console.error('[KANBAN] Erreur création projet:', error);
+            showError(error.message || 'Impossible de créer le projet');
         }
-        
-        const result = await response.json();
-        console.log('[KANBAN] Projet créé avec succès ✅', result);
-        
-        // Masquer le formulaire
-        hideProjectForm();
-        
-        // Recharger la liste des projets
-        await loadProjects();
-        
-        // Message de succès
-        showSuccess('Projet créé avec succès !');
-        
-    } catch (error) {
-        console.error('[KANBAN] Erreur création projet:', error);
-        showError(error.message || 'Impossible de créer le projet');
     }
-}
 
-// ===== 14. SUPPRESSION D'UN PROJET (FETCH DELETE) =====
-async function handleDeleteProject(projectId) {
-    // Demander confirmation
-    if (!confirm('Êtes-vous sûr de vouloir supprimer ce projet et toutes ses tâches ?')) {
-        return;
-    }
-    
-    try {
-        console.log(`[KANBAN] Suppression du projet ID: ${projectId}`);
-        
-        // Appel API DELETE /api/projects/{id}
-        const response = await fetch(`/api/projects/${projectId}`, {
-            method: 'DELETE'
-        });
-        
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Erreur lors de la suppression');
+    // ===== 14. SUPPRESSION D'UN PROJET (API DELETE avec CSRF) =====
+    async function handleDeleteProject(projectId) {
+        if (!confirm('Êtes-vous sûr de vouloir supprimer ce projet et toutes ses tâches ?')) {
+            return;
         }
         
-        console.log('[KANBAN] Projet supprimé avec succès ✅');
-        
-        // Si c'était le projet sélectionné, réinitialiser
-        if (currentProjectId === projectId) {
-            currentProjectId = null;
-            clearTasksDisplay();
+        try {
+            console.log(`[KANBAN] Suppression du projet ID: ${projectId}`);
+            
+            // 🔒 Utilisation de API.delete avec CSRF automatique
+            await API.delete(`/api/projects/${projectId}`);
+            
+            console.log('[KANBAN] Projet supprimé avec succès ✅');
+            
+            if (currentProjectId === projectId) {
+                currentProjectId = null;
+                clearTasksDisplay();
+            }
+            
+            await loadProjects();
+            showSuccess('Projet supprimé avec succès !');
+            
+        } catch (error) {
+            console.error('[KANBAN] Erreur suppression projet:', error);
+            showError(error.message || 'Impossible de supprimer le projet');
         }
-        
-        // Recharger la liste des projets
-        await loadProjects();
-        
-        // Message de succès
-        showSuccess('Projet supprimé avec succès !');
-        
-    } catch (error) {
-        console.error('[KANBAN] Erreur suppression projet:', error);
-        showError(error.message || 'Impossible de supprimer le projet');
     }
-}
 
     // ===== 14bis. ÉDITION D'UN PROJET (TRANSFORMATION CARD → FORMULAIRE) =====
 function handleEditProject(project) {
@@ -478,58 +449,42 @@ function handleEditProject(project) {
     document.getElementById(`edit-project-title-${project.id}`)?.focus();
 }
 
-// ===== 14ter. MISE À JOUR D'UN PROJET (FETCH PUT) =====
-async function handleUpdateProject(event, projectId) {
-    event.preventDefault(); // Empêche le rechargement de la page
-    
-    const form = event.target;
-    const titleInput = form.querySelector('input[name="title"]');
-    const descriptionInput = form.querySelector('textarea[name="description"]');
-    
-    const projectData = {
-        name: titleInput.value.trim(),
-        description: descriptionInput.value.trim() || null
-    };
-    
-    try {
-        console.log(`[KANBAN] Mise à jour du projet ID: ${projectId}`, projectData);
+    // ===== 14ter. MISE À JOUR D'UN PROJET (API PUT avec CSRF) =====
+    async function handleUpdateProject(event, projectId) {
+        event.preventDefault();
         
-        // Appel API PUT /api/projects/{id}
-        const response = await fetch(`/api/projects/${projectId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(projectData)
-        });
+        const form = event.target;
+        const titleInput = form.querySelector('input[name="title"]');
+        const descriptionInput = form.querySelector('textarea[name="description"]');
         
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Erreur lors de la mise à jour');
-        }
+        const projectData = {
+            name: titleInput.value.trim(),
+            description: descriptionInput.value.trim() || null
+        };
         
-        const result = await response.json();
-        console.log('[KANBAN] Projet mis à jour avec succès ✅', result);
-        
-        // Recharger la liste des projets pour afficher les modifications
-        await loadProjects();
-        
-        // Message de succès
-        showSuccess('Projet modifié avec succès !');
-        
-        // Si c'était le projet sélectionné, mettre à jour le nom dans le bloc réduit
-        if (currentProjectId === projectId) {
-            const currentProjectName = document.getElementById('current-project-name');
-            if (currentProjectName) {
-                currentProjectName.textContent = projectData.name;
+        try {
+            console.log(`[KANBAN] Mise à jour du projet ID: ${projectId}`, projectData);
+            
+            // 🔒 Utilisation de API.put avec CSRF automatique
+            const result = await API.put(`/api/projects/${projectId}`, projectData);
+            
+            console.log('[KANBAN] Projet mis à jour avec succès ✅', result);
+            
+            await loadProjects();
+            showSuccess('Projet modifié avec succès !');
+            
+            if (currentProjectId === projectId) {
+                const currentProjectName = document.getElementById('current-project-name');
+                if (currentProjectName) {
+                    currentProjectName.textContent = projectData.name;
+                }
             }
+            
+        } catch (error) {
+            console.error('[KANBAN] Erreur mise à jour projet:', error);
+            showError(error.message || 'Impossible de mettre à jour le projet');
         }
-        
-    } catch (error) {
-        console.error('[KANBAN] Erreur mise à jour projet:', error);
-        showError(error.message || 'Impossible de mettre à jour le projet');
     }
-}
 
 // ===== 15. CHARGEMENT DES TÂCHES D'UN PROJET (FETCH API) =====
 async function loadTasks(projectId) {
@@ -757,124 +712,85 @@ function hideTaskForm() {
     }
 }
 
-// ===== 20. CRÉATION D'UNE TÂCHE (FETCH POST) =====
-async function handleCreateTask(event) {
-    event.preventDefault();
-    
-    if (!currentProjectId) {
-        showError('Aucun projet sélectionné');
-        return;
-    }
-    
-    const form = event.target;
-    const titleInput = form.querySelector('input[name="title"]');
-    const descriptionInput = form.querySelector('textarea[name="description"]');
-    
-    const taskData = {
-        title: titleInput.value.trim(),
-        description: descriptionInput.value.trim() || null,
-        status: 'todo',
-        position: tasks.filter(t => t.status === 'todo').length + 1 // Position = dernière position + 1
-    };
-    
-    try {
-        console.log('[KANBAN] Création de la tâche:', taskData);
+    // ===== 20. CRÉATION D'UNE TÂCHE (API POST avec CSRF) =====
+    async function handleCreateTask(event) {
+        event.preventDefault();
         
-        // Appel API POST /api/projects/{id}/tasks
-        const response = await fetch(`/api/projects/${currentProjectId}/tasks`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(taskData)
-        });
-        
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Erreur lors de la création');
+        if (!currentProjectId) {
+            showError('Aucun projet sélectionné');
+            return;
         }
         
-        const result = await response.json();
-        console.log('[KANBAN] Tâche créée avec succès ✅', result);
+        const form = event.target;
+        const titleInput = form.querySelector('input[name="title"]');
+        const descriptionInput = form.querySelector('textarea[name="description"]');
         
-        // Masquer le formulaire
-        hideTaskForm();
+        const taskData = {
+            title: titleInput.value.trim(),
+            description: descriptionInput.value.trim() || null,
+            status: 'todo',
+            position: tasks.filter(t => t.status === 'todo').length + 1
+        };
         
-        // Recharger les tâches
-        await loadTasks(currentProjectId);
-        
-        // Message de succès
-        showSuccess('Tâche créée avec succès !');
-        
-    } catch (error) {
-        console.error('[KANBAN] Erreur création tâche:', error);
-        showError(error.message || 'Impossible de créer la tâche');
+        try {
+            console.log('[KANBAN] Création de la tâche:', taskData);
+            
+            // 🔒 Utilisation de API.post avec CSRF automatique
+            const result = await API.post(`/api/projects/${currentProjectId}/tasks`, taskData);
+            
+            console.log('[KANBAN] Tâche créée avec succès ✅', result);
+            
+            hideTaskForm();
+            await loadTasks(currentProjectId);
+            showSuccess('Tâche créée avec succès !');
+            
+        } catch (error) {
+            console.error('[KANBAN] Erreur création tâche:', error);
+            showError(error.message || 'Impossible de créer la tâche');
+        }
     }
-}
 
-// ===== 21. MISE À JOUR DU STATUT D'UNE TÂCHE (FETCH PATCH) =====
-async function handleUpdateTaskStatus(taskId, newStatus) {
-    try {
-        console.log(`[KANBAN] Changement status tâche ID:${taskId} vers ${newStatus}`);
-        
-        // Appel API PATCH /api/tasks/{id}/status
-        const response = await fetch(`/api/tasks/${taskId}/status`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ status: newStatus })
-        });
-        
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Erreur lors de la mise à jour');
+    // ===== 21. MISE À JOUR DU STATUT D'UNE TÂCHE (API PATCH avec CSRF) =====
+    async function handleUpdateTaskStatus(taskId, newStatus) {
+        try {
+            console.log(`[KANBAN] Changement status tâche ID:${taskId} vers ${newStatus}`);
+            
+            // 🔒 Utilisation de API.patch avec CSRF automatique
+            await API.patch(`/api/tasks/${taskId}/status`, { status: newStatus });
+            
+            console.log('[KANBAN] Statut mis à jour avec succès ✅');
+            
+            await loadTasks(currentProjectId);
+            showSuccess('Tâche mise à jour !');
+            
+        } catch (error) {
+            console.error('[KANBAN] Erreur mise à jour statut:', error);
+            showError(error.message || 'Impossible de mettre à jour la tâche');
         }
-        
-        console.log('[KANBAN] Statut mis à jour avec succès ✅');
-        
-        // Recharger les tâches pour mettre à jour l'affichage
-        await loadTasks(currentProjectId);
-        
-        showSuccess('Tâche mise à jour !');
-        
-    } catch (error) {
-        console.error('[KANBAN] Erreur mise à jour statut:', error);
-        showError(error.message || 'Impossible de mettre à jour la tâche');
     }
-}
 
-// ===== 22. SUPPRESSION D'UNE TÂCHE (FETCH DELETE) =====
-async function handleDeleteTask(taskId) {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?')) {
-        return;
-    }
-    
-    try {
-        console.log(`[KANBAN] Suppression de la tâche ID: ${taskId}`);
-        
-        // Appel API DELETE /api/tasks/{id}
-        const response = await fetch(`/api/tasks/${taskId}`, {
-            method: 'DELETE'
-        });
-        
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Erreur lors de la suppression');
+    // ===== 22. SUPPRESSION D'UNE TÂCHE (API DELETE avec CSRF) =====
+    async function handleDeleteTask(taskId) {
+        if (!confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?')) {
+            return;
         }
         
-        console.log('[KANBAN] Tâche supprimée avec succès ✅');
-        
-        // Recharger les tâches
-        await loadTasks(currentProjectId);
-        
-        showSuccess('Tâche supprimée avec succès !');
-        
-    } catch (error) {
-        console.error('[KANBAN] Erreur suppression tâche:', error);
-        showError(error.message || 'Impossible de supprimer la tâche');
+        try {
+            console.log(`[KANBAN] Suppression de la tâche ID: ${taskId}`);
+            
+            // 🔒 Utilisation de API.delete avec CSRF automatique
+            await API.delete(`/api/tasks/${taskId}`);
+            
+            console.log('[KANBAN] Tâche supprimée avec succès ✅');
+            
+            await loadTasks(currentProjectId);
+            showSuccess('Tâche supprimée avec succès !');
+            
+        } catch (error) {
+            console.error('[KANBAN] Erreur suppression tâche:', error);
+            showError(error.message || 'Impossible de supprimer la tâche');
+        }
     }
-}
 
 // ===== 22bis. ÉDITION D'UNE TÂCHE (TRANSFORMATION CARD → FORMULAIRE) =====
 function handleEditTask(task) {
@@ -950,51 +866,35 @@ function handleEditTask(task) {
     document.getElementById(`edit-task-title-${task.id}`)?.focus();
 }
 
-// ===== 22ter. MISE À JOUR D'UNE TÂCHE (FETCH PUT) =====
-async function handleUpdateTask(event, taskId) {
-    event.preventDefault(); // Empêche le rechargement de la page
-    
-    const form = event.target;
-    const titleInput = form.querySelector('input[name="title"]');
-    const descriptionInput = form.querySelector('textarea[name="description"]');
-    
-    const taskData = {
-        title: titleInput.value.trim(),
-        description: descriptionInput.value.trim() || null
-    };
-    
-    try {
-        console.log(`[KANBAN] Mise à jour de la tâche ID: ${taskId}`, taskData);
+    // ===== 22ter. MISE À JOUR D'UNE TÂCHE (API PUT avec CSRF) =====
+    async function handleUpdateTask(event, taskId) {
+        event.preventDefault();
         
-        // Appel API PUT /api/tasks/{id}
-        const response = await fetch(`/api/tasks/${taskId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(taskData)
-        });
+        const form = event.target;
+        const titleInput = form.querySelector('input[name="title"]');
+        const descriptionInput = form.querySelector('textarea[name="description"]');
         
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Erreur lors de la mise à jour');
+        const taskData = {
+            title: titleInput.value.trim(),
+            description: descriptionInput.value.trim() || null
+        };
+        
+        try {
+            console.log(`[KANBAN] Mise à jour de la tâche ID: ${taskId}`, taskData);
+            
+            // 🔒 Utilisation de API.put avec CSRF automatique
+            const result = await API.put(`/api/tasks/${taskId}`, taskData);
+            
+            console.log('[KANBAN] Tâche mise à jour avec succès ✅', result);
+            
+            await loadTasks(currentProjectId);
+            showSuccess('Tâche modifiée avec succès !');
+            
+        } catch (error) {
+            console.error('[KANBAN] Erreur mise à jour tâche:', error);
+            showError(error.message || 'Impossible de mettre à jour la tâche');
         }
-        
-        const result = await response.json();
-        console.log('[KANBAN] Tâche mise à jour avec succès ✅', result);
-        
-        // Recharger les tâches pour afficher les modifications
-        await loadTasks(currentProjectId);
-        
-        // Message de succès
-        showSuccess('Tâche modifiée avec succès !');
-        
-    } catch (error) {
-        console.error('[KANBAN] Erreur mise à jour tâche:', error);
-        showError(error.message || 'Impossible de mettre à jour la tâche');
     }
-}
-
 
 
 // ===== 23. VIDER L'AFFICHAGE DES TÂCHES =====

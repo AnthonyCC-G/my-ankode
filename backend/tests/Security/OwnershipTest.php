@@ -11,7 +11,6 @@ use App\Tests\ApiTestCase;
  * Tests de sécurité : Ownership (403 Forbidden)
  * 
  * Vérifie qu'un utilisateur ne peut PAS accéder aux données d'un autre utilisateur.
- * Référentiel DWWM : "Réaliser les tests de sécurité. Les composants métier sont sécurisés."
  */
 class OwnershipTest extends ApiTestCase
 {
@@ -49,6 +48,8 @@ class OwnershipTest extends ApiTestCase
      * - Marie se connecte
      * - Marie essaie d'accéder à GET /api/tasks/{taskAlice}
      * - Résultat attendu : 403 Forbidden
+     * 
+     * Note : GET ne nécessite pas de CSRF, aucun changement
      */
     public function testUserCannotAccessOtherUserTask(): void
     {
@@ -69,6 +70,8 @@ class OwnershipTest extends ApiTestCase
      * - Marie se connecte
      * - Marie essaie de modifier PUT /api/projects/{projectAlice}
      * - Résultat attendu : 403 Forbidden
+     * 
+     * Utilise apiRequest() pour gérer le CSRF automatiquement
      */
     public function testUserCannotUpdateOtherUserProject(): void
     {
@@ -76,7 +79,8 @@ class OwnershipTest extends ApiTestCase
         $this->loginUser($this->marie);
         
         // Act : Marie essaie de modifier le project d'Alice
-        $this->jsonRequest('PUT', '/api/projects/' . $this->projectAlice->getId(), [
+        // apiRequest (avec CSRF)
+        $this->apiRequest('PUT', '/api/projects/' . $this->projectAlice->getId(), [
             'name' => 'Projet piraté par Marie',
             'description' => 'Tentative de modification'
         ]);
@@ -92,6 +96,8 @@ class OwnershipTest extends ApiTestCase
      * - Marie se connecte
      * - Marie essaie de supprimer DELETE /api/tasks/{taskAlice}
      * - Résultat attendu : 403 Forbidden
+     * 
+     * Utilise apiRequest() pour gérer le CSRF automatiquement
      */
     public function testUserCannotDeleteOtherUserTask(): void
     {
@@ -99,7 +105,8 @@ class OwnershipTest extends ApiTestCase
         $this->loginUser($this->marie);
         
         // Act : Marie essaie de supprimer la task d'Alice
-        $this->client->request('DELETE', '/api/tasks/' . $this->taskAlice->getId());
+        // client->request → apiRequest (avec CSRF)
+        $this->apiRequest('DELETE', '/api/tasks/' . $this->taskAlice->getId());
         
         // Assert : 403 Forbidden
         $this->assertResponseStatusCode(403);
@@ -112,6 +119,8 @@ class OwnershipTest extends ApiTestCase
      * - Marie se connecte
      * - Marie essaie de créer POST /api/projects/{projectAlice}/tasks
      * - Résultat attendu : 403 Forbidden
+     * 
+     * Utilise apiRequest() pour gérer le CSRF automatiquement
      */
     public function testUserCannotCreateTaskInOtherUserProject(): void
     {
@@ -119,7 +128,8 @@ class OwnershipTest extends ApiTestCase
         $this->loginUser($this->marie);
         
         // Act : Marie essaie de créer une task dans le project d'Alice
-        $this->jsonRequest('POST', '/api/projects/' . $this->projectAlice->getId() . '/tasks', [
+        // apiRequest (avec CSRF)
+        $this->apiRequest('POST', '/api/projects/' . $this->projectAlice->getId() . '/tasks', [
             'title' => 'Task piratée par Marie',
             'description' => 'Tentative de création',
             'status' => 'todo'

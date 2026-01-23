@@ -19,7 +19,7 @@ class UserFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        // 1️⃣ ADMIN 
+        // 1️ ADMIN 
         $admin = new User();
         $admin->setEmail('anthony@test.com');
         $admin->setUsername('anthony_dev');
@@ -37,7 +37,7 @@ class UserFixtures extends Fixture
         // Référence pour tests admin futurs
         $this->addReference('user_anthony', $admin);
 
-        // 2️⃣ ALICE - Utilisatrice lambda #1 (reprend les données d'Anthony)
+        // 2️ ALICE - Utilisatrice lambda #1 (reprend les données d'Anthony)
         $alice = new User();
         $alice->setEmail('alice@test.com');
         $alice->setUsername('alice_user');
@@ -55,7 +55,7 @@ class UserFixtures extends Fixture
         // Référence pour ProjectFixtures, TaskFixtures, CompetenceFixtures
         $this->addReference('user_alice', $alice);
 
-        // 3️⃣ MARIE - Utilisatrice lambda #2 (garde ses données)
+        // 3️ MARIE - Utilisatrice lambda #2 (garde ses données)
         $marie = new User();
         $marie->setEmail('marie@test.com');
         $marie->setUsername('marie_user');
