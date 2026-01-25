@@ -37,12 +37,24 @@ class Competence
     private ?int $level = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\Length(
+        max: 1000,
+        maxMessage: "Les notes ne peuvent pas dépasser {{ limit }} caractères"
+    )]
     private ?string $notes = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\Length(
+        max: 500,
+        maxMessage: "Les liens projets ne peuvent pas dépasser {{ limit }} caractères"
+    )]
     private ?string $projects_links = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\Length(
+        max: 500,
+        maxMessage: "Les liens snippets ne peuvent pas dépasser {{ limit }} caractères"
+    )]
     private ?string $snippets_links = null;
 
     #[ORM\Column]

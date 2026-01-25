@@ -1,0 +1,632 @@
+/**
+ * COMPETENCES.CSS - Styles de la page Competences
+ * Layout : 2 colonnes (Configuration | Liste scrollable)
+ * Couleur principale : Gold (#D4A574) - deja utilisee dans le dashboard
+ */
+
+/* ==================== HEADER COMPETENCES ==================== */
+.competences-header {
+    text-align: center;
+    padding: var(--spacing-xl) var(--spacing-lg);
+    padding-top: 120px; /* COPIE SNIPPETS : padding-top important */
+    margin-top: 80px; /* COPIE SNIPPETS : margin-top pour navbar */
+    margin-bottom: var(--spacing-md);
+}
+
+.competences-title {
+    font-family: var(--font-main);
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.competences-intro {
+    font-family: var(--font-main);
+    font-size: var(--font-size-base);
+    color: var(--text-secondary);
+    max-width: 900px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.competences-intro strong {
+    color: var(--gold-500);
+    font-weight: var(--font-weight-semibold);
+}
+
+/* ==================== MAIN CONTAINER : 2 COLONNES ==================== */
+.competences-main {
+    display: flex;
+    gap: var(--spacing-xl); /* Plus d'espace entre colonnes */
+    height: calc(100vh - 340px); /* HAUTEUR FIXE pour eviter debordement */
+    padding-left: 100px; /* Rapproche de la sidebar : 120px -> 100px */
+    padding-right: 220px; /* Reserve 200px + marge pour mascotte */
+    padding-bottom: 140px; /* Espace pour le footer */
+}
+
+/* ===== COLONNE GAUCHE : CONFIGURATION (Formulaire) ===== */
+.competences-config {
+    flex: 0 0 420px; /* Largeur fixe 420px (elargi pour aeration) */
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+    height: 100%; /* Utilise toute la hauteur disponible */
+    max-height: 100%; /* Ne depasse jamais la hauteur du conteneur */
+    overflow-y: auto; /* Scroll interne si contenu depasse */
+    overflow-x: hidden; /* Pas de scroll horizontal */
+    position: sticky;
+    top: 100px; /* Stick sous la navbar */
+}
+
+/* Header de la config avec bouton */
+.config-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.block-title {
+    font-family: var(--font-main);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.btn-new-competence {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--gold-500);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.btn-new-competence svg {
+    width: 16px;
+    height: 16px;
+}
+
+.btn-new-competence:hover {
+    background: var(--gold-700);
+    transform: translateY(-2px);
+}
+
+/* Messages flash */
+.flash-messages {
+    margin-bottom: var(--spacing-md);
+}
+
+.flash-message {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    animation: slideDown 0.3s ease-out;
+}
+
+.flash-message--success {
+    background: rgba(81, 207, 102, 0.15);
+    border-left: 4px solid var(--green-500);
+    color: var(--green-500);
+}
+
+.flash-message--error {
+    background: rgba(255, 107, 107, 0.15);
+    border-left: 4px solid var(--red-500);
+    color: var(--red-500);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== FORMULAIRE ===== */
+.competence-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm); /* Reduit de md a sm pour compacter */
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px; /* Reduit de 8px a 4px pour compacter */
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+}
+
+.form-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--gold-500);
+}
+
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: var(--spacing-sm);
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    font-family: var(--font-main);
+    transition: all var(--transition-base);
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--gold-500);
+    box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.15);
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 60px; /* Reduit de 80px a 60px */
+}
+
+.form-hint {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.form-error {
+    font-size: var(--font-size-xs);
+    color: var(--red-500);
+    min-height: 1rem;
+}
+
+/* ===== ETOILES CLIQUABLES (Niveau 1-5) ===== */
+.stars-container {
+    display: flex;
+    gap: var(--spacing-xs);
+    font-size: 2rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.star {
+    color: var(--neutral-300);
+    transition: all var(--transition-fast);
+    cursor: pointer;
+}
+
+/* Etoile survolee ou selectionnee */
+.star.active,
+.star.hover {
+    color: var(--gold-500);
+    text-shadow: 0 0 8px rgba(212, 165, 116, 0.5);
+    transform: scale(1.1);
+}
+
+/* Animation au clic */
+.star:active {
+    transform: scale(0.95);
+}
+
+/* Description du niveau */
+.level-description {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    font-weight: var(--font-weight-medium);
+    margin: 0;
+}
+
+/* ===== BOUTONS D'ACTION ===== */
+.form-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+}
+
+.btn-submit,
+.btn-cancel {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.btn-submit {
+    background: var(--gold-500);
+    color: #ffffff;
+}
+
+.btn-submit:hover {
+    background: var(--gold-700);
+    transform: translateY(-2px);
+}
+
+.btn-submit svg {
+    width: 16px;
+    height: 16px;
+}
+
+.btn-cancel {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-cancel:hover {
+    background: rgba(255, 107, 107, 0.1);
+    border-color: var(--red-500);
+    color: var(--red-500);
+}
+
+.btn-cancel svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ===== COLONNE DROITE : LISTE DES COMPETENCES ===== */
+.competences-list {
+    flex: 1; /* Prend l'espace restant */
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Utilise toute la hauteur disponible */
+    max-height: 100%; /* Ne depasse jamais la hauteur du conteneur */
+    overflow: hidden; /* Cache le debordement (scroll dans .competences-cards) */
+    background: var(--bg-secondary); /* Background pour integrer le header */
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+}
+
+.list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm); /* Separation visuelle */
+    border-bottom: 1px solid var(--border-color); /* Ligne de separation */
+}
+
+.list-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin: 0;
+}
+
+/* Zone des messages flash dans le header */
+.list-flash-messages {
+    flex: 1; /* Prend l'espace disponible au centre */
+    margin: 0 var(--spacing-md);
+    text-align: center;
+}
+
+/* Flash messages SIMPLES pour le header (pas de background) */
+.list-flash-messages .flash-success {
+    color: var(--green-500);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-sm);
+}
+
+.list-flash-messages .flash-error {
+    color: var(--red-500);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-sm);
+}
+
+.list-counter {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* ===== ETAT VIDE ===== */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-2xl);
+    background: transparent; /* Pas de background (deja dans le bloc) */
+    border: none; /* Pas de border (deja dans le bloc) */
+    border-radius: var(--radius-lg);
+    text-align: center;
+}
+
+.empty-icon {
+    width: 64px;
+    height: 64px;
+    color: var(--gold-500);
+    margin-bottom: var(--spacing-md);
+    opacity: 0.5;
+}
+
+.empty-state p {
+    color: var(--text-secondary);
+    margin: var(--spacing-xs) 0;
+}
+
+/* ===== CONTAINER DES CARDS (Scrollable) ===== */
+.competences-cards {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    flex: 1; /* Prend tout l'espace disponible dans le parent */
+    overflow-y: auto; /* Scroll vertical si contenu depasse */
+    overflow-x: hidden; /* Pas de scroll horizontal */
+    padding-right: var(--spacing-xs);
+}
+
+/* Scrollbar personnalisee */
+.competences-cards::-webkit-scrollbar {
+    width: 8px;
+}
+
+.competences-cards::-webkit-scrollbar-track {
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+}
+
+.competences-cards::-webkit-scrollbar-thumb {
+    background: var(--gold-500);
+    border-radius: var(--radius-md);
+}
+
+.competences-cards::-webkit-scrollbar-thumb:hover {
+    background: var(--gold-700);
+}
+
+/* ===== CARD COMPETENCE ===== */
+.competence-card {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg); /* Plus de padding pour cards spacieuses */
+    transition: all var(--transition-base);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm); /* Espacement interne */
+}
+
+.competence-card:hover {
+    border-color: var(--gold-500);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(212, 165, 116, 0.2);
+}
+
+/* Card en mode edition */
+.competence-card.editing {
+    border-color: var(--gold-500);
+    background: rgba(212, 165, 116, 0.05);
+}
+
+/* Header de la card */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-sm);
+}
+
+.card-title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin: 0;
+}
+
+/* Etoiles d'affichage (non cliquables dans la card) */
+.card-stars {
+    display: flex;
+    gap: 2px;
+    font-size: 1,5rem;
+    color: var(--gold-500);
+}
+
+/* Body de la card */
+.card-body {
+    margin-bottom: var(--spacing-sm);
+}
+
+.card-notes {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    line-height: 1.6; /* Meilleure lisibilite */
+    margin: 0;
+    white-space: pre-wrap; /* Preserve les retours a la ligne */
+    word-wrap: break-word; /* Coupe les mots trop longs */
+}
+
+.card-links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
+}
+
+.card-link-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+}
+
+.card-link-item svg {
+    width: 14px;
+    height: 14px;
+    color: var(--gold-500);
+}
+
+/* Footer de la card */
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--border-color);
+}
+
+.card-date {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.card-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+.btn-edit,
+.btn-delete {
+    padding: var(--spacing-xs);
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.btn-edit svg,
+.btn-delete svg {
+    width: 16px;
+    height: 16px;
+    color: var(--text-secondary);
+}
+
+.btn-edit:hover {
+    background: rgba(212, 165, 116, 0.1);
+    border-color: var(--gold-500);
+}
+
+.btn-edit:hover svg {
+    color: var(--gold-500);
+}
+
+.btn-delete:hover {
+    background: rgba(255, 107, 107, 0.1);
+    border-color: var(--red-500);
+}
+
+.btn-delete:hover svg {
+    color: var(--red-500);
+}
+
+/* ==================== RESPONSIVE MOBILE ==================== */
+@media (max-width: 768px) {
+    .competences-header {
+        margin-top: 100px; /* Espace pour le mobile-header */
+        padding: var(--spacing-md);
+    }
+
+    .competences-title {
+        font-size: var(--font-size-2xl);
+    }
+
+    .competences-intro {
+        font-size: var(--font-size-sm);
+    }
+
+    /* Layout mobile : 1 colonne empilee (TOUT visible sans scroll) */
+    .competences-main {
+        display: block !important; /* Block pour empilement naturel */
+        flex-direction: column;
+        height: auto !important; /* Override hauteur fixe desktop */
+        min-height: auto !important;
+        max-height: none !important;
+        padding: 0 var(--spacing-sm);
+        padding-bottom: 100px; /* Espace pour bottom-nav */
+    }
+
+    /* Configuration en pleine largeur (TOUT visible sans scroll) */
+    .competences-config {
+        flex: none !important;
+        width: 100%;
+        height: auto !important; /* Override hauteur */
+        min-height: auto !important;
+        max-height: none !important;
+        overflow-y: visible !important; /* Force visible */
+        overflow-x: hidden;
+        position: static; /* Pas sticky */
+        margin-bottom: var(--spacing-md);
+    }
+
+    /* Liste en pleine largeur (TOUT visible sans scroll) */
+    .competences-list {
+        flex: none !important;
+        width: 100%;
+        height: auto !important; /* Override hauteur */
+        min-height: auto !important;
+        max-height: none !important;
+        overflow: visible !important; /* Force visible */
+    }
+
+    /* Container des cards : TOUT visible sans scroll */
+    .competences-cards {
+        flex: none !important; /* Override flex: 1 */
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        overflow-y: visible !important; /* Force visible */
+        overflow-x: hidden;
+    }
+
+    /* Boutons plus petits sur mobile */
+    .btn-new-competence {
+        font-size: var(--font-size-xs);
+        padding: var(--spacing-xs);
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .btn-submit,
+    .btn-cancel {
+        width: 100%;
+    }
+}
+
+/* ==================== MODE LIGHT ==================== */
+body:not(.dark-mode) .competences-config,
+body:not(.dark-mode) .competences-list,
+body:not(.dark-mode) .competence-card {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: var(--neutral-300);
+}
+
+body:not(.dark-mode) .competence-card:hover {
+    border-color: var(--gold-500);
+    box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
+}
