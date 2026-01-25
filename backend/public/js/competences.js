@@ -1,8 +1,3 @@
-/**
- * COMPETENCES.JS - Gestion des competences techniques
- * Layout : 2 colonnes (Configuration fixe | Liste scrollable)
- */
-
 // ===== 1. VARIABLES GLOBALES =====
 let competences = []; // Liste de toutes les competences de l'utilisateur
 let isEditMode = false; // Mode edition ou creation
@@ -11,7 +6,6 @@ let currentLevel = 1; // Niveau selectionne (1-5 etoiles)
 
 // ===== 2. INITIALISATION AU CHARGEMENT DU DOM =====
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('[COMPETENCES] DOM charge - Initialisation de la page Competences');
     
     // Charger les competences au demarrage
     loadCompetences();
@@ -22,7 +16,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialiser les etoiles cliquables
     initStarsInteraction();
     
-    console.log('[COMPETENCES] Script competences.js charge avec succes ✅');
 });
 
 // ===== 3. INITIALISATION DES EVENT LISTENERS =====
@@ -43,12 +36,10 @@ function initEventListeners() {
     const btnNewCompetence = document.getElementById('btn-new-competence');
     if (btnNewCompetence) {
         btnNewCompetence.addEventListener('click', () => {
-            console.log('[COMPETENCES] Bouton "Nouvelle competence" clique - Reset formulaire');
             resetForm();
         });
     }
     
-    console.log('[COMPETENCES] Event listeners initialises ✅');
 }
 
 // ===== 4. INITIALISATION DES ETOILES CLIQUABLES (Niveau 1-5) =====
@@ -56,7 +47,6 @@ function initStarsInteraction() {
     const starsContainer = document.getElementById('stars-container');
     
     if (!starsContainer) {
-        console.error('[COMPETENCES] Element #stars-container introuvable');
         return;
     }
     
@@ -76,7 +66,6 @@ function initStarsInteraction() {
             document.getElementById('competence-level').value = value;
             updateStarsDisplay(value, false);
             updateLevelDescription(value);
-            console.log(`[COMPETENCES] Niveau selectionne : ${value}/5`);
         });
     });
     
@@ -89,19 +78,16 @@ function initStarsInteraction() {
     updateStarsDisplay(1, false);
     updateLevelDescription(1);
     
-    console.log('[COMPETENCES] Etoiles cliquables initialisees ✅');
 }
 
 // ===== 5. CHARGEMENT DES COMPETENCES (API GET) =====
 async function loadCompetences() {
     try {
-        console.log('[COMPETENCES] Chargement des competences...');
         
         // Appel API GET /api/competences
         const data = await API.get('/api/competences');
         competences = data;
         
-        console.log(`[COMPETENCES] ${competences.length} competence(s) chargee(s) ✅`, competences);
         
         // Afficher les competences dans le DOM
         displayCompetences();
@@ -109,7 +95,6 @@ async function loadCompetences() {
         toggleEmptyState();
         
     } catch (error) {
-        console.error('[COMPETENCES] Erreur chargement competences:', error);
         showFlashMessage('Impossible de charger les competences.', 'error');
     }
 }
@@ -119,7 +104,6 @@ function displayCompetences() {
     const container = document.getElementById('competences-cards');
     
     if (!container) {
-        console.error('[COMPETENCES] Element #competences-cards introuvable');
         return;
     }
     
@@ -231,7 +215,6 @@ function createCompetenceCard(competence) {
 async function handleSubmitCompetence(e) {
     e.preventDefault();
     
-    console.log('[COMPETENCES] Soumission du formulaire...');
     
     // Recuperer les valeurs du formulaire
     const data = {
@@ -262,12 +245,10 @@ async function handleSubmitCompetence(e) {
         
         if (isEditMode && editingCompetenceId) {
             // Mode EDITION : PUT
-            console.log('[COMPETENCES] Modification de la competence :', editingCompetenceId, data);
             await API.put(`/api/competences/${editingCompetenceId}`, data);
             showFlashMessage('Competence modifiee avec succes', 'success');
         } else {
             // Mode CREATION : POST
-            console.log('[COMPETENCES] Creation d\'une nouvelle competence :', data);
             await API.post('/api/competences', data);
             showFlashMessage('Competence creee avec succes', 'success');
         }
@@ -279,7 +260,6 @@ async function handleSubmitCompetence(e) {
         resetForm();
         
     } catch (error) {
-        console.error('[COMPETENCES] Erreur lors de la sauvegarde :', error);
         showFlashMessage('Erreur lors de la sauvegarde : ' + error.message, 'error');
     } finally {
         const btnSubmit = document.getElementById('btn-submit');
@@ -295,11 +275,9 @@ function handleEditCompetence(id) {
     const competence = competences.find(c => c.id === id);
     
     if (!competence) {
-        console.error('[COMPETENCES] Competence introuvable :', id);
         return;
     }
     
-    console.log('[COMPETENCES] Edition de la competence :', competence);
     
     // Passer en mode edition
     isEditMode = true;
@@ -336,7 +314,6 @@ async function handleDeleteCompetence(id) {
     const competence = competences.find(c => c.id === id);
     
     if (!competence) {
-        console.error('[COMPETENCES] Competence introuvable :', id);
         return;
     }
     
@@ -346,12 +323,10 @@ async function handleDeleteCompetence(id) {
     );
     
     if (!confirmed) {
-        console.log('[COMPETENCES] Suppression annulee par l\'utilisateur');
         return;
     }
     
     try {
-        console.log('[COMPETENCES] Suppression de la competence :', id);
         
         // Appel API DELETE
         await API.delete(`/api/competences/${id}`);
@@ -367,14 +342,12 @@ async function handleDeleteCompetence(id) {
         await loadCompetences();
         
     } catch (error) {
-        console.error('[COMPETENCES] Erreur lors de la suppression :', error);
         showFlashMessage('Erreur lors de la suppression : ' + error.message, 'error');
     }
 }
 
 // ===== 10. REINITIALISATION DU FORMULAIRE =====
 function resetForm() {
-    console.log('[COMPETENCES] Reinitialisation du formulaire');
     
     // Reinitialiser les variables d'etat
     isEditMode = false;
@@ -398,7 +371,6 @@ function resetForm() {
 }
 
 function handleCancelForm() {
-    console.log('[COMPETENCES] Annulation du formulaire');
     resetForm();
 }
 
@@ -467,15 +439,18 @@ function toggleEmptyState() {
 }
 
 function showFlashMessage(message, type = 'success') {
-    const container = document.getElementById('config-flash-messages');
+    const container = document.getElementById('list-flash-messages');
     
     if (!container) {
-        console.error('[COMPETENCES] Element #config-flash-messages introuvable');
         return;
     }
     
-    const flash = document.createElement('div');
-    flash.className = `flash-message flash-message--${type}`;
+    // Effacer le message precedent
+    container.innerHTML = '';
+    
+    // Creer le nouveau message (span simple)
+    const flash = document.createElement('span');
+    flash.className = `flash-${type}`; // flash-success ou flash-error
     flash.textContent = message;
     
     container.appendChild(flash);

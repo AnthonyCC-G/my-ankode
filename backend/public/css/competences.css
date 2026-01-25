@@ -7,9 +7,10 @@
 /* ==================== HEADER COMPETENCES ==================== */
 .competences-header {
     text-align: center;
-    padding: var(--spacing-md) var(--spacing-md);
+    padding: var(--spacing-xl) var(--spacing-lg);
+    padding-top: 120px; /* COPIE SNIPPETS : padding-top important */
     margin-top: 80px; /* COPIE SNIPPETS : margin-top pour navbar */
-    margin-bottom: var(--spacing-xs);
+    margin-bottom: var(--spacing-md);
 }
 
 .competences-title {
@@ -37,10 +38,11 @@
 /* ==================== MAIN CONTAINER : 2 COLONNES ==================== */
 .competences-main {
     display: flex;
-    gap: var(--spacing-md); /* Plus d'espace entre colonnes */
-    padding-left: 24px; 
+    gap: var(--spacing-xl); /* Plus d'espace entre colonnes */
+    height: calc(100vh - 340px); /* HAUTEUR FIXE pour eviter debordement */
+    padding-left: 100px; /* Rapproche de la sidebar : 120px -> 100px */
     padding-right: 220px; /* Reserve 200px + marge pour mascotte */
-    padding-bottom: 70px; /* Espace pour le footer */
+    padding-bottom: 140px; /* Espace pour le footer */
 }
 
 /* ===== COLONNE GAUCHE : CONFIGURATION (Formulaire) ===== */
@@ -50,7 +52,10 @@
     border: 2px solid var(--border-color);
     border-radius: var(--radius-lg);
     padding: var(--spacing-md);
-    height: fit-content; /* S'adapte au contenu */
+    height: 100%; /* Utilise toute la hauteur disponible */
+    max-height: 100%; /* Ne depasse jamais la hauteur du conteneur */
+    overflow-y: auto; /* Scroll interne si contenu depasse */
+    overflow-x: hidden; /* Pas de scroll horizontal */
     position: sticky;
     top: 100px; /* Stick sous la navbar */
 }
@@ -293,6 +298,9 @@
     flex: 1; /* Prend l'espace restant */
     display: flex;
     flex-direction: column;
+    height: 100%; /* Utilise toute la hauteur disponible */
+    max-height: 100%; /* Ne depasse jamais la hauteur du conteneur */
+    overflow: hidden; /* Cache le debordement (scroll dans .competences-cards) */
     background: var(--bg-secondary); /* Background pour integrer le header */
     border: 2px solid var(--border-color);
     border-radius: var(--radius-lg);
@@ -306,6 +314,33 @@
     margin-bottom: var(--spacing-md);
     padding-bottom: var(--spacing-sm); /* Separation visuelle */
     border-bottom: 1px solid var(--border-color); /* Ligne de separation */
+}
+
+.list-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin: 0;
+}
+
+/* Zone des messages flash dans le header */
+.list-flash-messages {
+    flex: 1; /* Prend l'espace disponible au centre */
+    margin: 0 var(--spacing-md);
+    text-align: center;
+}
+
+/* Flash messages SIMPLES pour le header (pas de background) */
+.list-flash-messages .flash-success {
+    color: var(--green-500);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-sm);
+}
+
+.list-flash-messages .flash-error {
+    color: var(--red-500);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-sm);
 }
 
 .list-counter {
@@ -345,8 +380,9 @@
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);
-    max-height: calc(100vh - 400px);
-    overflow-y: auto;
+    flex: 1; /* Prend tout l'espace disponible dans le parent */
+    overflow-y: auto; /* Scroll vertical si contenu depasse */
+    overflow-x: hidden; /* Pas de scroll horizontal */
     padding-right: var(--spacing-xs);
 }
 
@@ -413,7 +449,7 @@
 .card-stars {
     display: flex;
     gap: 2px;
-    font-size: 1rem;
+    font-size: 1,5rem;
     color: var(--gold-500);
 }
 
@@ -522,29 +558,48 @@
         font-size: var(--font-size-sm);
     }
 
-    /* Layout mobile : 1 colonne */
+    /* Layout mobile : 1 colonne empilee (TOUT visible sans scroll) */
     .competences-main {
+        display: block !important; /* Block pour empilement naturel */
         flex-direction: column;
+        height: auto !important; /* Override hauteur fixe desktop */
+        min-height: auto !important;
+        max-height: none !important;
         padding: 0 var(--spacing-sm);
         padding-bottom: 100px; /* Espace pour bottom-nav */
     }
 
-    /* Configuration en pleine largeur */
+    /* Configuration en pleine largeur (TOUT visible sans scroll) */
     .competences-config {
-        flex: none;
+        flex: none !important;
         width: 100%;
-        position: static;
+        height: auto !important; /* Override hauteur */
+        min-height: auto !important;
+        max-height: none !important;
+        overflow-y: visible !important; /* Force visible */
+        overflow-x: hidden;
+        position: static; /* Pas sticky */
         margin-bottom: var(--spacing-md);
     }
 
-    /* Liste en pleine largeur */
+    /* Liste en pleine largeur (TOUT visible sans scroll) */
     .competences-list {
+        flex: none !important;
         width: 100%;
+        height: auto !important; /* Override hauteur */
+        min-height: auto !important;
+        max-height: none !important;
+        overflow: visible !important; /* Force visible */
     }
 
-    /* Cards moins hautes sur mobile */
+    /* Container des cards : TOUT visible sans scroll */
     .competences-cards {
-        max-height: calc(100vh - 500px);
+        flex: none !important; /* Override flex: 1 */
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        overflow-y: visible !important; /* Force visible */
+        overflow-x: hidden;
     }
 
     /* Boutons plus petits sur mobile */

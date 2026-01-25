@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Compétences - My Ankode{% endblock %}
+{% block title %}Mes Compétences - MY-ANKODE{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -10,25 +10,23 @@
 {% block body %}
 
 {# ========================================
-   HEADER : TITRE + DESCRIPTION
+   BLOC 1 : HEADER TITRE DE PAGE
    ======================================== #}
 <header class="competences-header">
     <h1 class="competences-title">Mes Compétences</h1>
     <p class="competences-intro">
-        Suis ta progression technique en liant tes compétences à tes réalisations concrètes.
-        Les étoiles reflètent ta maîtrise, les liens vers tes projets et snippets prouvent ton apprentissage.
-        <strong>Combats le syndrome de l'imposteur avec des preuves tangibles !</strong>
+        Liste de tes compétences techniques pour <strong>combattre le syndrome de l'imposteur</strong>. 
+        Évalue ton niveau (1 à 5 étoiles), documente ta progression et relie-les à tes projets Kanban et snippets de code concrets.
     </p>
 </header>
 
 {# ========================================
    CONTENEUR PRINCIPAL : 2 COLONNES
-   [Configuration] | [Liste]
    ======================================== #}
 <main class="competences-main">
     
     {# ===== COLONNE GAUCHE : CONFIGURATION (Formulaire) ===== #}
-    <section class="competences-config">
+    <aside class="competences-config">
         <div class="config-header">
             <h2 class="block-title">Configuration</h2>
             <button class="btn-new-competence" id="btn-new-competence">
@@ -38,21 +36,18 @@
                 Nouvelle compétence
             </button>
         </div>
-
-        {# Messages flash pour feedback utilisateur #}
-        <div class="flash-messages" id="config-flash-messages"></div>
-
-        {# Formulaire de création/édition #}
-        <form id="competence-form" class="competence-form">
+        
+        {# ===== FORMULAIRE DE CRÉATION/ÉDITION ===== #}
+        <form class="competence-form" id="competence-form">
+            {# ID caché pour mode édition #}
+            <input type="hidden" id="competence-id" name="id" value="">
+            <input type="hidden" id="competence-level" name="level" value="1">
             
-            {# Champ caché pour l'ID (mode édition) #}
-            <input type="hidden" id="competence-id" name="competence-id">
-
             {# Nom de la compétence #}
             <div class="form-group">
                 <label for="competence-name" class="form-label">
-                    <svg class="form-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="form-icon">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                     </svg>
                     Nom de la compétence
                 </label>
@@ -61,17 +56,17 @@
                     id="competence-name" 
                     name="name" 
                     class="form-input" 
-                    placeholder="Ex: PHP, JavaScript, React..."
-                    required
+                    placeholder="Ex: React, Docker, PostgreSQL..." 
                     maxlength="100"
+                    required
                 >
-                <span class="form-error" id="error-name"></span>
+                <span class="form-hint">Max 100 caractères</span>
             </div>
-
-            {# Niveau (Étoiles cliquables 1-5) #}
+            
+            {# Niveau (étoiles cliquables) #}
             <div class="form-group">
                 <label class="form-label">
-                    <svg class="form-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="form-icon">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                     </svg>
                     Niveau de maîtrise
@@ -83,35 +78,31 @@
                     <span class="star" data-value="4">★</span>
                     <span class="star" data-value="5">★</span>
                 </div>
-                <input type="hidden" id="competence-level" name="level" value="1">
-                <p class="level-description" id="level-description">Niveau 1/5 - Débutant</p>
-                <span class="form-error" id="error-level"></span>
+                <span class="level-description" id="level-description">Niveau 1/5 - Débutant (notions de base)</span>
             </div>
-
-            {# Notes personnelles #}
+            
+            {# Notes (optionnel) #}
             <div class="form-group">
                 <label for="competence-notes" class="form-label">
-                    <svg class="form-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="form-icon">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
                     </svg>
-                    Notes personnelles (optionnel)
+                    Notes (optionnel)
                 </label>
                 <textarea 
                     id="competence-notes" 
                     name="notes" 
                     class="form-textarea" 
-                    placeholder="Ex: Points forts, axes d'amélioration, ressources utiles..."
-                    rows="4"
+                    placeholder="Décris ce que tu maîtrises, ce que tu as appris..."
                     maxlength="1000"
                 ></textarea>
                 <span class="form-hint">Max 1000 caractères</span>
-                <span class="form-error" id="error-notes"></span>
             </div>
-
+            
             {# Liens vers projets Kanban #}
             <div class="form-group">
                 <label for="competence-projects" class="form-label">
-                    <svg class="form-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="form-icon">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                     </svg>
                     Projets liés (optionnel)
@@ -120,18 +111,16 @@
                     id="competence-projects" 
                     name="projectsLinks" 
                     class="form-textarea" 
-                    placeholder="Ex: Site e-commerce, API REST, Portfolio..."
-                    rows="2"
+                    placeholder="Liste des projets Kanban utilisant cette compétence..."
                     maxlength="500"
                 ></textarea>
-                <span class="form-hint">Titres de tes projets Kanban utilisant cette compétence</span>
-                <span class="form-error" id="error-projects"></span>
+                <span class="form-hint">Max 500 caractères - Ex: Portfolio, API REST, Blog...</span>
             </div>
-
+            
             {# Liens vers snippets #}
             <div class="form-group">
                 <label for="competence-snippets" class="form-label">
-                    <svg class="form-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="form-icon">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                     </svg>
                     Snippets liés (optionnel)
@@ -140,15 +129,13 @@
                     id="competence-snippets" 
                     name="snippetsLinks" 
                     class="form-textarea" 
-                    placeholder="Ex: Auth JWT, Validation forms, API CRUD..."
-                    rows="2"
+                    placeholder="Liste des snippets de code liés à cette compétence..."
                     maxlength="500"
                 ></textarea>
-                <span class="form-hint">Titres de tes snippets utilisant cette compétence</span>
-                <span class="form-error" id="error-snippets"></span>
+                <span class="form-hint">Max 500 caractères - Ex: Docker restart, React Hook, SQL query...</span>
             </div>
-
-            {# Boutons d'action #}
+            
+            {# Boutons de soumission #}
             <div class="form-actions">
                 <button type="submit" class="btn-submit" id="btn-submit">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -164,30 +151,32 @@
                 </button>
             </div>
         </form>
-    </section>
-
+    </aside>
+    
     {# ===== COLONNE DROITE : LISTE DES COMPÉTENCES ===== #}
     <section class="competences-list">
         <div class="list-header">
-            <h2 class="block-title">Mes compétences</h2>
-            <p class="list-counter" id="list-counter">0 compétence</p>
+            <h2 class="list-title">Mes compétences</h2>
+            
+            {# Zone des messages flash (dans le header du bloc Liste) #}
+            <div class="list-flash-messages" id="list-flash-messages"></div>
+            
+            <span class="list-counter" id="list-counter">0 compétence</span>
         </div>
-
+        
         {# État vide #}
-        <div class="empty-state" id="empty-state">
-            <svg class="empty-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+        <div class="empty-state" id="empty-state" style="display: flex;">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="empty-icon">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <p>Aucune compétence pour le moment.</p>
-            <p>Crée ta première compétence pour commencer à suivre ta progression !</p>
+            <p>Aucune compétence enregistrée pour le moment.</p>
+            <p><small>Utilise le formulaire ci-contre pour créer ta première compétence.</small></p>
         </div>
-
+        
         {# Container des cards (scrollable) #}
-        <div class="competences-cards" id="competences-cards">
-            {# Les cards seront injectées dynamiquement par JavaScript #}
-        </div>
+        <div class="competences-cards" id="competences-cards" style="display: none;"></div>
     </section>
-
+    
 </main>
 
 {% endblock %}
