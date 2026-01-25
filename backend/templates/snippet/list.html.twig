@@ -1,45 +1,180 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mes Snippets - MY-ANKODE{% endblock %}
+{% block title %}Snippets - My Ankode{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/snippets.css') }}">
+{% endblock %}
 
 {% block body %}
-<div class="container mt-5">
-    <h1 class="mb-4">Mes Snippets</h1>
+
+{# ========================================
+   BLOC 1 : HEADER TITRE DE PAGE
+   Position : En dessous de la navbar fixe
+   Largeur : 100% sans bordure
+   ======================================== #}
+<header class="snippets-header">
+    <h1 class="snippets-title">Snippets de code</h1>
+    <p class="snippets-intro">
+        Un snippet est un extrait de code réutilisable que tu peux sauvegarder pour gagner du temps. 
+        Crée, organise et retrouve facilement tous tes morceaux de code favoris en un clin d'œil.
+    </p>
+</header>
+
+{# ========================================
+   CONTENEUR PRINCIPAL : Layout Flexbox ROW
+   Structure : [Colonne gauche] + [Aside fixe]
+   ======================================== #}
+<main class="snippets-main">
     
-    {% if snippets is empty %}
-        <div class="alert alert-info">
-            <p class="mb-0">Aucun snippet enregistré pour le moment.</p>
-            <small>Utilisez l'API <code>POST /api/snippets</code> pour ajouter des snippets de code.</small>
-        </div>
-    {% else %}
-        <p class="text-muted">{{ snippets|length }} snippet(s) enregistré(s)</p>
+    {# ===== COLONNE GAUCHE : Config + Liste (accordéon) ===== #}
+    <div class="snippets-left">
         
-        <div class="row">
-            {% for snippet in snippets %}
-                <div class="col-md-6 mb-3">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">{{ snippet.title }}</h5>
-                            <span class="badge bg-secondary">{{ snippet.language }}</span>
+        {# ========================================
+           BLOC CONFIG : Formulaire de création/édition
+           État par défaut : FOCUS (ouvert)
+           ======================================== #}
+        <section class="snippets-block snippets-block--config" id="config-block">
+            
+            {# ÉTAT FOCUS : Formulaire complet visible #}
+            <div class="block-content block-content--focus">
+                <div class="block-header">
+                    <h2 class="block-title">Configuration</h2>
+                    
+                    {# Zone pour les messages flash #}
+                    <div class="block-flash-messages" id="config-flash-messages"></div>
+                    
+                    {# Bouton "Nouveau snippet" - À DROITE #}
+                    <button class="btn-new-snippet" id="btn-new-snippet-expanded">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Nouveau snippet
+                    </button>
+                </div>
+                
+                {# ===== FORMULAIRE DE CRÉATION/ÉDITION ===== #}
+                <form class="snippet-form" id="snippet-form">
+                    {# ID caché pour savoir si on est en mode édition #}
+                    <input type="hidden" id="snippet-id" name="id" value="">
+                    
+                    {# LIGNE 1 : Titre + Langage (côte à côte) #}
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="snippet-title">Titre du snippet</label>
+                            <input 
+                                type="text" 
+                                id="snippet-title" 
+                                name="title" 
+                                class="form-input" 
+                                placeholder="Ex: Docker restart command" 
+                                required
+                            >
                         </div>
-                        <div class="card-body">
-                            {% if snippet.description %}
-                                <p class="card-text text-muted">{{ snippet.description }}</p>
-                            {% endif %}
-                            <pre class="bg-light p-3 rounded"><code>{{ snippet.code|slice(0, 200) }}{% if snippet.code|length > 200 %}...{% endif %}</code></pre>
-                            {% if snippet.tags %}
-                                <div class="mt-2">
-                                    {% for tag in snippet.tags %}
-                                        <span class="badge bg-info me-1">{{ tag }}</span>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                            <small class="text-muted d-block mt-2">Créé le {{ snippet.createdAt|date('d/m/Y H:i') }}</small>
+                        
+                        <div class="form-group">
+                            <label for="snippet-language">Langage</label>
+                            <input 
+                                type="text" 
+                                id="snippet-language" 
+                                name="language" 
+                                class="form-input" 
+                                placeholder="Ex: JavaScript, PHP, CSS..." 
+                                required
+                            >
                         </div>
                     </div>
+                    
+                    {# LIGNE 2 : Code + Description (50/50 avec scrollbars) #}
+                    <div class="form-row form-row--split">
+                        <div class="form-group form-group--half">
+                            <label for="snippet-code">Code</label>
+                            <textarea 
+                                id="snippet-code" 
+                                name="code" 
+                                class="form-textarea form-textarea--code" 
+                                placeholder="Colle ton code ici..." 
+                                rows="10" 
+                                required
+                            ></textarea>
+                        </div>
+                        
+                        <div class="form-group form-group--half">
+                            <label for="snippet-description">Description</label>
+                            <textarea 
+                                id="snippet-description" 
+                                name="description" 
+                                class="form-textarea" 
+                                placeholder="Décris à quoi sert ce snippet (optionnel)" 
+                                rows="10"
+                            ></textarea>
+                        </div>
+                    </div>
+                    
+                    {# BOUTONS D'ACTION #}
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="btn-save-snippet">
+                            Enregistrer
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="btn-cancel-snippet">
+                            Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            {# ÉTAT REDUCED : Seulement titre + info cliquable #}
+            <div class="block-content block-content--reduced" style="display: none;">
+                <div class="block-reduced-info">
+                    <span class="block-title">Configuration</span>
                 </div>
-            {% endfor %}
-        </div>
-    {% endif %}
-</div>
+            </div>
+        </section>
+        
+        {# ========================================
+           BLOC LISTE : Snippets existants
+           État par défaut : REDUCED (fermé)
+           ======================================== #}
+        <section class="snippets-block snippets-block--list" id="list-block">
+            
+            {# ÉTAT REDUCED : Seulement titre cliquable #}
+            <div class="block-content block-content--reduced">
+                <div class="block-reduced-info">
+                    <span class="block-title">Snippets existants</span>
+                </div>
+            </div>
+            
+            {# ÉTAT FOCUS : Liste complète des snippets #}
+            <div class="block-content block-content--focus" style="display: none;">
+                <div class="block-header">
+                    <h2 class="block-title">Snippets existants</h2>
+                </div>
+                
+                {# Container scrollable avec liste des snippets #}
+                <div class="snippets-container" id="snippets-container">
+                    {# Sera rempli dynamiquement par JS #}
+                    <p class="empty-state">Aucun snippet pour le moment. Crée ton premier snippet ci-dessus !</p>
+                </div>
+            </div>
+        </section>
+        
+    </div>
+    
+    {# ===== ASIDE FIXE : Accès rapide (HORS accordéon) ===== #}
+    <aside class="snippets-aside" id="snippets-aside">
+        <h3 class="aside-title">Accès rapide</h3>
+        <ul class="aside-list" id="aside-list">
+            {# Sera rempli dynamiquement par JS #}
+            <li class="aside-empty">Aucun snippet</li>
+        </ul>
+    </aside>
+    
+</main>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/snippets.js') }}"></script>
 {% endblock %}

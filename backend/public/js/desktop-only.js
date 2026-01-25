@@ -8,13 +8,10 @@
         
         // VÉRIFICATION IMMÉDIATE au chargement
         if (window.innerWidth >= 768) {
-            console.log('[DESKTOP-ONLY] Écran desktop détecté au chargement - Retour au Kanban');
-            const referrer = document.referrer;
-            if (referrer && referrer.includes('/kanban')) {
-                window.location.href = '/kanban';
-            } else {
-                window.location.href = '/dashboard';
-            }
+            console.log('[DESKTOP-ONLY] Écran desktop détecté au chargement - Retour à la page d\'origine');
+            const lastPage = localStorage.getItem('lastDesktopPage') || '/dashboard';
+            console.log('[DESKTOP-ONLY] Redirection vers:', lastPage);
+            window.location.href = lastPage;
             return; // Stopper l'exécution si on redirige
         }
         
@@ -24,13 +21,10 @@
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(function() {
                 if (window.innerWidth >= 768) {
-                    console.log('[DESKTOP-ONLY] Écran desktop détecté après resize - Retour au Kanban');
-                    const referrer = document.referrer;
-                    if (referrer && referrer.includes('/kanban')) {
-                        window.location.href = '/kanban';
-                    } else {
-                        window.location.href = '/dashboard';
-                    }
+                    console.log('[DESKTOP-ONLY] Écran desktop détecté après resize - Retour à la page d\'origine');
+                    const lastPage = localStorage.getItem('lastDesktopPage') || '/dashboard';
+                    console.log('[DESKTOP-ONLY] Redirection vers:', lastPage);
+                    window.location.href = lastPage;
                 }
             }, 250);
         });
