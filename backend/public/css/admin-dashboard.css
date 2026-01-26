@@ -1,0 +1,215 @@
+/* ========================================
+   ADMIN DASHBOARD - MY-ANKODE
+   Layout Grid 2x3 + Header comme Snippets
+   ======================================== */
+
+/* ==================== HEADER TITRE DE PAGE ==================== */
+.admin-header {
+    width: 100%;
+    text-align: center;
+    padding: var(--spacing-xl) var(--spacing-lg);
+    margin-top: 80px; /* Espace pour la navbar fixe */
+    margin-bottom: var(--spacing-xs);
+}
+
+.admin-title {
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin: 0 0 var(--spacing-sm) 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    flex-wrap: wrap;
+}
+
+.admin-title i {
+    color: var(--color-primary);
+}
+
+.admin-title .badge {
+    background-color: var(--color-error);
+    font-size: var(--font-size-sm);
+    vertical-align: middle;
+}
+
+.admin-intro {
+    font-size: var(--font-size-base);
+    color: var(--text-secondary);
+    margin: 0 auto;
+    max-width: 800px;
+    line-height: 1.6;
+}
+
+/* ==================== CONTENEUR PRINCIPAL ==================== */
+.admin-main {
+    padding: 0 var(--spacing-lg) var(--spacing-3xl);
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* ==================== GRID 2x3 ==================== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-lg);
+}
+
+/* ==================== CARDS DE STATISTIQUES ==================== */
+.stat-card {
+    background-color: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-base);
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-cyan-hover);
+    border-color: var(--color-primary);
+}
+
+body:not(.dark-mode) .stat-card {
+    background-color: var(--bg-tertiary);
+    box-shadow: var(--shadow-lg);
+}
+
+body:not(.dark-mode) .stat-card:hover {
+    box-shadow: var(--shadow-xl);
+}
+
+/* ==================== ICÔNES DES STATS ==================== */
+.stat-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-full);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-4xl);
+    margin-bottom: var(--spacing-md);
+}
+
+/* Icône Utilisateurs - Cyan */
+.bg-primary-subtle {
+    background-color: rgba(0, 194, 209, 0.2);
+}
+
+.stat-icon i.text-primary {
+    color: var(--color-primary);
+}
+
+/* Icône Projets - Vert */
+.bg-success-subtle {
+    background-color: rgba(81, 207, 102, 0.2);
+}
+
+.stat-icon i.text-success {
+    color: var(--color-success);
+}
+
+/* Icône Tâches - Orange */
+.bg-warning-subtle {
+    background-color: rgba(253, 171, 94, 0.2);
+}
+
+.stat-icon i.text-warning {
+    color: var(--color-accent);
+}
+
+/* Icône Articles - Cyan clair */
+.bg-info-subtle {
+    background-color: rgba(125, 211, 219, 0.2);
+}
+
+.stat-icon i.text-info {
+    color: var(--cyan-300);
+}
+
+/* Icône Snippets - Gris */
+.bg-secondary-subtle {
+    background-color: rgba(108, 117, 125, 0.2);
+}
+
+.stat-icon i.text-secondary {
+    color: var(--neutral-500);
+}
+
+/* Icône Compétences - Rouge */
+.bg-danger-subtle {
+    background-color: rgba(255, 107, 107, 0.2);
+}
+
+.stat-icon i.text-danger {
+    color: var(--color-error);
+}
+
+/* ==================== NOMBRES DES STATS ==================== */
+.stat-number {
+    font-size: var(--font-size-5xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-primary);
+    margin: var(--spacing-sm) 0;
+}
+
+body:not(.dark-mode) .stat-number {
+    color: var(--cyan-700);
+}
+
+/* Animation fade-in pour les chiffres */
+.stat-number .fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ==================== LABELS DES STATS ==================== */
+.stat-label {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* ==================== MESSAGES FLASH ==================== */
+.alert {
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    margin-bottom: var(--spacing-md);
+}
+
+.alert-warning {
+    background-color: rgba(253, 171, 94, 0.1);
+    border-color: var(--color-accent);
+    color: var(--text-primary);
+}
+
+/* ==================== SPINNER DE CHARGEMENT ==================== */
+.spinner-border-sm {
+    color: var(--color-primary);
+}
+
+/* ==================== CROIX D'ERREUR ==================== */
+.stat-number .text-danger {
+    font-size: var(--font-size-3xl);
+}
+

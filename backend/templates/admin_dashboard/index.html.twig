@@ -1,0 +1,118 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard Admin - MY-ANKODE{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/admin-dashboard.css') }}">
+{% endblock %}
+
+{% block body %}
+
+{# ========================================
+   HEADER TITRE DE PAGE (sous la navbar)
+   ======================================== #}
+<header class="admin-header">
+    <h1 class="admin-title">
+        <i class="bi bi-speedometer2"></i> Dashboard Administrateur
+        <span class="badge bg-danger">ADMIN</span>
+    </h1>
+    <p class="admin-intro">
+        Vue d'ensemble des statistiques globales de MY-ANKODE
+    </p>
+</header>
+
+{# ========================================
+   CONTENEUR PRINCIPAL : Grid 2x3
+   ======================================== #}
+<main class="admin-main">
+
+    {# Messages flash #}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    {# Grid de statistiques 2x3 #}
+    <div class="stats-grid">
+        
+        {# Card Utilisateurs #}
+        <div class="stat-card">
+            <div class="stat-icon bg-primary-subtle">
+                <i class="bi bi-people-fill text-primary"></i>
+            </div>
+            <h3 class="stat-number" id="total-users">
+                <span class="spinner-border spinner-border-sm" role="status"></span>
+            </h3>
+            <p class="stat-label">Utilisateurs inscrits</p>
+        </div>
+
+        {# Card Projets #}
+        <div class="stat-card">
+            <div class="stat-icon bg-success-subtle">
+                <i class="bi bi-kanban-fill text-success"></i>
+            </div>
+            <h3 class="stat-number" id="total-projects">
+                <span class="spinner-border spinner-border-sm" role="status"></span>
+            </h3>
+            <p class="stat-label">Projets créés</p>
+        </div>
+
+        {# Card Tâches #}
+        <div class="stat-card">
+            <div class="stat-icon bg-warning-subtle">
+                <i class="bi bi-list-check text-warning"></i>
+            </div>
+            <h3 class="stat-number" id="total-tasks">
+                <span class="spinner-border spinner-border-sm" role="status"></span>
+            </h3>
+            <p class="stat-label">Tâches totales</p>
+        </div>
+
+        {# Card Articles de veille #}
+        <div class="stat-card">
+            <div class="stat-icon bg-info-subtle">
+                <i class="bi bi-newspaper text-info"></i>
+            </div>
+            <h3 class="stat-number" id="total-articles">
+                <span class="spinner-border spinner-border-sm" role="status"></span>
+            </h3>
+            <p class="stat-label">Articles de veille</p>
+        </div>
+
+        {# Card Snippets #}
+        <div class="stat-card">
+            <div class="stat-icon bg-secondary-subtle">
+                <i class="bi bi-code-slash text-secondary"></i>
+            </div>
+            <h3 class="stat-number" id="total-snippets">
+                <span class="spinner-border spinner-border-sm" role="status"></span>
+            </h3>
+            <p class="stat-label">Snippets de code</p>
+        </div>
+
+        {# Card Compétences #}
+        <div class="stat-card">
+            <div class="stat-icon bg-danger-subtle">
+                <i class="bi bi-star-fill text-danger"></i>
+            </div>
+            <h3 class="stat-number" id="total-competences">
+                <span class="spinner-border spinner-border-sm" role="status"></span>
+            </h3>
+            <p class="stat-label">Compétences suivies</p>
+        </div>
+
+    </div>
+
+</main>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/admin-dashboard.js') }}"></script>
+{% endblock %}
