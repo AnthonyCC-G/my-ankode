@@ -15,8 +15,9 @@
     background: rgba(0, 77, 99, 0.85);
     backdrop-filter: blur(15px);
     border: 2px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    
+    /*border-radius: var(--radius-lg);*/
+    border-top-left-radius: 48px 48px;
+    border-bottom-right-radius: 48px 48px ;
     box-shadow: var(--shadow-lg);
 }
 

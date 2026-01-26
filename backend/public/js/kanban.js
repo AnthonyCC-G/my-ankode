@@ -5,22 +5,18 @@
 // ===== 1. DÉTECTION MOBILE CÔTÉ CLIENT (Double sécurité avec le controller) =====
 (function checkMobileDevice() {
     const isMobile = window.innerWidth < 768;
-    
+
     if (isMobile) {
-        console.log('[KANBAN] Appareil mobile détecté - Redirection vers /desktop-only');
         localStorage.setItem('lastDesktopPage', '/kanban');
         window.location.href = '/desktop-only';
         return;
     }
-    
-    console.log('[KANBAN] Appareil desktop détecté - Chargement du Kanban');
-    
+
     let resizeTimer;
     window.addEventListener('resize', function() {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(function() {
             if (window.innerWidth < 768) {
-                console.log('[KANBAN] Fenêtre réduite en mobile - Redirection');
                 localStorage.setItem('lastDesktopPage', '/kanban');
                 window.location.href = '/desktop-only';
             }
@@ -35,15 +31,11 @@ let tasks = []; // Liste des tâches du projet sélectionné
 
 // ===== 3. INITIALISATION AU CHARGEMENT DU DOM =====
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('[KANBAN] DOM chargé - Initialisation du Kanban');
-    
     // Charger les projets au démarrage
     loadProjects();
     
     // Initialiser les événements globaux
     initEventListeners();
-    
-    console.log('[KANBAN] Script kanban.js chargé avec succès');
 });
 
 // ===== 4. INITIALISATION DES EVENT LISTENERS =====
@@ -95,15 +87,11 @@ function initEventListeners() {
     if (btnNewTaskTodo) {
         btnNewTaskTodo.addEventListener('click', showTaskForm);
     }
-    
-    console.log('[KANBAN] Event listeners initialisés ');
 }
 
 // ===== 5. CHARGEMENT DES PROJETS (FETCH API) =====
 async function loadProjects() {
     try {
-        console.log('[KANBAN] Chargement des projets...');
-        
         // Appel API GET /api/projects
         const response = await fetch('/api/projects');
         
@@ -114,9 +102,7 @@ async function loadProjects() {
         
         // Parsing de la réponse JSON
         projects = await response.json();
-        
-        console.log(`[KANBAN] ${projects.length} projet(s) chargé(s) ✅`, projects);
-        
+
         // Affichage des projets dans le DOM
         displayProjects();
         
@@ -230,8 +216,6 @@ function createProjectCard(project) {
 
 // ===== 8. SÉLECTION D'UN PROJET =====
 function selectProject(projectId) {
-    console.log(`[KANBAN] Sélection du projet ID: ${projectId}`);
-    
     currentProjectId = projectId;
     
     // Mettre à jour la classe "selected" sur les cards
@@ -258,8 +242,6 @@ function selectProject(projectId) {
 
 // ===== 9. TOGGLE FOCUS : BASCULER VERS BLOC PROJETS =====
 function switchToProjectsBlock() {
-    console.log('[KANBAN] Basculer vers bloc Projets');
-    
     const projectsBlock = document.getElementById('projects-block');
     const tasksBlock = document.getElementById('tasks-block');
     
@@ -277,8 +259,6 @@ function switchToProjectsBlock() {
 
 // ===== 10. TOGGLE FOCUS : BASCULER VERS BLOC TÂCHES =====
 function switchToTasksBlock() {
-    console.log('[KANBAN] Basculer vers bloc Tâches');
-    
     const projectsBlock = document.getElementById('projects-block');
     const tasksBlock = document.getElementById('tasks-block');
     
@@ -331,13 +311,9 @@ function hideProjectForm() {
         };
         
         try {
-            console.log('[KANBAN] Création du projet:', projectData);
-            
             // 🔒 Utilisation de API.post avec CSRF automatique
             const result = await API.post('/api/projects', projectData);
-            
-            console.log('[KANBAN] Projet créé avec succès ✅', result);
-            
+
             hideProjectForm();
             await loadProjects();
             showSuccess('Projet créé avec succès !');
@@ -355,13 +331,9 @@ function hideProjectForm() {
         }
         
         try {
-            console.log(`[KANBAN] Suppression du projet ID: ${projectId}`);
-            
             // 🔒 Utilisation de API.delete avec CSRF automatique
             await API.delete(`/api/projects/${projectId}`);
-            
-            console.log('[KANBAN] Projet supprimé avec succès ✅');
-            
+
             if (currentProjectId === projectId) {
                 currentProjectId = null;
                 clearTasksDisplay();
@@ -378,8 +350,6 @@ function hideProjectForm() {
 
     // ===== 14bis. ÉDITION D'UN PROJET (TRANSFORMATION CARD → FORMULAIRE) =====
 function handleEditProject(project) {
-    console.log(`[KANBAN] Édition du projet ID: ${project.id}`);
-    
     // Récupérer la card du projet
     const projectCard = document.querySelector(`.project-card[data-project-id="${project.id}"]`);
     
@@ -465,13 +435,9 @@ function handleEditProject(project) {
         };
         
         try {
-            console.log(`[KANBAN] Mise à jour du projet ID: ${projectId}`, projectData);
-            
             // 🔒 Utilisation de API.put avec CSRF automatique
             const result = await API.put(`/api/projects/${projectId}`, projectData);
-            
-            console.log('[KANBAN] Projet mis à jour avec succès ✅', result);
-            
+
             await loadProjects();
             showSuccess('Projet modifié avec succès !');
             
@@ -491,19 +457,15 @@ function handleEditProject(project) {
 // ===== 15. CHARGEMENT DES TÂCHES D'UN PROJET (FETCH API) =====
 async function loadTasks(projectId) {
     try {
-        console.log(`[KANBAN] Chargement des tâches du projet ID: ${projectId}`);
-        
         // Appel API GET /api/projects/{id}/tasks
         const response = await fetch(`/api/projects/${projectId}/tasks`);
         
         if (!response.ok) {
             throw new Error(`Erreur HTTP ${response.status}`);
         }
-        
+
         tasks = await response.json();
-        
-        console.log(`[KANBAN] ${tasks.length} tâche(s) chargée(s) ✅`, tasks);
-        
+
         // Afficher les tâches dans les colonnes
         displayTasks();
         
@@ -735,13 +697,9 @@ function hideTaskForm() {
         };
         
         try {
-            console.log('[KANBAN] Création de la tâche:', taskData);
-            
             // 🔒 Utilisation de API.post avec CSRF automatique
             const result = await API.post(`/api/projects/${currentProjectId}/tasks`, taskData);
-            
-            console.log('[KANBAN] Tâche créée avec succès ✅', result);
-            
+
             hideTaskForm();
             await loadTasks(currentProjectId);
             showSuccess('Tâche créée avec succès !');
@@ -755,13 +713,9 @@ function hideTaskForm() {
     // ===== 21. MISE À JOUR DU STATUT D'UNE TÂCHE (API PATCH avec CSRF) =====
     async function handleUpdateTaskStatus(taskId, newStatus) {
         try {
-            console.log(`[KANBAN] Changement status tâche ID:${taskId} vers ${newStatus}`);
-            
             // 🔒 Utilisation de API.patch avec CSRF automatique
             await API.patch(`/api/tasks/${taskId}/status`, { status: newStatus });
-            
-            console.log('[KANBAN] Statut mis à jour avec succès ✅');
-            
+
             await loadTasks(currentProjectId);
             showSuccess('Tâche mise à jour !');
             
@@ -778,13 +732,9 @@ function hideTaskForm() {
         }
         
         try {
-            console.log(`[KANBAN] Suppression de la tâche ID: ${taskId}`);
-            
             // 🔒 Utilisation de API.delete avec CSRF automatique
             await API.delete(`/api/tasks/${taskId}`);
-            
-            console.log('[KANBAN] Tâche supprimée avec succès ✅');
-            
+
             await loadTasks(currentProjectId);
             showSuccess('Tâche supprimée avec succès !');
             
@@ -796,8 +746,6 @@ function hideTaskForm() {
 
 // ===== 22bis. ÉDITION D'UNE TÂCHE (TRANSFORMATION CARD → FORMULAIRE) =====
 function handleEditTask(task) {
-    console.log(`[KANBAN] Édition de la tâche ID: ${task.id}`);
-    
     // Récupérer la card de la tâche
     const taskCard = document.querySelector(`.task-card[data-task-id="${task.id}"]`);
     
@@ -882,13 +830,9 @@ function handleEditTask(task) {
         };
         
         try {
-            console.log(`[KANBAN] Mise à jour de la tâche ID: ${taskId}`, taskData);
-            
             // 🔒 Utilisation de API.put avec CSRF automatique
             const result = await API.put(`/api/tasks/${taskId}`, taskData);
-            
-            console.log('[KANBAN] Tâche mise à jour avec succès ✅', result);
-            
+
             await loadTasks(currentProjectId);
             showSuccess('Tâche modifiée avec succès !');
             
@@ -913,8 +857,6 @@ function clearTasksDisplay() {
 // ===== 24. MESSAGES DE SUCCÈS =====
 function showSuccess(message) {
     // TODO : Implémenter un système de toast/notifications
-    console.log(`[KANBAN] ✅ ${message}`);
-    // Pour le MVP, on utilise console.log
     // Post-MVP : Créer un composant toast comme dans la Veille
 }
 

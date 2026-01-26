@@ -52,13 +52,15 @@
     width: 200px; /* Largeur FIXE */
     height: calc(100vh - 560px); /* Hauteur FIXE - ne bouge jamais */
     flex-shrink: 0; /* Empêche l'aside de rétrécir */
-    
+
     background: var(--bg-secondary);
     border: 2px solid var(--border-color);
     border-radius: var(--radius-lg);
     padding: var(--spacing-md);
-    overflow-y: auto;
-    overflow-x: hidden;
+
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Pas de scroll sur le conteneur principal */
 }
 
 body:not(.dark-mode) .snippets-aside {
@@ -86,12 +88,12 @@ body:not(.dark-mode) .snippets-block {
 }
 
 .snippets-block--list {
-    flex: 0 0 60px; /* Réduit (juste le header) */
+    flex: 0 0 80px; /* Réduit (juste le header) - augmenté pour le bouton */
 }
 
 /* Quand on inverse : Config REDUCED, Liste FOCUS (géré par JS) */
 .snippets-block--config.reduced {
-    flex: 0 0 60px;
+    flex: 0 0 80px;
 }
 
 .snippets-block--list.focus {
@@ -113,7 +115,19 @@ body:not(.dark-mode) .snippets-block {
     padding: var(--spacing-sm) var(--spacing-lg);
     cursor: pointer;
     transition: all var(--transition-base);
-    min-height: 60px;
+    height: 80px; /* Hauteur fixe pour accommoder le bouton "Nouveau snippet" */
+    box-sizing: border-box;
+}
+
+/* Compacter tous les éléments dans le bloc réduit pour que tout soit lisible */
+.block-content--reduced * {
+    margin: 0;
+    line-height: 1.2;
+}
+
+/* Masquer le bouton "Nouveau snippet" quand le bloc Configuration est réduit */
+.snippets-block--config.reduced .btn-new-snippet {
+    display: none;
 }
 
 /* Hover sur bloc réduit : Effet visuel cliquable */
@@ -138,6 +152,8 @@ body:not(.dark-mode) .snippets-block {
     padding: var(--spacing-md);
     border-bottom: 2px solid var(--border-color);
     margin-bottom: var(--spacing-md);
+    height: 80px; /* Hauteur fixe pour accommoder le bouton "Nouveau snippet" */
+    box-sizing: border-box;
 }
 
 .block-title {
@@ -183,6 +199,7 @@ body:not(.dark-mode) .snippets-block--list .block-header {
     text-align: center;
     padding-bottom: var(--spacing-sm);
     border-bottom: 2px solid var(--color-primary); /* ✅ Border cyan */
+    flex-shrink: 0; /* Le titre reste fixe, ne bouge pas au scroll */
 }
 
 /* ==================== BLOC 2 : CONFIGURATION (Formulaire) ==================== */
@@ -401,6 +418,18 @@ body:not(.dark-mode) .btn-new-snippet:hover {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm);
+    flex: 1; /* Prend tout l'espace disponible */
+    overflow-y: auto; /* Scroll uniquement sur la liste */
+    overflow-x: hidden;
+
+    /* Masquer la scrollbar tout en gardant le scroll fonctionnel */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE et Edge */
+}
+
+/* Masquer la scrollbar pour Chrome, Safari et Opera */
+.aside-list::-webkit-scrollbar {
+    display: none;
 }
 
 .aside-empty {
