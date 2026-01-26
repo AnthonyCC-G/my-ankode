@@ -6,22 +6,18 @@
 // ===== 1. DÉTECTION MOBILE CÔTÉ CLIENT =====
 (function checkMobileDevice() {
     const isMobile = window.innerWidth < 768;
-    
+
     if (isMobile) {
-        console.log('[SNIPPETS] Appareil mobile détecté - Redirection vers /desktop-only');
         localStorage.setItem('lastDesktopPage', '/snippets');
         window.location.href = '/desktop-only';
         return;
     }
-    
-    console.log('[SNIPPETS] Appareil desktop détecté - Chargement de la page Snippets');
-    
+
     let resizeTimer;
     window.addEventListener('resize', function() {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(function() {
             if (window.innerWidth < 768) {
-                console.log('[SNIPPETS] Fenêtre réduite en mobile - Redirection');
                 localStorage.setItem('lastDesktopPage', '/snippets');
                 window.location.href = '/desktop-only';
             }
@@ -36,15 +32,11 @@ let editingSnippetId = null;
 
 // ===== 3. INITIALISATION AU CHARGEMENT DU DOM =====
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('[SNIPPETS] DOM chargé - Initialisation de la page Snippets');
-    
     // Charger les snippets depuis l'API
     loadSnippets();
     
     // Initialiser les event listeners
     initEventListeners();
-    
-    console.log('[SNIPPETS] Script snippets.js chargé avec succès ✅');
 });
 
 // ===== 4. INITIALISATION DES EVENT LISTENERS =====
@@ -65,7 +57,6 @@ function initEventListeners() {
     const btnNewSnippetExpanded = document.getElementById('btn-new-snippet-expanded');
     if (btnNewSnippetExpanded) {
         btnNewSnippetExpanded.addEventListener('click', () => {
-            console.log('[SNIPPETS] Bouton "Nouveau snippet" cliqué - Reset formulaire');
             resetForm();
         });
     }
@@ -75,7 +66,6 @@ function initEventListeners() {
     if (btnNewSnippetReduced) {
         btnNewSnippetReduced.addEventListener('click', (e) => {
             e.stopPropagation(); // Empêche le clic de se propager au bloc reduced
-            console.log('[SNIPPETS] Bouton "Nouveau snippet" (reduced) cliqué - Focus Config + Reset formulaire');
             focusConfigBlock();
             resetForm();
         });
@@ -85,7 +75,6 @@ function initEventListeners() {
     const configBlockReduced = document.querySelector('#config-block .block-content--reduced');
     if (configBlockReduced) {
         configBlockReduced.addEventListener('click', () => {
-            console.log('[SNIPPETS] Clic sur Config reduced → Focus Config');
             focusConfigBlock();
         });
     }
@@ -93,24 +82,17 @@ function initEventListeners() {
     const listBlockReduced = document.querySelector('#list-block .block-content--reduced');
     if (listBlockReduced) {
         listBlockReduced.addEventListener('click', () => {
-            console.log('[SNIPPETS] Clic sur Liste reduced → Focus Liste');
             focusListBlock();
         });
     }
-    
-    console.log('[SNIPPETS] Event listeners initialisés ✅');
 }
 
 // ===== 5. CHARGEMENT DES SNIPPETS (API GET) =====
 async function loadSnippets() {
     try {
-        console.log('[SNIPPETS] Chargement des snippets...');
-        
         const data = await API.get('/api/snippets');
         snippets = data;
-        
-        console.log(`[SNIPPETS] ${snippets.length} snippet(s) chargé(s) ✅`, snippets);
-        
+
         // Trier les snippets par langage alphabétique puis par titre
         snippets.sort((a, b) => {
             const langA = (a.language || '').toLowerCase();
@@ -162,8 +144,6 @@ function displaySnippetsList() {
         const card = createSnippetCard(snippet);
         container.appendChild(card);
     });
-    
-    console.log(`[SNIPPETS] ${snippets.length} card(s) affichée(s) dans la liste ✅`);
 }
 
 // ===== 7. CRÉATION D'UNE CARD SNIPPET =====
@@ -250,13 +230,11 @@ function toggleCardExpand(card) {
         body.classList.remove('collapsed');
         body.classList.add('expanded');
         card.classList.add('expanded');
-        console.log('[SNIPPETS] Card expanded');
     } else {
         // Collapse
         body.classList.remove('expanded');
         body.classList.add('collapsed');
         card.classList.remove('expanded');
-        console.log('[SNIPPETS] Card collapsed');
     }
 }
 
@@ -294,14 +272,10 @@ function displaySnippetsAside() {
         
         asideList.appendChild(item);
     });
-    
-    console.log(`[SNIPPETS] ${snippets.length} mini-card(s) affichée(s) dans l'aside ✅`);
 }
 
 // ===== 9. SCROLL VERS UN SNIPPET (depuis l'aside) + HIGHLIGHT =====
 function scrollToSnippet(snippetId) {
-    console.log(`[SNIPPETS] Scroll vers snippet ID: ${snippetId}`);
-    
     // Ouvrir le bloc liste si fermé
     focusListBlock();
     
@@ -374,20 +348,14 @@ async function handleSubmitSnippet(event) {
     try {
         if (isEditMode && editingSnippetId) {
             // Mode édition : PUT
-            console.log(`[SNIPPETS] Mise à jour du snippet ID: ${editingSnippetId}`, snippetData);
-            
             const result = await API.put(`/api/snippets/${editingSnippetId}`, snippetData);
-            
-            console.log('[SNIPPETS] Snippet mis à jour avec succès ✅', result);
+
             showFlashMessage('Snippet modifié avec succès !', 'success');
             
         } else {
             // Mode création : POST
-            console.log('[SNIPPETS] Création d\'un nouveau snippet', snippetData);
-            
             const result = await API.post('/api/snippets', snippetData);
-            
-            console.log('[SNIPPETS] Snippet créé avec succès ✅', result);
+
             showFlashMessage('Snippet créé avec succès !', 'success');
         }
         
@@ -408,8 +376,6 @@ async function handleSubmitSnippet(event) {
 
 // ===== 11. ÉDITION D'UN SNIPPET =====
 function handleEditSnippet(snippetId) {
-    console.log(`[SNIPPETS] Édition du snippet ID: ${snippetId}`);
-    
     // Trouver le snippet
     const snippet = snippets.find(s => s.id === snippetId);
     
@@ -439,26 +405,20 @@ function handleEditSnippet(snippetId) {
 
 // ===== 12. SUPPRESSION D'UN SNIPPET (API DELETE) =====
 async function handleDeleteSnippet(snippetId) {
-    console.log(`[SNIPPETS] Tentative de suppression du snippet ID: ${snippetId}`);
-    
     // Trouver le snippet pour afficher son titre dans la confirmation
     const snippet = snippets.find(s => s.id === snippetId);
     const snippetTitle = snippet ? snippet.title : 'ce snippet';
     
     // Confirmation utilisateur
     const confirmed = confirm(`Êtes-vous sûr de vouloir supprimer "${snippetTitle}" ?\n\nCette action est irréversible.`);
-    
+
     if (!confirmed) {
-        console.log('[SNIPPETS] Suppression annulée par l\'utilisateur');
         return;
     }
     
     try {
-        console.log(`[SNIPPETS] Suppression du snippet ID: ${snippetId}`);
-        
         await API.delete(`/api/snippets/${snippetId}`);
-        
-        console.log('[SNIPPETS] Snippet supprimé avec succès ✅');
+
         showFlashMessage('Snippet supprimé avec succès !', 'success');
         
         // Recharger la liste des snippets
@@ -472,8 +432,6 @@ async function handleDeleteSnippet(snippetId) {
 
 // ===== 13. ANNULATION DU FORMULAIRE =====
 function handleCancelForm() {
-    console.log('[SNIPPETS] Annulation du formulaire');
-    
     resetForm();
     
     // Si on était en mode édition, retourner à la liste
@@ -491,17 +449,13 @@ function resetForm() {
     
     document.getElementById('snippet-id').value = '';
     document.getElementById('btn-save-snippet').textContent = 'Enregistrer';
-    
+
     isEditMode = false;
     editingSnippetId = null;
-    
-    console.log('[SNIPPETS] Formulaire réinitialisé');
 }
 
 // ===== 15. GESTION DE L'ACCORDÉON - FOCUS/REDUCED (comme Kanban) =====
 function focusConfigBlock() {
-    console.log('[SNIPPETS] Focus sur Config');
-    
     const configBlock = document.getElementById('config-block');
     const listBlock = document.getElementById('list-block');
     
@@ -520,8 +474,6 @@ function focusConfigBlock() {
 }
 
 function focusListBlock() {
-    console.log('[SNIPPETS] Focus sur Liste');
-    
     const configBlock = document.getElementById('config-block');
     const listBlock = document.getElementById('list-block');
     
@@ -550,11 +502,9 @@ function showFlashMessage(message, type = 'success') {
     
     // Classe CSS selon le type
     const className = type === 'success' ? 'flash-success' : 'flash-error';
-    
+
     flashContainer.innerHTML = `<span class="${className}">${escapeHtml(message)}</span>`;
-    
-    console.log(`[SNIPPETS] Message flash affiché: ${message} (${type})`);
-    
+
     // Effacer le message après 5 secondes
     setTimeout(() => {
         flashContainer.innerHTML = '';

@@ -72,6 +72,7 @@ class SnippetController extends AbstractController
 
     /**
      * POST /api/snippets - Créer un snippet
+     * Protection CSRF  //
      */
     #[Route('', name: 'api_snippets_create', methods: ['POST'])]
     public function create(Request $request): JsonResponse
@@ -123,6 +124,7 @@ class SnippetController extends AbstractController
 
     /**
      * PUT /api/snippets/{id} - Modifier un snippet
+     * Protection CSRF  //
      */
     #[Route('/{id}', name: 'api_snippets_update', methods: ['PUT'])]
     public function update(string $id, Request $request): JsonResponse
@@ -183,6 +185,7 @@ class SnippetController extends AbstractController
 
     /**
      * DELETE /api/snippets/{id} - Supprimer un snippet
+     * Protection CSRF  //
      */
     #[Route('/{id}', name: 'api_snippets_delete', methods: ['DELETE'])]
     public function delete(string $id): JsonResponse

@@ -18,13 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('delete-account-form');
     const errorMessage = document.getElementById('delete-error-message');
     const submitBtn = document.getElementById('delete-submit-btn');
-    
-    // Debug : verifier que tous les elements sont trouves
-    console.log(' Debug delete-account.js:');
-    console.log('- Bouton supprimer:', btnDeleteAccount);
-    console.log('- Modal:', modal);
-    console.log('- Formulaire:', form);
-    
+
     // Si un element manque, arreter le script
     if (!btnDeleteAccount || !modal || !form) {
         console.error(' Elements manquants pour la suppression de compte');
@@ -39,7 +33,6 @@ document.addEventListener('DOMContentLoaded', function() {
      * Ouvrir le modal
      */
     function openModal() {
-        console.log(' Ouverture du modal');
         modal.classList.add('active');
         document.body.style.overflow = 'hidden'; // Bloque le scroll de la page
     }
@@ -48,7 +41,6 @@ document.addEventListener('DOMContentLoaded', function() {
      * Fermer le modal
      */
     function closeModal() {
-        console.log(' Fermeture du modal');
         modal.classList.remove('active');
         document.body.style.overflow = ''; // Reactive le scroll
         
@@ -80,7 +72,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Ouvrir le modal au clic sur le bouton rouge
     btnDeleteAccount.addEventListener('click', function(e) {
         e.preventDefault();
-        console.log(' Clic sur le bouton de suppression');
         openModal();
     });
     
@@ -102,7 +93,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Fermer le modal avec la touche Echap
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && modal.classList.contains('active')) {
-            console.log('⌨ Touche Echap pressee');
             closeModal();
         }
     });
@@ -113,9 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     form.addEventListener('submit', async function(e) {
         e.preventDefault(); // Empeche le rechargement de la page
-        
-        console.log(' Soumission du formulaire de suppression');
-        
+
         // Recuperer le mot de passe
         const password = document.getElementById('delete-password').value;
         const checkbox = document.getElementById('delete-confirm-checkbox').checked;
@@ -140,9 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // ========================================
             // 5. REQUETE DELETE VERS L'API
             // ========================================
-            
-            console.log(' Envoi de la requete DELETE /api/user/delete');
-            
+
             const response = await fetch('/api/user/delete', {
                 method: 'DELETE',
                 headers: {
@@ -152,18 +138,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     password: password
                 })
             });
-            
+
             const data = await response.json();
-            console.log(' Reponse API:', data);
-            
+
             // ========================================
             // 6. TRAITEMENT DE LA REPONSE
             // ========================================
             
             if (response.ok && data.success) {
                 // Succes : compte supprime
-                console.log('Compte supprime avec succes');
-                
+
                 // Afficher un message de confirmation
                 alert('Votre compte a ete supprime avec succes. Vous allez etre redirige vers la page d\'authentification.');
                 
@@ -190,6 +174,4 @@ document.addEventListener('DOMContentLoaded', function() {
             submitBtn.textContent = 'Confirmer la suppression';
         }
     });
-    
-    console.log('Script delete-account.js initialise');
 });
