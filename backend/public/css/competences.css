@@ -8,7 +8,7 @@
 .competences-header {
     text-align: center;
     padding: var(--spacing-xl) var(--spacing-lg);
-    padding-top: 120px; /* COPIE SNIPPETS : padding-top important */
+    /*padding-top: 120px; COPIE SNIPPETS : padding-top important */
     margin-top: 80px; /* COPIE SNIPPETS : margin-top pour navbar */
     margin-bottom: var(--spacing-md);
 }

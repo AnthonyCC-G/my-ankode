@@ -9,8 +9,14 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * API REST pour la gestion des snippets de code
+ * Protection CSRF gérée automatiquement par CsrfValidationSubscriber
+ */
 #[Route('/api/snippets')]
+#[IsGranted('ROLE_USER')]
 class SnippetController extends AbstractController
 {
     public function __construct(
