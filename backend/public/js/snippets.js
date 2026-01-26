@@ -69,6 +69,17 @@ function initEventListeners() {
             resetForm();
         });
     }
+
+    // Bouton "Nouveau snippet" (dans le bloc config reduced)
+    const btnNewSnippetReduced = document.getElementById('btn-new-snippet-reduced');
+    if (btnNewSnippetReduced) {
+        btnNewSnippetReduced.addEventListener('click', (e) => {
+            e.stopPropagation(); // Empêche le clic de se propager au bloc reduced
+            console.log('[SNIPPETS] Bouton "Nouveau snippet" (reduced) cliqué - Focus Config + Reset formulaire');
+            focusConfigBlock();
+            resetForm();
+        });
+    }
     
     // Clic sur bloc reduced pour basculer en focus
     const configBlockReduced = document.querySelector('#config-block .block-content--reduced');
