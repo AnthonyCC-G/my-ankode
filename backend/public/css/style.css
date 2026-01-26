@@ -238,7 +238,7 @@ body:not(.dark-mode) .title-app h2 {
     width: 100%;
     background: rgba(0,0,0,0.3);
     backdrop-filter: blur(15px);
-    border-top: 1px solid var(--border-color);
+    /*border-top: 1px solid var(--border-color);*/
     padding: var(--spacing-sm) 0;
     z-index: var(--z-sticky);
 }
@@ -278,7 +278,7 @@ body:not(.dark-mode) .title-app h2 {
 /* Footer en mode light */
 body:not(.dark-mode) .footer-sticky {
     background: rgba(245, 249, 252, 0.3);
-    border-top: 1px solid var(--border-color);
+    /*border-top: 1px solid var(--border-color);*/
 }
 
 body:not(.dark-mode) .footer-link {
