@@ -47,6 +47,12 @@
             <a href="{{ path('app_competences') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_competences' %}active{% endif %}">
                 Compétences
             </a>
+            {# LIEN ADMIN - visible uniquement pour ROLE_ADMIN #}
+            {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_admin_dashboard') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_admin_dashboard' %}active{% endif %}">
+                Admin
+            </a>
+            {% endif %}
             <a href="{{ path('app_logout') }}" class="nav-link nav-link--logout">
                 Déconnexion
             </a>
