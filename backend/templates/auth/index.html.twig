@@ -27,7 +27,7 @@
 
     {# ===== DIV2 : BLOC INSCRIPTION ===== #}
     <section class="auth-block auth-block--register">
-        <h2 class="auth-block__title">if ( S'inscrire ) {</h2>
+        <h2 class="auth-block__title">if (!compte) { S'inscrire }</h2>
         
         {{ form_start(registrationForm, {'attr': {'class': 'auth-form', 'novalidate': 'novalidate'}}) }}
         
@@ -63,12 +63,12 @@
 
         {{ form_end(registrationForm) }}
         
-        <p class="auth-block__closing">}</p>
+        {#<p class="auth-block__closing">}</p>#}
     </section>
 
     {# ===== DIV3 : BLOC CONNEXION ===== #}
     <section class="auth-block auth-block--login">
-        <h2 class="auth-block__title">} else ( Se connecter ) {</h2>
+        <h2 class="auth-block__title"> else { Se connecter }</h2>
 
         {# Erreurs de connexion #}
         {% if login_error %}
@@ -118,7 +118,7 @@
             <button type="submit" class="btn btn--primary">Se connecter</button>
         </form>
         
-        <p class="auth-block__closing">}</p>
+        {#<p class="auth-block__closing">}</p>#}
     </section>
 
 </div>

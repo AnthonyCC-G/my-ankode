@@ -69,7 +69,7 @@
 /* ===== BLOCS AUTHENTIFICATION ===== */
 .auth-block {
     background-color: var(--bg-secondary);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--color-accent);
     border-radius: var(--radius-lg);
     padding: var(--spacing-xl);
     box-shadow: var(--shadow-md);
@@ -208,7 +208,6 @@
 }
 
 .auth-block--register .form-label::after {
-    content: ' = "';
     color: var(--text-muted);
 }
 
@@ -218,7 +217,6 @@
 
 /* ===== STYLE "CODE" - CONNEXION ===== */
 .auth-block--login .form-label::after {
-    content: " =";
     color: var(--text-muted);
     margin-left: 0.2rem;
 }
