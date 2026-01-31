@@ -41,8 +41,8 @@ body:not(.dark-mode) {
 /* ==================== LOGO ==================== */
 .logo {
     position: fixed;
-    top: var(--spacing-md);
-    left: var(--spacing-md);
+    top: 1px;
+    left: 1px;
     z-index: var(--z-header);
 }
 
@@ -58,7 +58,7 @@ body:not(.dark-mode) {
 
 .logo img {
     width: auto;
-    height: 90px;
+    height: 120px;
     filter: drop-shadow(0 2px 8px rgba(0, 210, 255, 0.3));
 }
 

@@ -40,7 +40,7 @@ class ArticleMongoTest extends ApiTestCase
         $this->assertEquals('Test Article MongoDB', $article->getTitle());
         $this->assertEquals('https://example.com/test-article', $article->getUrl());
         
-        // ✅ CORRIGÉ : Utilise le système multi-utilisateurs
+        // Utilise le système multi-utilisateurs
         $this->assertFalse($article->isReadByUser((string) $user->getId()));
         $this->assertFalse($article->isFavoritedByUser((string) $user->getId()));
         

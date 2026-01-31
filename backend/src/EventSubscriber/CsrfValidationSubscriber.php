@@ -10,7 +10,7 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 /**
- * Valide automatiquement le token CSRF pour toutes les routes API
+ * Valide ou non le token CSRF pour toutes les routes API
  * qui modifient des données (POST, PUT, PATCH, DELETE)
  */
 class CsrfValidationSubscriber implements EventSubscriberInterface

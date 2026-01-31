@@ -11,8 +11,8 @@
     gap: var(--spacing-xl);
     max-width: 1200px;
     margin: 0 auto;
-    padding: var(--spacing-xl);
-    min-height: calc(100vh - 180px);
+    padding-top: var(--spacing-md);
+    min-height: calc(100vh - 110px);
 }
 
 /* ===== MESSAGES FLASH ===== */
