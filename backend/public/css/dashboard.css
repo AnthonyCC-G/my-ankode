@@ -47,7 +47,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 2rem; /* var(--spacing-lg) fluide */
+    padding: 1rem; /* var(--spacing-lg) fluide */
     
     background: rgba(0, 77, 99, 0.25);
     backdrop-filter: blur(10px);
@@ -55,7 +55,7 @@
     border-radius: var(--radius-lg);
     
     transition: all var(--transition-base);
-    min-height: 10rem;
+    min-height: 9rem;
 }
 
 .dashboard-card:hover {
@@ -326,9 +326,9 @@ body:not(.dark-mode) .card-snippets .card-link {
     grid-template-columns: repeat(2, 1fr); /* INCHANGÉ */
     gap: 0.5rem; /* var(--spacing-md) fluide */
     align-items: center;
-    padding: 0.5rem 0; /* ✅ Compact */
-    margin-top: 0.5rem; /* ✅ Espace visible entre grid et footer */
-    border-top: 1px solid var(--border-color);
+    padding: 0.5rem 0; /* Compact */
+    margin-top: 0.5rem; /* Espace visible entre grid et footer */
+    border-top: 2px solid var(--custom-border);
     max-width: 87.5rem; /* 1400px */
     margin-left: auto;
     margin-right: auto;
@@ -359,7 +359,7 @@ body:not(.dark-mode) .card-snippets .card-link {
     background: transparent;
     padding-left: var(--spacing-lg);
     color: gold;
-    border: 1px solid var(--gold-700);
+    border: 2px solid var(--gold-700);
     border-radius: var(--radius-md);
     font-size: 0.875rem; /* var(--font-size-sm) fluide */
     font-weight: 500;
@@ -385,7 +385,7 @@ body:not(.dark-mode) .card-snippets .card-link {
     font-weight: var(--font-weight-medium);
     background: transparent;
     color: var(--red-500);
-    border: 1px solid var(--red-500);
+    border: 2px solid var(--red-500);
     border-radius: var(--radius-md);
     cursor: pointer;
     transition: all var(--transition-base);
