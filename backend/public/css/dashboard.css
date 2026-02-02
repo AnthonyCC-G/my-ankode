@@ -1,18 +1,22 @@
 /* ==================== DASHBOARD PAGE ==================== */
 
 .dashboard-container {
-    width: 100%;
+    /*width: 100%;
     max-width: 75rem; 
     margin: 0 auto;
     padding: 1.5rem;
-    padding-left: 1rem;
+    padding-left: 1rem;*/
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    min-height: calc(100vh - 200px);
 }
 
 /* ===== HEADER DASHBOARD ===== */
 .dashboard-header {
     text-align: center;
-    margin-bottom: 1rem;
-    padding-bottom: 1rem;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
     border-bottom: 1px solid var(--border-color);
 }
 
