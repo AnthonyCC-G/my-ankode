@@ -4,6 +4,7 @@
 # 
 # Ce script prépare l'environnement de test et lance la suite complète :
 # - Vérifie que Docker est actif
+# - S'assure que la base de test existe (création si nécessaire)
 # - Nettoie les caches dev et test
 # - Recharge les fixtures en environnement test (isolation des données)
 # - Lance tous les tests PHPUnit avec statistiques détaillées
@@ -50,27 +51,64 @@ fi
 echo -e "${GREEN}✅ Conteneurs actifs${NC}"
 echo ""
 
-# Étape 2 : Nettoyage du cache
-echo -e "${CYAN}2️⃣ Nettoyage cache...${NC}"
+# Étape 2 : Vérification/Création de la base de test
+echo -e "${CYAN}2️⃣ Vérification base de données test...${NC}"
+
+# Vérifier si la base existe en essayant de se connecter
+DB_CHECK=$(docker-compose exec backend php bin/console dbal:run-sql "SELECT 1" --env=test 2>&1)
+
+if echo "$DB_CHECK" | grep -q "database \"my_ankode_test\" does not exist"; then
+    echo -e "${YELLOW}⚠️  Base de test inexistante, création en cours...${NC}"
+    
+    # Créer la base
+    CREATE_OUTPUT=$(docker-compose exec backend php bin/console doctrine:database:create --env=test 2>&1)
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}❌ Erreur lors de la création de la base${NC}"
+        echo "$CREATE_OUTPUT"
+        exit 1
+    fi
+    echo -e "${GREEN}✅ Base de données créée${NC}"
+    
+    # Créer le schéma (tables)
+    SCHEMA_OUTPUT=$(docker-compose exec backend php bin/console doctrine:schema:create --env=test 2>&1)
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}❌ Erreur lors de la création du schéma${NC}"
+        echo "$SCHEMA_OUTPUT"
+        exit 1
+    fi
+    echo -e "${GREEN}✅ Schéma créé${NC}"
+else
+    echo -e "${GREEN}✅ Base de test existante${NC}"
+fi
+echo ""
+
+# Étape 3 : Nettoyage du cache
+echo -e "${CYAN}3️⃣ Nettoyage cache...${NC}"
 docker-compose exec backend php bin/console cache:clear --env=dev --quiet
 echo -e "${GREEN}✅ Cache dev cleared${NC}"
 docker-compose exec backend php bin/console cache:clear --env=test --quiet
 echo -e "${GREEN}✅ Cache test cleared${NC}"
 echo ""
 
-# Étape 3 : Rechargement des fixtures test
-echo -e "${CYAN}3️⃣ Rechargement fixtures test...${NC}"
-docker-compose exec backend php bin/console doctrine:fixtures:load --env=test -n > /dev/null 2>&1
-if [ $? -eq 0 ]; then
+# Étape 4 : Rechargement des fixtures test
+echo -e "${CYAN}4️⃣ Rechargement fixtures test...${NC}"
+
+# Capturer la sortie pour afficher uniquement en cas d'erreur
+FIXTURES_OUTPUT=$(docker-compose exec backend php bin/console doctrine:fixtures:load --env=test -n 2>&1)
+FIXTURES_EXIT=$?
+
+if [ $FIXTURES_EXIT -eq 0 ]; then
     echo -e "${GREEN}✅ Fixtures test chargées${NC}"
 else
     echo -e "${RED}❌ Erreur lors du chargement des fixtures${NC}"
+    echo ""
+    echo "$FIXTURES_OUTPUT"
     exit 1
 fi
 echo ""
 
-# Étape 4 : Lancement des tests
-echo -e "${CYAN}4️⃣ Lancement tests PHPUnit...${NC}"
+# Étape 5 : Lancement des tests
+echo -e "${CYAN}5️⃣ Lancement tests PHPUnit...${NC}"
 echo ""
 
 # Construire la commande PHPUnit
