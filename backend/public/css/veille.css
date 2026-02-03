@@ -5,8 +5,8 @@
     width: calc(100% - 60px); /* MODIF : Soustrait la largeur sidebar */
     max-width: 1400px;
     margin: 0 auto;
-    padding-top: 120px;
-    padding-bottom: var(--spacing-lg);
+    padding-top: 100px;
+    padding-bottom: var(--spacing-md);
     text-align: center;
 }
 
@@ -36,14 +36,12 @@
     margin-right: auto;
     padding-left: var(--spacing-sm);
     padding-right: var(--spacing-lg);
-    padding-bottom: 180px;
-    
     display: grid;
     grid-template-columns: 1fr 1fr; /* 2 colonnes egales TOUJOURS */
     grid-template-rows: 200px 1fr;
-    gap: var(--spacing-md);
+    gap: var(--spacing-xs);
+    height: calc(100vh - 400px);
     
-    min-height: calc(100vh - 360px);
 }
 
 /* ===== STYLES COMMUNS POUR LES BLOCS ===== */
@@ -52,7 +50,7 @@
 .veille-articles {
     background: rgba(0, 77, 99, 0.25);
     backdrop-filter: blur(10px);
-    border: 2px solid var(--border-color);
+    border: 2px solid var(--orange-500); /* ← MODIF : Blocs principaux */
     border-radius: var(--radius-lg);
     padding: var(--spacing-md);
     transition: all var(--transition-base);
@@ -63,7 +61,7 @@ body:not(.dark-mode) .veille-search,
 body:not(.dark-mode) .veille-favorites,
 body:not(.dark-mode) .veille-articles {
     background: rgba(255, 255, 255, 0.85);
-    border-color: var(--neutral-300);
+    border-color: var(--orange-500); /* ← MODIF : Blocs principaux */
 }
 
 /* Titres des blocs */
@@ -105,10 +103,17 @@ body:not(.dark-mode) .veille-articles {
     font-family: var(--font-main);
     font-size: var(--font-size-base);
     color: var(--text-primary);
-    background: var(--custom-dark-card);
-    border: 2px solid var(--border-color);
+    background: rgba(0, 77, 99, 0.3); /* ← MODIF : Fond subtil dark */
+    border: 2px solid var(--gold-700); /* ← MODIF : Input démarqué */
     border-radius: var(--radius-md);
     transition: all var(--transition-base);
+}
+
+/* Mode Light - Input démarqué */
+body:not(.dark-mode) .search-input {
+    background: rgba(253, 171, 94, 0.08); /* ← MODIF : Fond teinté orange léger */
+    border-color: var(--gold-700); /* ← MODIF */
+    color: var(--neutral-900);
 }
 
 .search-input:focus {
@@ -195,7 +200,7 @@ body:not(.dark-mode) .veille-articles {
     align-items: center;
     justify-content: space-between;
     padding: var(--spacing-md);
-    padding-bottom: var(--spacing-sm);
+    padding-bottom: var(--spacing-md);
     background: transparent;
     border: none;
     cursor: pointer;
@@ -248,8 +253,9 @@ body:not(.dark-mode) .veille-articles {
 
 /* Item favori - Structure avec lien et bouton */
 .favorite-item {
-    padding: var(--spacing-sm);
+    padding: var(--spacing-xs);
     background: rgba(0, 77, 99, 0.473);
+    border: 1px solid var(--gold-700); /* ← MODIF : Items favoris */
     border-radius: var(--radius-sm);
     margin-bottom: var(--spacing-xs);
     transition: all var(--transition-base);
@@ -339,6 +345,7 @@ body:not(.dark-mode) .veille-articles {
     flex-direction: column;
     overflow: hidden;
     transition: grid-column var(--transition-base);
+    padding-bottom: var(--spacing-xs);
 }
 
 /* Header avec titre et compteur */
@@ -346,7 +353,7 @@ body:not(.dark-mode) .veille-articles {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-xs);
 }
 
 .articles-counter {
@@ -368,7 +375,7 @@ body:not(.dark-mode) .veille-articles {
     flex: 1;
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-xs);
 }
 
 /* Gradient gauche : indique qu'il y a du contenu avant */
@@ -452,7 +459,7 @@ body:not(.dark-mode) .carousel-wrapper::after {
     flex: 1;
     overflow-x: auto;
     overflow-y: hidden;
-    padding: var(--spacing-sm) 0;
+    padding: var(--spacing-xs) 0;
     
     /* Smooth scroll */
     scroll-behavior: smooth;
@@ -470,24 +477,24 @@ body:not(.dark-mode) .carousel-wrapper::after {
 /* Grid des cards : CARROUSEL horizontal */
 .articles-grid {
     display: flex;
-    gap: var(--spacing-md);
+    gap: var(--spacing-xs);
     padding-right: var(--spacing-lg);
+    align-items: center;
 }
 
 /* Card article - Largeur fixe */
 .article-card {
-    flex: 0 0 400px;
-    min-width: 400px;
-    height: 450px; /* hauteur */
-    max-height: 450px; /* hauteur max  */
+    flex: 0 0 300px;
+    min-width: 300px;
+    height: auto; /* hauteur */
     background: rgba(0, 194, 209, 0.05);
-    border: 2px solid var(--custom-border);
+    border: 2px solid var(--gold-700); /* ← MODIF : Cards */
     border-radius: var(--radius-md);
-    padding: var(--spacing-lg);
+    padding: var(--spacing-md);
     transition: all var(--transition-base);
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-xs);
     overflow: hidden; /* cache tout dépassement */
 }
 
@@ -502,15 +509,15 @@ body:not(.dark-mode) .carousel-wrapper::after {
 }
 
 .article-title {
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-base);
     font-weight: var(--font-weight-semibold);
     color: var(--text-primary);
     margin: 0;
-    line-height: 1.4;
+    line-height: 1.3;
     flex-shrink: 0;
     min-height: 0; 
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -523,18 +530,18 @@ body:not(.dark-mode) .carousel-wrapper::after {
 }
 
 .article-description {
-    font-size: var(--font-size-base);
+    font-size: var(--font-size-sm);
     color: var(--text-secondary);
     margin: 0;
-    line-height: 1.6;
-    min-height: 0;
+    line-height: 1.5;
+    /*min-height: 0;*/
     
     /* PREND L'ESPACE RESTANT mais limité */
     flex: 1 1 auto;
     
     /* Limite à 3 lignes maximum */
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -542,15 +549,15 @@ body:not(.dark-mode) .carousel-wrapper::after {
 
 .article-actions {
     display: flex;
-    gap: var(--spacing-sm);
-    padding-top: var(--spacing-sm);
+    gap: var(--spacing-xs);
+    padding-top: var(--spacing-xs);
     flex-shrink: 0; /* LES BOUTONS NE SE COMPRESSENT JAMAIS */
-    min-height: 56px; /* HAUTEUR MINIMUM GARANTIE */
+    /*min-height: 56px; /* HAUTEUR MINIMUM GARANTIE */
 }
 
 .article-actions button {
     flex: 1;
-    height: 48px; /* HAUTEUR FIXE BOUTONS */
+    height: 40px; /* HAUTEUR FIXE BOUTONS */
     padding: var(--spacing-sm);
     background: transparent;
     border: 2px solid var(--border-color);
@@ -569,8 +576,8 @@ body:not(.dark-mode) .carousel-wrapper::after {
 }
 
 .article-actions button svg {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
 }
 
 /* Styles specifiques pour les boutons d'actions */
@@ -687,7 +694,7 @@ body:not(.dark-mode) .carousel-wrapper::after {
     max-width: 600px;
     background: rgba(0, 77, 99, 0.15);
     backdrop-filter: blur(8px);
-    border: 1px solid var(--border-color);
+    border: 2px solid var(--orange-500); /* ← MODIF : Bloc principal */
     border-radius: var(--radius-md);
     padding: var(--spacing-sm) var(--spacing-md);
     margin-top: var(--spacing-md);
@@ -696,12 +703,12 @@ body:not(.dark-mode) .carousel-wrapper::after {
 /* Mode Light */
 body:not(.dark-mode) .veille-sources {
     background: rgba(255, 255, 255, 0.7);
-    border-color: var(--neutral-300);
+    border-color: var(--orange-500); /* ← MODIF : Bloc principal */
 }
 
 .sources-credits {
     font-size: var(--font-size-xs);
-    color: var(--text-muted);
+    color: var(--text-primary);
     margin: 0;
     text-align: center;
     display: flex;
@@ -719,7 +726,7 @@ body:not(.dark-mode) .veille-sources {
 }
 
 .sources-credits a {
-    color: var(--color-primary);
+    color: var(--text-primary);
     text-decoration: none;
     font-weight: var(--font-weight-medium);
     transition: color var(--transition-fast);

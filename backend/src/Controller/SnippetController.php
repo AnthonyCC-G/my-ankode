@@ -32,14 +32,14 @@ class SnippetController extends AbstractController
         $user = $this->getUser();
         
         if (!$user) {
-            return $this->json(['error' => 'Non authentifié'], Response::HTTP_UNAUTHORIZED);
+            return $this->json(['error' => 'Non authentifié'], 401);
         }
 
         // Récupérer les snippets de cet utilisateur
         $snippets = $this->dm->getRepository(Snippet::class)
-            ->findBy(['userId' => $user->getId()]);
+            ->findBy(['userId' => (string) $user->getId()]);
 
-        return $this->json($snippets, Response::HTTP_OK);
+        return $this->json($snippets, 200);
     }
 
     /**
@@ -51,7 +51,7 @@ class SnippetController extends AbstractController
         $user = $this->getUser();
         
         if (!$user) {
-            return $this->json(['error' => 'Non authentifié'], Response::HTTP_UNAUTHORIZED);
+            return $this->json(['error' => 'Non authentifié'], 401);
         }
 
         // Récupérer le snippet par son ID
@@ -59,15 +59,15 @@ class SnippetController extends AbstractController
 
         // Vérifier que le snippet existe
         if (!$snippet) {
-            return $this->json(['error' => 'Snippet non trouvé'], Response::HTTP_NOT_FOUND);
+            return $this->json(['error' => 'Snippet non trouvé'], 404);
         }
 
         // Vérifier que l'utilisateur est bien le propriétaire
-        if ($snippet->getUserId() !== $user->getId()) {
-            return $this->json(['error' => 'Accès refusé'], Response::HTTP_FORBIDDEN);
+        if ($snippet->getUserId() !== (string) $user->getId()) {
+            return $this->json(['error' => 'Accès refusé'], 403);
         }
 
-        return $this->json($snippet, Response::HTTP_OK);
+        return $this->json($snippet, 200);
     }
 
     /**
@@ -80,7 +80,7 @@ class SnippetController extends AbstractController
         $user = $this->getUser();
         
         if (!$user) {
-            return $this->json(['error' => 'Non authentifié'], Response::HTTP_UNAUTHORIZED);
+            return $this->json(['error' => 'Non authentifié'], 401);
         }
 
         // Récupérer les données JSON de la requête
@@ -88,28 +88,20 @@ class SnippetController extends AbstractController
 
         // Validation des champs obligatoires
         if (empty($data['title'])) {
-            return $this->json(['error' => 'Le titre est obligatoire'], Response::HTTP_BAD_REQUEST);
+            return $this->json(['error' => 'Le titre est obligatoire'], 400);
         }
         
         if (empty($data['language'])) {
-            return $this->json(['error' => 'Le langage est obligatoire'], Response::HTTP_BAD_REQUEST);
+            return $this->json(['error' => 'Le langage est obligatoire'], 400);
         }
         
         if (empty($data['code'])) {
-            return $this->json(['error' => 'Le code est obligatoire'], Response::HTTP_BAD_REQUEST);
-        }
-
-        // Validation du langage (doit être dans la liste autorisée)
-        $allowedLanguages = ['js', 'php', 'html', 'css', 'sql', 'other'];
-        if (!in_array($data['language'], $allowedLanguages)) {
-            return $this->json([
-                'error' => 'Langage invalide. Valeurs autorisées : ' . implode(', ', $allowedLanguages)
-            ], Response::HTTP_BAD_REQUEST);
+            return $this->json(['error' => 'Le code est obligatoire'], 400);
         }
 
         // Créer le nouveau snippet
         $snippet = new Snippet();
-        $snippet->setUserId($user->getId());
+        $snippet->setUserId((string) $user->getId());
         $snippet->setTitle($data['title']);
         $snippet->setLanguage($data['language']);
         $snippet->setCode($data['code']);
@@ -119,7 +111,7 @@ class SnippetController extends AbstractController
         $this->dm->persist($snippet);
         $this->dm->flush();
 
-        return $this->json($snippet, Response::HTTP_CREATED);
+        return $this->json($snippet, 201);
     }
 
     /**
@@ -132,33 +124,23 @@ class SnippetController extends AbstractController
         $user = $this->getUser();
         
         if (!$user) {
-            return $this->json(['error' => 'Non authentifié'], Response::HTTP_UNAUTHORIZED);
+            return $this->json(['error' => 'Non authentifié'], 401);
         }
 
         // Récupérer le snippet
         $snippet = $this->dm->getRepository(Snippet::class)->find($id);
 
         if (!$snippet) {
-            return $this->json(['error' => 'Snippet non trouvé'], Response::HTTP_NOT_FOUND);
+            return $this->json(['error' => 'Snippet non trouvé'], 404);
         }
 
         // Vérifier que l'utilisateur est bien le propriétaire
-        if ($snippet->getUserId() !== $user->getId()) {
-            return $this->json(['error' => 'Accès refusé'], Response::HTTP_FORBIDDEN);
+        if ($snippet->getUserId() !== (string) $user->getId()) {
+            return $this->json(['error' => 'Accès refusé'], 403);
         }
 
         // Récupérer les données JSON
         $data = json_decode($request->getContent(), true);
-
-        // Validation du langage si fourni
-        if (isset($data['language'])) {
-            $allowedLanguages = ['js', 'php', 'html', 'css', 'sql', 'other'];
-            if (!in_array($data['language'], $allowedLanguages)) {
-                return $this->json([
-                    'error' => 'Langage invalide. Valeurs autorisées : ' . implode(', ', $allowedLanguages)
-                ], Response::HTTP_BAD_REQUEST);
-            }
-        }
 
         // Mettre à jour les champs (uniquement ceux fournis)
         if (isset($data['title'])) {
@@ -180,7 +162,7 @@ class SnippetController extends AbstractController
         // Sauvegarder les modifications
         $this->dm->flush();
 
-        return $this->json($snippet, Response::HTTP_OK);
+        return $this->json($snippet, 200);
     }
 
     /**
@@ -193,25 +175,25 @@ class SnippetController extends AbstractController
         $user = $this->getUser();
         
         if (!$user) {
-            return $this->json(['error' => 'Non authentifié'], Response::HTTP_UNAUTHORIZED);
+            return $this->json(['error' => 'Non authentifié'], 401);
         }
 
         // Récupérer le snippet
         $snippet = $this->dm->getRepository(Snippet::class)->find($id);
 
         if (!$snippet) {
-            return $this->json(['error' => 'Snippet non trouvé'], Response::HTTP_NOT_FOUND);
+            return $this->json(['error' => 'Snippet non trouvé'], 404);
         }
 
         // Vérifier que l'utilisateur est bien le propriétaire
-        if ($snippet->getUserId() !== $user->getId()) {
-            return $this->json(['error' => 'Accès refusé'], Response::HTTP_FORBIDDEN);
+        if ($snippet->getUserId() !== (string) $user->getId()) {
+            return $this->json(['error' => 'Accès refusé'], 403);
         }
 
         // Supprimer le snippet
         $this->dm->remove($snippet);
         $this->dm->flush();
 
-        return $this->json(['message' => 'Snippet supprimé avec succès'], Response::HTTP_OK);
+        return $this->json(['message' => 'Snippet supprimé avec succès'], 200);
     }
 }

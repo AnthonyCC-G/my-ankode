@@ -3,11 +3,11 @@
 /* Aside fixe à gauche, visible uniquement desktop */
 .user-sidebar {
     position: fixed;
-    left: var(--spacing-md);
-    top: 120px; /* 90px logo + 30px gap */
+    left: 1.625rem;
+    top: 140px; /* 110px logo + 30px gap */
     bottom: 90px; /* s'arrête avant les mentions légales qui sont sur toutes les pages en desktop */
     z-index: calc(var(--z-header) - 1); /* Sous la navbar */
-    width: 80px;
+    width: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -15,9 +15,8 @@
     background: rgba(0, 77, 99, 0.85);
     backdrop-filter: blur(15px);
     border: 2px solid var(--border-color);
-    /*border-radius: var(--radius-lg);*/
-    border-top-left-radius: 48px 48px;
-    border-bottom-right-radius: 48px 48px ;
+    border-radius: var(--radius-lg);
+    
     box-shadow: var(--shadow-lg);
 }
 

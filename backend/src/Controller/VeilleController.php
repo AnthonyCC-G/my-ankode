@@ -28,7 +28,7 @@ class VeilleController extends AbstractController
     }
 
     /**
-     * API REST - Liste des articles avec pagination
+     * API REST - Liste des articles 
      */
     #[Route('/api/articles', name: 'api_articles_list', methods: ['GET'])]
     public function getArticlesApi(Request $request, DocumentManager $dm): JsonResponse

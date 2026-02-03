@@ -1,34 +1,37 @@
 /* ==================== DASHBOARD PAGE ==================== */
 
 .dashboard-container {
-    width: 100%;
-    max-width: 1400px;
+    /*width: 100%;
+    max-width: 75rem; 
     margin: 0 auto;
-    padding: var(--spacing-xl) var(--spacing-lg);
-    padding-top: 160px;
-    padding-bottom: 200px;
+    padding: 1.5rem;
+    padding-left: 1rem;*/
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    min-height: calc(100vh - 200px);
 }
 
 /* ===== HEADER DASHBOARD ===== */
 .dashboard-header {
     text-align: center;
-    margin-bottom: var(--spacing-xl);
-    padding-bottom: var(--spacing-md);
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
     border-bottom: 1px solid var(--border-color);
 }
 
 .dashboard-title {
     font-family: var(--font-main);
-    font-size: var(--font-size-3xl);
+    font-size: clamp(1.5rem, 3vw, 2rem);
     font-weight: var(--font-weight-bold);
     color: var(--text-primary);
-    margin: 0 0 var(--spacing-sm) 0;
+    margin: 6% 0 0 0;
     letter-spacing: -0.02em;
 }
 
 .dashboard-subtitle {
     font-family: var(--font-main);
-    font-size: var(--font-size-lg);
+    font-size: clamp(0.875rem, 1.5vw, 1rem); /* var(--font-size-lg) fluide */
     font-weight: var(--font-weight-normal);
     color: var(--text-secondary);
     margin: 0;
@@ -37,9 +40,9 @@
 /* ===== GRID 2x2 CARDS ===== */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); 
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
+    grid-template-columns: repeat(2, 1fr); /* INCHANGÉ */
+    gap: 0.3rem;
+    margin-bottom: var(--spacing-xs);
 }
 
 /* ===== CARDS COMMUNES ===== */
@@ -48,7 +51,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: var(--spacing-lg);
+    padding: 1rem; /* var(--spacing-lg) fluide */
     
     background: rgba(0, 77, 99, 0.25);
     backdrop-filter: blur(10px);
@@ -56,11 +59,11 @@
     border-radius: var(--radius-lg);
     
     transition: all var(--transition-base);
-    min-height: 300px;
+    min-height: 9rem;
 }
 
 .dashboard-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-0.25rem); /* -4px */
     box-shadow: var(--shadow-lg);
 }
 
@@ -72,8 +75,8 @@ body:not(.dark-mode) .dashboard-card {
 
 /* ===== ICONES SVG ===== */
 .card-icon {
-    width: 56px;
-    height: 56px;
+    width: 3rem;
+    height: clamp(3rem, 6vw, 3.5rem);
     margin-bottom: var(--spacing-sm);
     display: flex;
     align-items: center;
@@ -89,10 +92,10 @@ body:not(.dark-mode) .dashboard-card {
 /* ===== TITRES CARDS ===== */
 .card-title {
     font-family: var(--font-main);
-    font-size: var(--font-size-xl);
+    font-size: clamp(1rem, 2vw, 1.25rem); 
     font-weight: var(--font-weight-semibold);
     color: var(--text-primary);
-    margin: 0 0 var(--spacing-sm) 0;
+    margin: 0 0 var(--spacing-xs) 0;
     text-align: center;
 }
 
@@ -103,7 +106,7 @@ body:not(.dark-mode) .dashboard-card {
     align-items: center;
     justify-content: center;
     text-align: center;
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-xs);
     width: 100%;
 }
 
@@ -113,7 +116,7 @@ body:not(.dark-mode) .dashboard-card {
 
 .card-stat {
     font-family: var(--font-main);
-    font-size: var(--font-size-base);
+    font-size: clamp(0.875rem, 1.2vw, 0.95rem); /* var(--font-size-base) fluide */
     font-weight: var(--font-weight-medium);
     color: var(--text-primary);
     margin: 0 0 var(--spacing-sm) 0;
@@ -121,7 +124,7 @@ body:not(.dark-mode) .dashboard-card {
 
 .card-empty {
     font-family: var(--font-main);
-    font-size: var(--font-size-sm);
+    font-size: 0.875rem; /* var(--font-size-sm) fluide */
     font-weight: var(--font-weight-normal);
     color: var(--text-secondary);
     font-style: italic;
@@ -148,7 +151,7 @@ body:not(.dark-mode) .dashboard-card {
     align-items: center;
     gap: var(--spacing-xs);
     padding: var(--spacing-xs);
-    font-size: var(--font-size-xs);
+    font-size: 0.75rem; /* var(--font-size-xs) fluide */
     color: var(--text-secondary);
     text-align: center;
     
@@ -173,8 +176,8 @@ body:not(.dark-mode) .card-mini-item:last-child {
 
 /* Badges de statut pour les tâches */
 .mini-item-badge {
-    width: 8px;
-    height: 8px;
+    width: 0.5rem; /* 8px */
+    height: 0.5rem;
     border-radius: 50%;
     flex-shrink: 0;
 }
@@ -194,10 +197,10 @@ body:not(.dark-mode) .card-mini-item:last-child {
 /* ===== LIENS CARDS ===== */
 .card-link {
     display: inline-block;
-    padding: var(--spacing-sm) var(--spacing-md);
+    padding: var(--spacing-xs) var(--spacing-xs);
     
     font-family: var(--font-main);
-    font-size: var(--font-size-sm);
+    font-size: 0.875rem; /* var(--font-size-sm) fluide */
     font-weight: var(--font-weight-semibold);
     text-decoration: none;
     text-align: center;
@@ -207,7 +210,7 @@ body:not(.dark-mode) .card-mini-item:last-child {
 }
 
 .card-link:hover {
-    transform: translateY(-2px);
+    transform: translateY(-0.125rem); /* -2px */
 }
 
 /* Liens desktop/mobile */
@@ -227,7 +230,7 @@ body:not(.dark-mode) .card-mini-item:last-child {
 }
 
 .card-veille:hover {
-    box-shadow: 0 8px 20px rgba(253, 171, 94, 0.4);
+    box-shadow: 0 0.5rem 1.25rem rgba(253, 171, 94, 0.4); /* 0 8px 20px */
 }
 
 .card-veille .card-icon svg {
@@ -241,7 +244,7 @@ body:not(.dark-mode) .card-mini-item:last-child {
 
 .card-veille .card-link:hover {
     background: #FDAB5E;
-    box-shadow: 0 4px 12px rgba(253, 171, 94, 0.5);
+    box-shadow: 0 0.25rem 0.75rem rgba(253, 171, 94, 0.5); /* 0 4px 12px */
 }
 
 body:not(.dark-mode) .card-veille .card-link {
@@ -254,7 +257,7 @@ body:not(.dark-mode) .card-veille .card-link {
 }
 
 .card-kanban:hover {
-    box-shadow: 0 8px 20px rgba(81, 207, 102, 0.4);
+    box-shadow: 0 0.5rem 1.25rem rgba(81, 207, 102, 0.4);
 }
 
 .card-kanban .card-icon svg {
@@ -268,7 +271,7 @@ body:not(.dark-mode) .card-veille .card-link {
 
 .card-kanban .card-link:hover {
     background: var(--green-700);
-    box-shadow: 0 4px 12px rgba(81, 207, 102, 0.5);
+    box-shadow: 0 0.25rem 0.75rem rgba(81, 207, 102, 0.5);
 }
 
 /* SNIPPETS - Cyan */
@@ -277,7 +280,7 @@ body:not(.dark-mode) .card-veille .card-link {
 }
 
 .card-snippets:hover {
-    box-shadow: 0 8px 20px rgba(0, 194, 209, 0.4);
+    box-shadow: 0 0.5rem 1.25rem rgba(0, 194, 209, 0.4);
 }
 
 .card-snippets .card-icon svg {
@@ -291,7 +294,7 @@ body:not(.dark-mode) .card-veille .card-link {
 
 .card-snippets .card-link:hover {
     background: var(--cyan-600);
-    box-shadow: 0 4px 12px rgba(0, 194, 209, 0.5);
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 194, 209, 0.5);
 }
 
 body:not(.dark-mode) .card-snippets .card-link {
@@ -304,7 +307,7 @@ body:not(.dark-mode) .card-snippets .card-link {
 }
 
 .card-competences:hover {
-    box-shadow: 0 8px 20px rgba(212, 165, 116, 0.4);
+    box-shadow: 0 0.5rem 1.25rem rgba(212, 165, 116, 0.4);
 }
 
 .card-competences .card-icon svg {
@@ -318,20 +321,19 @@ body:not(.dark-mode) .card-snippets .card-link {
 
 .card-competences .card-link:hover {
     background: var(--gold-700);
-    box-shadow: 0 4px 12px rgba(212, 165, 116, 0.5);
+    box-shadow: 0 0.25rem 0.75rem rgba(212, 165, 116, 0.5);
 }
 
 /* ===== FOOTER DASHBOARD ===== */
 .dashboard-footer {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Même structure que dashboard-grid */
-    gap: var(--spacing-md); /* Même gap que les cards */
+    grid-template-columns: repeat(2, 1fr); /* INCHANGÉ */
+    gap: 0.5rem; /* var(--spacing-md) fluide */
     align-items: center;
-    padding-top: var(--spacing-md);
-    padding-bottom: var(--spacing-md); 
-    margin-top: var(--spacing-md);
-    border-top: 1px solid var(--border-color);
-    max-width: 1400px; /* Même largeur max que dashboard-container */
+    padding: 0.5rem 0; /* Compact */
+    margin-top: 0.5rem; /* Espace visible entre grid et footer */
+    border-top: 2px solid var(--custom-border);
+    max-width: 87.5rem; /* 1400px */
     margin-left: auto;
     margin-right: auto;
     width: 100%;
@@ -361,9 +363,9 @@ body:not(.dark-mode) .card-snippets .card-link {
     background: transparent;
     padding-left: var(--spacing-lg);
     color: gold;
-    border: 1px solid var(--gold-700);
+    border: 2px solid var(--gold-700);
     border-radius: var(--radius-md);
-    font-size: var(--font-size-sm);
+    font-size: 0.875rem; /* var(--font-size-sm) fluide */
     font-weight: 500;
     font-family: var(--font-main);
     cursor: pointer;
@@ -374,7 +376,7 @@ body:not(.dark-mode) .card-snippets .card-link {
 
 .footer-action-warning:hover {
     background: #d97706; /* Doré plus foncé au hover */
-    transform: translateY(-2px);
+    transform: translateY(-0.125rem); /* -2px */
     color: white;
 }
 
@@ -383,11 +385,11 @@ body:not(.dark-mode) .card-snippets .card-link {
     justify-self: end;
     padding-right: var(--spacing-lg);
     font-family: var(--font-main);
-    font-size: var(--font-size-sm);
+    font-size: 0.875rem;/* var(--font-size-sm) fluide */
     font-weight: var(--font-weight-medium);
     background: transparent;
     color: var(--red-500);
-    border: 1px solid var(--red-500);
+    border: 2px solid var(--red-500);
     border-radius: var(--radius-md);
     cursor: pointer;
     transition: all var(--transition-base);
@@ -396,7 +398,7 @@ body:not(.dark-mode) .card-snippets .card-link {
 .footer-action-danger:hover {
     background: var(--red-500);
     color: #ffffff;
-    transform: translateY(-2px);
+    transform: translateY(-0.125rem); /* -2px */
 }
 
 
@@ -404,26 +406,26 @@ body:not(.dark-mode) .card-snippets .card-link {
 /* ===== RESPONSIVE ===== */
 
 /* Tablette */
-@media (max-width: 991px) {
+@media (max-width: 62rem) { /* 991px */
     .dashboard-container {
-        padding: var(--spacing-lg) var(--spacing-md);
+        padding: clamp(2rem, 4vh, 4rem) clamp(1rem, 2vw, 2rem);
     }
     
     .dashboard-title {
-        font-size: var(--font-size-2xl);
+        font-size: clamp(1.25rem, 3vw, 2rem); /* var(--font-size-2xl) fluide */
     }
     
     .dashboard-subtitle {
-        font-size: var(--font-size-base);
+        font-size: clamp(0.875rem, 1.5vw, 1rem); /* var(--font-size-base) fluide */
     }
 }
 
 /* Mobile */
-@media (max-width: 768px) {
+@media (max-width: 48rem) { /* 768px */
     .dashboard-container {
-        padding: var(--spacing-md);
-        padding-top: 100px;
-        padding-bottom: 120px;
+        padding: clamp(1rem, 2vw, 2rem);
+        padding-top: clamp(4rem, 8vh, 6.25rem); /* 100px adaptatif */
+        padding-bottom: clamp(5rem, 10vh, 7.5rem); /* 120px adaptatif */
     }
     
     .dashboard-header {
@@ -431,35 +433,35 @@ body:not(.dark-mode) .card-snippets .card-link {
     }
     
     .dashboard-title {
-        font-size: var(--font-size-xl);
+        font-size: clamp(1.125rem, 2.5vw, 1.5rem); /* var(--font-size-xl) fluide */
     }
     
     .dashboard-subtitle {
-        font-size: var(--font-size-sm);
+        font-size: clamp(0.75rem, 1.2vw, 0.875rem); /* var(--font-size-sm) fluide */
     }
     
     /* Grid devient stack vertical */
     .dashboard-grid {
         grid-template-columns: 1fr;
-        gap: var(--spacing-md);
+        gap: clamp(1rem, 3vw, 2rem); /* var(--spacing-md) fluide */
     }
     
     .dashboard-card {
-        min-height: 240px;
-        padding: var(--spacing-lg);
+        min-height: clamp(13rem, 35vh, 15rem); /* 240px adaptatif */
+        padding: clamp(1.5rem, 4vw, 2rem); /* var(--spacing-lg) fluide */
     }
     
     .card-icon {
-        width: 48px;
-        height: 48px;
+        width: clamp(2.5rem, 5vw, 3rem); /* 48px adaptatif */
+        height: clamp(2.5rem, 5vw, 3rem);
     }
     
     .card-title {
-        font-size: var(--font-size-lg);
+        font-size: clamp(1rem, 2vw, 1.25rem); /* var(--font-size-lg) fluide */
     }
     
     .card-empty {
-        font-size: var(--font-size-sm);
+        font-size: clamp(0.75rem, 1.2vw, 0.875rem); /* var(--font-size-sm) fluide */
     }
     
     /* Mini-liste redevient VERTICALE sur mobile */
@@ -502,17 +504,17 @@ body:not(.dark-mode) .card-snippets .card-link {
     /* Footer en colonne sur mobile */
     .dashboard-footer {
         flex-direction: column;
-        gap: var(--spacing-md);
+        gap: clamp(1rem, 3vw, 2rem); /* var(--spacing-md) fluide */
     }
 }
 
 /* Petit mobile */
-@media (max-width: 480px) {
+@media (max-width: 30rem) { /* 480px */
     .dashboard-title {
-        font-size: var(--font-size-lg);
+        font-size: clamp(1rem, 2vw, 1.25rem); /* var(--font-size-lg) fluide */
     }
     
     .dashboard-card {
-        min-height: 220px;
+        min-height: clamp(12rem, 30vh, 13.75rem); /* 220px adaptatif */
     }
 }

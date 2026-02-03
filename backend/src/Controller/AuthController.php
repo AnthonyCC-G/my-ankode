@@ -32,7 +32,7 @@ class AuthController extends AbstractController
         // ===== PARTIE INSCRIPTION (Register) =====
         $user = new User();
         $registrationForm = $this->createForm(RegistrationFormType::class, $user, [
-            'action' => $this->generateUrl('app_auth_register'), // ✅ ACTION VERS /auth/register
+            'action' => $this->generateUrl('app_auth_register'), //  ACTION VERS /auth/register
         ]);
 
         return $this->render('auth/index.html.twig', [
