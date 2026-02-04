@@ -19,7 +19,6 @@ class TaskRepository extends ServiceEntityRepository
 
     /**
      * Compte le nombre total de tâches d'un utilisateur
-     * 
      * @param User $user Utilisateur connecté
      * @return int
      */
@@ -37,7 +36,6 @@ class TaskRepository extends ServiceEntityRepository
     /**
      * Récupère les dernières tâches d'un utilisateur
      * Triées par date de création (plus récentes en premier)
-     * 
      * @param User $user Utilisateur connecté
      * @param int $limit Nombre de tâches à récupérer
      * @return Task[]
