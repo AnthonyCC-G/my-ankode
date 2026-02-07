@@ -28,6 +28,29 @@
                 <div class="cta-button">
                     <a href="{{ path('app_auth') }}">{ S'inscrire / Se Connecter }</a>
                 </div>
+
+                {# ===== Cards Dashboard - Asymétriques ===== #}
+                <div class="dashboard-cards">
+                    {# Card Témoignage - Petite, en haut à gauche #}
+                    <div class="dashboard-card dashboard-card--testimonial">
+                        <h3 class="card-title">{ Témoignage }</h3>
+                        <p class="card-text">
+                            "My Ankode m'a aidé à structurer mon apprentissage et suivre ma progression."
+                        </p>
+                        <span class="card-author">— Alex, Dev Junior</span>
+                    </div>
+
+                    {# Card Fonctionnalités - Plus grande, au centre #}
+                    <div class="dashboard-card dashboard-card--features">
+                        <h3 class="card-title">{ Features }</h3>
+                        <ul class="card-list">
+                            <li> Veille techno RSS</li>
+                            <li> Kanban projets</li>
+                            <li> Snippets code</li>
+                            <li> Suivi DWWM</li>
+                        </ul>
+                    </div>
+                </div>
                 
                 <div class="hero-image">
                     <img src="{{ asset('images/hero-developer.png') }}" alt="Développeur travaillant sur My Ankode">
