@@ -845,6 +845,66 @@
     font-size: var(--font-size-xs);
 }
 
+/* ===== DRAG & DROP ===== */
+
+/* ===== POIGNÉE DE DRAG & DROP ===== */
+.task-drag-handle {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 24px;
+    cursor: grab;
+    color: #64748b;;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.task-drag-handle:hover {
+    opacity: 1;
+    color: var(--color-primary);
+}
+
+.task-drag-handle:active {
+    cursor: grabbing;
+}
+
+.task-drag-handle svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Ajuster le padding de la card pour faire de la place à la poignée */
+.task-card {
+    position: relative;
+    padding-left: 32px; /* Faire de la place pour la poignée */
+}
+
+/* Colonne survolée pendant le drag */
+.tasks-container.drag-over {
+    background-color: var(--color-primary-light);
+    border: 2px dashed var(--color-primary);
+    border-radius: 8px;
+}
+
+/* Carte en cours de déplacement */
+.task-card[draggable="true"] {
+    cursor: grab;
+}
+
+.task-card[draggable="true"]:active {
+    cursor: grabbing;
+}
+
+/* Colonne survolée pendant le drag */
+.tasks-container.drag-over {
+    background-color: var(--color-primary-light);
+    border: 2px dashed var(--color-primary);
+    border-radius: 8px;
+}
+
+
 
 /* ==================== AJUSTEMENTS MASCOTTE POUR KANBAN ==================== */
 
@@ -887,7 +947,7 @@
 
 /* Hover renforcé */
 .mascot-container .lightbulb:hover {
-    filter: drop-shadow(0 0 25px rgba(255, 215, 0, 1)) !important;
+    filter: drop-shadow(0 0 25px rgba(255, 215, 0, 1));
     transform: scale(1.15);
 }
 
@@ -898,7 +958,7 @@ body:not(.dark-mode) .mascot-container .lightbulb {
 }
 
 body:not(.dark-mode) .mascot-container .lightbulb:hover {
-    filter: grayscale(100%) brightness(0.7) !important;
+    filter: grayscale(100%) brightness(0.7);
     transform: scale(1.1);
 }
 
