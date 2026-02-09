@@ -85,7 +85,7 @@ body:not(.dark-mode) .logo img {
     justify-content: center;
     align-items: center;
     gap: var(--spacing-sm);
-    flex-wrap: wrap;
+    flex-wrap: wrap; /* Permet de passer à la ligne sur très petit écran si besoin */
 }
 
 .footer-link {
@@ -106,8 +106,6 @@ body:not(.dark-mode) .logo img {
 }
 
 .footer-copyright {
-    text-align: center;
-    margin: var(--spacing-xs) 0 0;
     font-size: var(--font-size-sm);
     color: var(--text-secondary);
 }
