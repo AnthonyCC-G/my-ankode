@@ -1,0 +1,582 @@
+/* ==================== MY-ANKODE - Page d'accueil (Desktop uniquement) ==================== */
+
+/* ==================== CONTENEUR PRINCIPAL HOME ==================== */
+.home-container {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+/* ==================== GLOBE ANIMÉ (FOND DÉCORATIF) ==================== */
+.globe-animation {
+    position: absolute;
+    top: -10vh;
+    right: -5vw;
+    width: 25vw;
+    height: 25vw;
+    overflow: visible;
+    z-index: 1; /* Derrière le contenu principal */
+    pointer-events: none; /* Ne bloque pas les clics */
+}
+
+.globe-earth {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    animation: rotate-clockwise 80s linear infinite;
+    opacity: 0.5;
+    
+    /* Optimisation performance GPU */
+    will-change: transform;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
+@keyframes rotate-clockwise {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ==================== GRID LAYOUT PRINCIPAL ==================== */
+.home-main {
+    position: relative;
+    z-index: 10; /* Au-dessus du globe */
+    
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 5px;
+    
+    width: 100%;
+    height: calc(100vh - 80px);
+    padding: var(--spacing-xl);
+    padding-bottom: calc(var(--spacing-xl) + 100px);
+}
+
+/* ==================== TITRES HOME ==================== */
+
+/* ===== "Bienvenue sur" ===== */
+.title-welcome {
+    grid-column: span 2 / span 2;
+    grid-column-start: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.title-welcome h1 {
+    position: relative;
+    font-family: var(--font-main);
+    font-size: clamp(1.5rem, 3vw, 3rem);
+    font-weight: var(--font-weight-normal);
+    color: var(--text-primary);
+    margin: 0;
+    letter-spacing: 0.05em;
+}
+
+/* Ligne verticale cyan à gauche */
+.title-welcome h1::before {
+    content: '';
+    position: absolute;
+    left: -20px;
+    top: 0;
+    height: 160px;
+    width: 3px;
+    background: var(--cyan-500);
+    opacity: 0.6;
+    border-radius: 2px;
+}
+
+/* ===== "My Ankode" ===== */
+.title-app {
+    grid-column: span 2 / span 2;
+    grid-column-start: 3;
+    grid-row-start: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.title-app h2 {
+    position: relative;
+    font-family: var(--font-main);
+    font-size: clamp(2.5rem, 5vw, 5rem);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin: 0;
+    letter-spacing: 0.05em;
+}
+
+/* Ligne verticale cyan à gauche */
+.title-app h2::before {
+    content: '';
+    position: absolute;
+    left: -25px;
+    top: 0;
+    height: 190px;
+    width: 3px;
+    background: var(--cyan-500);
+    opacity: 0.6;
+    border-radius: 2px;
+}
+
+/* Mode light - Titres */
+body:not(.dark-mode) .title-welcome h1,
+body:not(.dark-mode) .title-app h2 {
+    color: var(--text-primary);
+}
+
+/* ==================== BOUTON CTA ==================== */
+.cta-button {
+    grid-column: span 2 / span 2;
+    grid-column-start: 4;
+    grid-row-start: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cta-button a {
+    position: relative;
+    display: inline-block;
+    
+    /* Style bouton */
+    padding: var(--spacing-md) var(--spacing-xl);
+    background: linear-gradient(135deg, var(--orange-500) 0%, #FF8C42 100%);
+    border: 2px solid var(--orange-500);
+    border-radius: var(--radius-lg);
+    
+    /* Texte */
+    font-family: var(--font-main);
+    font-size: clamp(1.25rem, 2.5vw, 2rem);
+    font-weight: var(--font-weight-semibold);
+    color: var(--neutral-900);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    
+    /* Ombre et glow */
+    box-shadow: 
+        0 4px 15px rgba(253, 171, 94, 0.4),
+        0 0 30px rgba(253, 171, 94, 0.3);
+    
+    /* Animation pulse */
+    animation: pulse-cta 3s ease-in-out infinite;
+    
+    /* Transition pour le hover */
+    transition: all var(--transition-base);
+}
+
+/* Ligne verticale cyan à gauche du CTA */
+.cta-button a::before {
+    content: '';
+    position: absolute;
+    left: -20px;
+    top: 0;
+    height: 100px;
+    width: 3px;
+    background: var(--cyan-500);
+    opacity: 0.6;
+    border-radius: 2px;
+}
+
+/* Animation PULSE (douce) */
+@keyframes pulse-cta {
+    0%, 100% { 
+        transform: scale(1);
+        box-shadow: 
+            0 4px 15px rgba(253, 171, 94, 0.4),
+            0 0 30px rgba(253, 171, 94, 0.3);
+    }
+    50% { 
+        transform: scale(1.05);
+        box-shadow: 
+            0 6px 20px rgba(253, 171, 94, 0.6),
+            0 0 40px rgba(253, 171, 94, 0.5);
+    }
+}
+
+/* HOVER : Arrêt du pulse + Scale */
+.cta-button a:hover {
+    animation: none;
+    transform: scale(1.08);
+    background: linear-gradient(135deg, #FF8C42 0%, var(--orange-500) 100%);
+    box-shadow: 
+        0 8px 25px rgba(253, 171, 94, 0.7),
+        0 0 50px rgba(253, 171, 94, 0.6);
+}
+
+/* ACTIVE : Effet "enfoncé" */
+.cta-button a:active {
+    transform: scale(1.02);
+    box-shadow: 
+        0 2px 10px rgba(253, 171, 94, 0.5),
+        0 0 20px rgba(253, 171, 94, 0.4);
+}
+
+/* ==================== HERO IMAGE ==================== */
+.hero-image {
+    grid-column: span 2 / span 2;
+    grid-row: span 3 / span 3;
+    grid-column-start: 1;
+    grid-row-start: 2;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding-bottom: 20px;
+    padding-left: 20px;
+}
+
+.hero-image img {
+    width: 60%;
+    max-width: 15vw;
+    max-height: 320px;
+    height: auto;
+    object-fit: contain;
+    
+    /* Border orange collée */
+    border: 3px solid var(--orange-500);
+    border-radius: var(--radius-lg);
+    
+    /* Glow orange de base */
+    /*box-shadow: 
+        0 0 20px rgba(253, 171, 94, 0.6),
+        0 0 40px rgba(253, 171, 94, 0.4);
+    
+    /* Drop-shadow */
+    filter: drop-shadow(0 15px 40px rgba(0, 194, 209, 0.4));
+    
+    /* Transition pour le hover */
+    transition: all var(--transition-base);
+}
+
+/* HOVER : Glow intensifié */
+.hero-image img:hover {
+    transform: translateY(-5px);
+    border-color: var(--orange-400);
+    box-shadow: 
+        0 0 30px rgba(253, 171, 94, 0.8),
+        0 0 60px rgba(253, 171, 94, 0.6);
+}
+
+/* ==================== DASHBOARD CARDS ==================== */
+.dashboard-cards {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Style commun des cards - Border + Glow */
+.dashboard-card {
+    position: absolute;
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: transparent;
+    border: 3px solid var(--cyan-500);
+    border-radius: var(--radius-lg);
+    pointer-events: auto;
+    transition: all var(--transition-base);
+}
+
+.dashboard-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 
+        0 0 25px rgba(0, 194, 209, 0.6),
+        0 0 50px rgba(0, 194, 209, 0.4);
+}
+
+/* ===== CARD TÉMOIGNAGE - Cyan (remplace le logo) ===== */
+.dashboard-card--testimonial {
+    width: 25vw;
+    top: 4px; /* Même position que le logo en temps normal */
+    left: 4px; /* Même position que le logo normal */
+    border-color: var(--cyan-500);
+}
+
+.dashboard-card--testimonial:hover {
+    border-color: var(--cyan-400);
+    box-shadow: 
+        0 0 25px rgba(0, 194, 209, 0.6),
+        0 0 50px rgba(0, 194, 209, 0.4);
+}
+
+/* ===== CARD FONCTIONNALITÉS - Cyan ===== */
+.dashboard-card--features {
+    width: 23vw;
+    min-width: 350px;
+    top: 60vh;
+    left: 50%;
+    transform: translateX(-50%);
+    border-color: var(--cyan-500);
+}
+
+.dashboard-card--features:hover {
+    transform: translateX(-45%) translateY(-5px);
+    border-color: var(--cyan-400);
+    box-shadow: 
+        0 0 25px rgba(0, 194, 209, 0.6),
+        0 0 50px rgba(0, 194, 209, 0.4);
+}
+
+/* ===== CONTENU DES CARDS ===== */
+.card-title {
+    font-family: var(--font-main);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin: 0 0 var(--spacing-sm) 0;
+}
+
+.card-text {
+    font-size: var(--font-size-sm);
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin: 0 0 var(--spacing-sm) 0;
+}
+
+.card-author {
+    font-size: var(--font-size-xs);
+    font-style: italic;
+    color: var(--cyan-400);
+    display: block;
+}
+
+.card-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.card-list li {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    padding-left: var(--spacing-sm);
+    position: relative;
+}
+
+.card-list li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--orange-500);
+}
+
+/* ===== MODE LIGHT - CARDS ===== */
+body:not(.dark-mode) .dashboard-card--testimonial {
+    border-color: var(--cyan-600);
+}
+
+body:not(.dark-mode) .dashboard-card--features {
+    border-color: var(--orange-500);
+}
+
+body:not(.dark-mode) .card-title {
+    color: var(--neutral-900);
+}
+
+body:not(.dark-mode) .card-text,
+body:not(.dark-mode) .card-list li {
+    color: var(--neutral-700);
+}
+
+/* ==================== MASQUAGE DU LOGO SUR PAGE HOME ==================== */
+/* Le logo du base.html.twig est masqué uniquement sur la page d'accueil */
+.logo {
+    display: none;
+}
+
+/* ========================================
+   IMAGES DÉCORATIVES AVEC BORDURE ORANGE
+   ======================================== */
+
+.decorative-image {
+    position: absolute;
+}
+
+.decorative-image img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    
+    /* Border orange collée - même style que hero */
+    border: 3px solid var(--orange-500);
+    border-radius: var(--radius-lg);
+    
+    /* Drop-shadow - même style que hero */
+    filter: drop-shadow(0 15px 40px rgba(0, 194, 209, 0.4));
+    
+    /* Transition pour le hover */
+    transition: all var(--transition-base);
+}
+
+/* HOVER : Glow intensifié - même effet que hero */
+.decorative-image img:hover {
+    transform: translateY(-5px);
+    border-color: var(--orange-400);
+    box-shadow: 
+        0 0 30px rgba(253, 171, 94, 0.8),
+        0 0 60px rgba(253, 171, 94, 0.6);
+}
+
+/* Image de la loupe (en haut à droite) */
+.decorative-image--loupe {
+    top: 5vh;
+    right: 28vw;
+    width: 5vw;
+    max-width: 180px;
+    z-index: 5;
+    transform: scaleX(-1);
+}
+
+/* Image du diagramme KPI (en bas à droite) */
+.decorative-image--kpi {
+    bottom: 8vh;
+    right: 20vw;
+    width: 8vw;
+    max-width: 200px;
+    z-index: 5;
+}
+
+
+/* ==================== RESPONSIVE MOBILE ==================== */
+@media (max-width: 768px) {
+    
+    /* ===== NEUTRALISER le scroll du body (override du style.css) ===== */
+    body {
+        overflow: hidden;
+        height: 100vh;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    
+    /* ===== CONTENEUR : Pas de scroll, hauteur fixe ===== */
+    .home-container {
+        height: 100vh;
+        overflow: hidden;
+    }
+    
+    /* ===== MASQUER les éléments desktop inutiles ===== */
+    .dashboard-cards,
+    .decorative-image--loupe,
+    .decorative-image--kpi {
+        display: none;
+    }
+    
+    /* ===== GLOBE : Descendre pour le voir entièrement ===== */
+    .globe-animation {
+        position: fixed;
+        top: 10vh;
+        right: 50%;
+        transform: translateX(50%);
+        width: 80vw;
+        height: 80vw;
+        z-index: 1;
+    }
+    
+    .globe-earth {
+        opacity: 0.15;
+    }
+    
+    /* ===== HERO IMAGE : Background bas fixe, opacity très faible ===== */
+    .hero-image {
+        position: fixed;
+        bottom: 12vh;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90vw;
+        max-width: none;
+        height: auto;
+        z-index: 2;
+        padding: 0;
+        grid-column: unset;
+        grid-row: unset;
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+    }
+    
+    .hero-image img {
+        width: 70%;
+        max-width: none;
+        max-height: 30vh;
+        opacity: 0.15;
+        border: none;
+        box-shadow: none;
+        filter: none;
+    }
+    
+    .hero-image img:hover {
+        transform: none;
+        border: none;
+        box-shadow: none;
+    }
+    
+    /* ===== GRID LAYOUT : Flexbox avec centrage simplifié ===== */
+    .home-main {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        
+        height: 100vh;
+        width: 100%;
+        padding: 0 var(--spacing-md);
+        
+        position: relative;
+        z-index: 10;
+    }
+    
+    /* ===== TITRES : Espacements pour équilibre visuel ===== */
+    .title-welcome,
+    .title-app,
+    .cta-button {
+        grid-column: unset;
+        grid-row: unset;
+        width: 100%;
+        text-align: center;
+    }
+    
+    .title-welcome {
+        margin-top: -10vh;
+        margin-bottom: var(--spacing-md);
+    }
+
+    .title-welcome h1 {
+        font-size: clamp(1.5rem, 6vw, 2rem);
+    }
+    
+    .title-app {
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .title-app h2 {
+        font-size: clamp(2rem, 8vw, 3rem);
+    }
+    
+    /* Masquer les lignes verticales cyan en mobile */
+    .title-welcome h1::before,
+    .title-app h2::before,
+    .cta-button a::before {
+        display: none;
+    }
+    
+    /* ===== BOUTON CTA : Espace naturel ===== */
+    .cta-button {
+        /* Pas de margin spécial, le centrage se fait naturellement */
+    }
+    
+    .cta-button a {
+        font-size: clamp(1rem, 5vw, 1.5rem);
+        padding: var(--spacing-sm) var(--spacing-lg);
+    }
+}

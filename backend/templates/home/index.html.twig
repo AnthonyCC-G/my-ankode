@@ -2,36 +2,69 @@
 
 {% block title %}{{ pageTitle }}{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+{% endblock %}
+
 {% block body %}
     <div class="home-container">
-        {# Header avec logo et globe #}
-            <header class="home-header">
-                <div class="logo">
-                    <a href="{{ app.user ? path('app_dashboard') : path('app_home') }}">
-                        <img src="{{ asset('images/logo/logo-myankode.png') }}" alt="My Ankode Logo">
-                    </a>
-                </div>
-                <div class="globe-animation">
-                    <img src="{{ asset('images/background/globe-earth.png') }}" alt="" class="globe-earth">
-                </div>
-            </header>
+        {# Globe décoratif en haut à droite (derrière le contenu) #}
+        <div class="globe-animation">
+            <img src="{{ asset('images/background/globe-earth.png') }}" alt="" class="globe-earth">
+        </div>
+
         {# Contenu principal - Layout Grid asymétrique #}
-            <main class="home-main">
-                <div class="title-welcome">
-                    <h1>{ Bienvenue sur }</h1>
+        <section class="home-main">
+            <div class="title-welcome">
+                <h1>{ Bienvenue sur }</h1>
+            </div>
+            
+            <div class="title-app">
+                <h2>{ My Ankode }</h2>
+            </div>
+            
+            {# ===== AJOUT IMAGE LOUPE ===== #}
+            <div class="decorative-image decorative-image--loupe">
+                <img src="{{ asset('images/background/Loupe.png') }}" alt="">
+            </div>
+            {# ===== FIN AJOUT ===== #}
+
+            <div class="cta-button">
+                <a href="{{ path('app_auth') }}">{ S'inscrire / Se Connecter }</a>
+            </div>
+
+            {# Cards Dashboard - Asymétriques #}
+            <div class="dashboard-cards">
+                <div class="dashboard-card dashboard-card--testimonial">
+                    <h3 class="card-title">{ Témoignage }</h3>
+                    <p class="card-text">
+                        "My Ankode m'a aidé à structurer mon apprentissage et suivre ma progression."
+                    </p>
+                    <span class="card-author">— A, Dev Junior</span>
                 </div>
-                
-                <div class="title-app">
-                    <h2>{ My Ankode }</h2>
+
+                <div class="dashboard-card dashboard-card--features">
+                    <h3 class="card-title">{ Features }</h3>
+                    <ul class="card-list">
+                        <li> Veille techno, pour y voir plus clair et anticiper</li>
+                        <li> Kanban, une tâche à la fois, l'oiseau fait son nid ...</li>
+                        <li> Snippets, conserver ses trophées dans la guerre des bugs</li>
+                        <li> Compétences, être fier du chemin parcouru</li>
+                    </ul>
                 </div>
-                
-                <div class="cta-button">
-                    <a href="{{ path('app_auth') }}">{ S'inscrire / Se Connecter }</a>
-                </div>
-                
-                <div class="hero-image">
-                    <img src="{{ asset('images/hero-developer.png') }}" alt="Développeur travaillant sur My Ankode">
-                </div>
-            </main>
+            </div>
+            
+            <div class="hero-image">
+                <img src="{{ asset('images/hero-developer.png') }}" alt="Développeur travaillant sur My Ankode">
+            </div>
+
+            {# ===== AJOUT IMAGE KPI ===== #}
+            <div class="decorative-image decorative-image--kpi">
+                <img src="{{ asset('images/background/Diagramme2.png') }}" alt="">
+            </div>
+            {# ===== FIN AJOUT ===== #}
+
+        </section>
     </div>
 {% endblock %}

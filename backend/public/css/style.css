@@ -1,4 +1,4 @@
-/* ==================== MY-ANKODE - Styles globaux ==================== */
+/* ==================== MY-ANKODE - Styles globaux de base ==================== */
 
 /* ==================== RESET & BASE ==================== */
 * {
@@ -12,10 +12,10 @@ body {
     height: 100vh;
     margin: 0;
     padding: 0;
-    overflow: hidden; /* Pas de scroll sur desktop - esprit dashboard */
+    overflow: hidden;
     font-family: var(--font-main);
     font-size: var(--font-size-base);
-    background: linear-gradient(180deg,var(--custom-dark-modal) 0%, var(--custom-border) 82%, var(--custom-border) 100%);
+    background: linear-gradient(180deg, var(--neutral-900) 0%, var(--cyan-900) 82%, var(--custom-dark-card) 100%);
     color: var(--text-primary);
     transition: background var(--transition-slow), color var(--transition-base);
 }
@@ -26,7 +26,6 @@ body:not(.dark-mode) {
     color: var(--text-primary);
 }
 
-
 /* ==================== VISIBILITY HELPERS ==================== */
 .desktop-only {
     display: block;
@@ -36,9 +35,7 @@ body:not(.dark-mode) {
     display: none;
 }
 
-/* ==================== HEADER & GLOBE ANIMÉ ==================== */
-
-/* ==================== LOGO ==================== */
+/* ==================== LOGO DESKTOP ==================== */
 .logo {
     position: fixed;
     top: 1px;
@@ -50,7 +47,6 @@ body:not(.dark-mode) {
     display: inline-block;
     transition: transform var(--transition-base);
 }
-
 
 .logo a:hover {
     transform: scale(1.05);
@@ -66,168 +62,10 @@ body:not(.dark-mode) .logo img {
     filter: drop-shadow(0 2px 8px rgba(0, 102, 204, 0.3));
 }
 
-
-.home-header {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 600px; /* Juste l'espace pour le globe */
-    height: 500px;
-    pointer-events: none; /* Ne bloque pas les clics */
-}
-
-/* Conteneur des globes */
-.globe-animation {
-    position: absolute;
-    top: -25vh; /* Déborde de 10% de la hauteur */
-    right: -16vw; /* Déborde de 10% de la largeur */
-    width: 37vw; /* 35% de la largeur viewport */
-    height: 37vw; /* Garde le ratio carré */
-    overflow: visible;
-    z-index: var(--z-base);
-    pointer-events: auto;
-}
-
-/* Globe Terre - Rotation lente horaire */
-.globe-earth {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    animation: rotate-clockwise 50s linear infinite;
-}
-
-/* Animations */
-@keyframes rotate-clockwise {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-@keyframes rotate-counter-clockwise {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(-360deg); }
-}
-
-/* Optimisation performance GPU */
-.globe-earth {
-    will-change: transform;
-    backface-visibility: hidden;
-    transform: translateZ(0);
-}
-
-/* ==================== CONTENU PRINCIPAL HOME ==================== */
-
-.home-container {
-    width: 100vw;
-    height: 100vh;
+/* ==================== MAIN CONTENT ==================== */
+.main-content {
     position: relative;
-    overflow: hidden;
-}
-
-.home-main {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(4, 1fr);
-    gap: 5px;
-    width: 100%;
-    height: calc(100vh - 80px); /* 100vh moins la hauteur du footer */
-    padding: var(--spacing-xl);
-    padding-bottom: calc(var(--spacing-xl) + 100px); /* Espace pour mascotte */
-}
-/* Div1 - "Bienvenue sur" */
-.title-welcome {
-    grid-column: span 2 / span 2;
-    grid-column-start: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-
-/* Style H1*/
-.title-welcome h1 {
-    font-family: var(--font-main);
-    font-size: clamp(1.5rem, 3vw, 3rem); /* 24px min → 3vw → 48px max */
-    font-weight: var(--font-weight-normal);
-    color: var(--text-primary);
-    margin: 0;
-    letter-spacing: 0.05em;
-}
-
-
-/* Div2 - "My Ankode" */
-.title-app {
-    grid-column: span 2 / span 2;
-    grid-column-start: 3;
-    grid-row-start: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Style H2*/
-.title-app h2 {
-    font-family: var(--font-main);
-    font-size: clamp(2.5rem, 5vw, 5rem); /* 40px min → 5vw → 80px max */
-    font-weight: var(--font-weight-bold);
-    color: var(--text-primary);
-    margin: 0;
-    letter-spacing: 0.05em;
-}
-
-
-/* Div3 - Bouton CTA */
-.cta-button {
-    grid-column: span 2 / span 2;
-    grid-column-start: 4;
-    grid-row-start: 3;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.cta-button a {
-    font-family: var(--font-main);
-    font-size: clamp(1.25rem, 2.5vw, 2.5rem); /* 20px min → 2.5vw → 40px max */
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-accent);
-    text-decoration: none;
-    letter-spacing: 0.05em;
-    transition: all var(--transition-base);
-}
-
-.cta-button a:hover {
-    color: #FF8C42;
-    transform: translateY(-2px);
-    filter: drop-shadow(0 4px 12px rgba(253, 171, 94, 0.5));
-}
-
-/* Mode light */
-body:not(.dark-mode) .title-welcome h1,
-body:not(.dark-mode) .title-app h2 {
-    color: var(--text-primary);
-}
-
-
-/* Div4 - Image Hero */
-.hero-image {
-    grid-column: span 2 / span 2;
-    grid-row: span 3 / span 3;
-    grid-column-start: 1;
-    grid-row-start: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.hero-image img {
-    width: 95%; /* 95% de sa cellule grid */
-    max-width: 45vw; /* Maximum 45% de la viewport */
-    height: auto;
-    object-fit: contain;
-    filter: drop-shadow(0 15px 40px rgba(0, 194, 209, 0.4));
+    z-index: var(--z-content);
 }
 
 /* ==================== FOOTER STICKY ==================== */
@@ -236,9 +74,8 @@ body:not(.dark-mode) .title-app h2 {
     bottom: 0;
     left: 0;
     width: 100%;
-    background: rgba(0,0,0,0.3);
+    background: rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(15px);
-    /*border-top: 1px solid var(--border-color);*/
     padding: var(--spacing-sm) 0;
     z-index: var(--z-sticky);
 }
@@ -248,7 +85,7 @@ body:not(.dark-mode) .title-app h2 {
     justify-content: center;
     align-items: center;
     gap: var(--spacing-sm);
-    flex-wrap: wrap;
+    flex-wrap: wrap; /* Permet de passer à la ligne sur très petit écran si besoin */
 }
 
 .footer-link {
@@ -269,8 +106,6 @@ body:not(.dark-mode) .title-app h2 {
 }
 
 .footer-copyright {
-    text-align: center;
-    margin: var(--spacing-xs) 0 0;
     font-size: var(--font-size-sm);
     color: var(--text-secondary);
 }
@@ -278,7 +113,6 @@ body:not(.dark-mode) .title-app h2 {
 /* Footer en mode light */
 body:not(.dark-mode) .footer-sticky {
     background: rgba(245, 249, 252, 0.3);
-    /*border-top: 1px solid var(--border-color);*/
 }
 
 body:not(.dark-mode) .footer-link {
@@ -424,8 +258,7 @@ body:not(.dark-mode) .lightbulb:hover {
     visibility: visible;
 }
 
-/* ==================== BOTTOM NAVIGATION BAR (MOBILE) ==================== */
-/* ===== Header Mobile Fixe ===== */
+/* ==================== MOBILE HEADER ==================== */
 .mobile-header {
     position: fixed;
     top: 0;
@@ -433,7 +266,7 @@ body:not(.dark-mode) .lightbulb:hover {
     right: 0;
     height: 70px;
     
-    display: none; /* Caché par défaut, visible sur mobile */
+    display: none;
     align-items: center;
     justify-content: space-between;
     padding: 0 var(--spacing-md);
@@ -456,16 +289,16 @@ body:not(.dark-mode) .mobile-header {
 
 /* Username au centre du header mobile */
 .mobile-header__user {
-    flex: 1; /* Prend l'espace disponible entre logo et actions */
+    flex: 1;
     text-align: center;
     
-    font-size: var(--font-size-sm); /* Petite taille pour que ça rentre */
+    font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
     color: var(--text-primary);
     
-    white-space: nowrap; /* Empêche retour à la ligne */
+    white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; /* Ajoute ... si trop long */
+    text-overflow: ellipsis;
 }
 
 /* Mode Light */
@@ -535,7 +368,7 @@ body:not(.dark-mode) .mobile-header__legal:hover {
     height: 35px;
 }
 
-/* ===== Bottom Navigation ===== */
+/* ==================== BOTTOM NAVIGATION BAR (MOBILE) ==================== */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -547,7 +380,7 @@ body:not(.dark-mode) .mobile-header__legal:hover {
     backdrop-filter: blur(15px);
     border-top: 2px solid var(--border-color);
     
-    display: none; /* Caché par défaut, visible sur mobile */
+    display: none;
     justify-content: space-around;
     align-items: center;
     padding: var(--spacing-xs) 0;
@@ -591,13 +424,13 @@ body:not(.dark-mode) .bottom-nav {
 .bottom-nav-icon {
     width: 28px;
     height: 28px;
-    color: var(--cyan-500); /* Cyan par défaut */
+    color: var(--cyan-500);
     stroke-width: 2;
 }
 
 /* État ACTIVE - Icône orange */
 .bottom-nav-item.active .bottom-nav-icon {
-    color: var(--orange-500); /* Orange pour l'active */
+    color: var(--orange-500);
     transform: scale(1.15);
 }
 
@@ -629,30 +462,12 @@ body:not(.dark-mode) .bottom-nav-label {
 
 /* ==================== RESPONSIVE DESIGN ==================== */
 
-/* ===== TABLETTE ===== */
-@media (max-width: 1024px) {
-    .home-main {
-        flex-direction: column;
-        text-align: center;
-        gap: var(--spacing-2xl);
-    }
-    
-    .hero-illustration {
-        flex: 0 0 auto;
-        max-width: 500px;
-    }
-    
-    .hero-content {
-        align-items: center;
-    }
-}
-
 /* ===== MOBILE ===== */
 @media (max-width: 768px) {
     
     /* ===== VISIBILITY ===== */
     .desktop-only {
-        display: none !important;
+        display: none;
     }
     
     .mobile-only {
@@ -661,11 +476,11 @@ body:not(.dark-mode) .bottom-nav-label {
     
     /* ===== ACTIVATION de la mobile-header et bottom-nav ===== */
     .mobile-header {
-        display: flex; /* Active le header mobile */
+        display: flex;
     }
     
     .bottom-nav {
-        display: flex; /* Active la bottom-nav */
+        display: flex;
     }
     
     /* ===== BODY ===== */
@@ -673,8 +488,8 @@ body:not(.dark-mode) .bottom-nav-label {
         overflow-y: auto;
         height: auto;
         min-height: 100vh;
-        padding-top: 70px; /* Espace pour la mobile-header */
-        padding-bottom: 90px; /* Espace pour la bottom-nav */
+        padding-top: 70px;
+        padding-bottom: 90px;
     }
     
     /* ===== LOGO ===== */
@@ -685,18 +500,6 @@ body:not(.dark-mode) .bottom-nav-label {
 
     .logo img {
         width: 60px;
-    }
-    
-    /* ===== GLOBE ===== */
-    .home-header {
-        height: 350px;
-    }
-    
-    .globe-animation {
-        width: 320px;
-        height: 320px;
-        top: -80px;
-        right: -100px;
     }
     
     /* ===== FOOTER COMPACT ===== */
@@ -733,69 +536,5 @@ body:not(.dark-mode) .bottom-nav-label {
     
     .character {
         width: 80px;
-    }
-    
-    /* ===== TITRES ET CONTENU MOBILE ===== */
-    .mobile-title {
-        text-align: center;
-        font-size: 1.5rem;
-        padding: 1rem;
-        color: var(--text-primary);
-    }
-    
-    .mobile-content {
-        padding: 1rem;
-        text-align: center;
-    }
-    
-    /* ===== HOME RESPONSIVE ===== */
-    .welcome-title {
-        font-size: var(--font-size-2xl);
-    }
-    
-    .app-title {
-        font-size: var(--font-size-4xl);
-    }
-    
-    .btn-cta {
-        font-size: var(--font-size-2xl);
-    }
-    
-    .hero-illustration {
-        max-width: 400px;
-    }
-}
-
-/* ===== PETIT MOBILE ===== */
-@media (max-width: 480px) {
-    .welcome-title {
-        font-size: var(--font-size-xl);
-    }
-    
-    .app-title {
-        font-size: var(--font-size-3xl);
-    }
-    
-    .btn-cta {
-        font-size: var(--font-size-xl);
-    }
-    
-    .hero-illustration {
-        max-width: 300px;
-    }
-    
-    .home-main {
-        padding-bottom: 120px;
-    }
-    
-    .home-header {
-        height: 220px;
-    }
-    
-    .globe-animation {
-        width: 180px;
-        height: 180px;
-        top: -30px;
-        right: -60px;
     }
 }
