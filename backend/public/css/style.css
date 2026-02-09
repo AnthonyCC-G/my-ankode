@@ -15,7 +15,7 @@ body {
     overflow: hidden;
     font-family: var(--font-main);
     font-size: var(--font-size-base);
-    background: linear-gradient(180deg, var(--custom-dark-modal) 0%, var(--custom-border) 82%, var(--custom-border) 100%);
+    background: linear-gradient(180deg, var(--neutral-900) 0%, var(--cyan-900) 82%, var(--custom-dark-card) 100%);
     color: var(--text-primary);
     transition: background var(--transition-slow), color var(--transition-base);
 }

@@ -24,6 +24,12 @@
                 <h2>{ My Ankode }</h2>
             </div>
             
+            {# ===== AJOUT IMAGE LOUPE ===== #}
+            <div class="decorative-image decorative-image--loupe">
+                <img src="{{ asset('images/background/Loupe.png') }}" alt="">
+            </div>
+            {# ===== FIN AJOUT ===== #}
+
             <div class="cta-button">
                 <a href="{{ path('app_auth') }}">{ S'inscrire / Se Connecter }</a>
             </div>
@@ -41,10 +47,10 @@
                 <div class="dashboard-card dashboard-card--features">
                     <h3 class="card-title">{ Features }</h3>
                     <ul class="card-list">
-                        <li> Veille techno RSS</li>
-                        <li> Kanban projets</li>
-                        <li> Snippets code</li>
-                        <li> Suivi des compétences</li>
+                        <li> Veille techno, pour y voir plus clair et anticiper</li>
+                        <li> Kanban, une tâche à la fois, l'oiseau fait son nid ...</li>
+                        <li> Snippets, conserver ses trophées dans la guerre des bugs</li>
+                        <li> Compétences, être fier du chemin parcouru</li>
                     </ul>
                 </div>
             </div>
@@ -52,6 +58,13 @@
             <div class="hero-image">
                 <img src="{{ asset('images/hero-developer.png') }}" alt="Développeur travaillant sur My Ankode">
             </div>
+
+            {# ===== AJOUT IMAGE KPI ===== #}
+            <div class="decorative-image decorative-image--kpi">
+                <img src="{{ asset('images/background/Diagramme2.png') }}" alt="">
+            </div>
+            {# ===== FIN AJOUT ===== #}
+
         </section>
     </div>
 {% endblock %}

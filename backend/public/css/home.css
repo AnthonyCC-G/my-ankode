@@ -28,7 +28,7 @@
     height: 100%;
     object-fit: contain;
     animation: rotate-clockwise 80s linear infinite;
-    opacity: 0.7;
+    opacity: 0.5;
     
     /* Optimisation performance GPU */
     will-change: transform;
@@ -117,7 +117,7 @@
     position: absolute;
     left: -25px;
     top: 0;
-    height: 150px;
+    height: 190px;
     width: 3px;
     background: var(--cyan-500);
     opacity: 0.6;
@@ -176,7 +176,7 @@ body:not(.dark-mode) .title-app h2 {
     position: absolute;
     left: -20px;
     top: 0;
-    height: 140px;
+    height: 100px;
     width: 3px;
     background: var(--cyan-500);
     opacity: 0.6;
@@ -242,7 +242,7 @@ body:not(.dark-mode) .title-app h2 {
     border-radius: var(--radius-lg);
     
     /* Glow orange de base */
-    box-shadow: 
+    /*box-shadow: 
         0 0 20px rgba(253, 171, 94, 0.6),
         0 0 40px rgba(253, 171, 94, 0.4);
     
@@ -291,11 +291,11 @@ body:not(.dark-mode) .title-app h2 {
         0 0 50px rgba(0, 194, 209, 0.4);
 }
 
-/* ===== CARD TÉMOIGNAGE - Cyan ===== */
+/* ===== CARD TÉMOIGNAGE - Cyan (remplace le logo) ===== */
 .dashboard-card--testimonial {
-    width: 28vw;
-    top: 28vh;
-    left: 6vw;
+    width: 25vw;
+    top: 4px; /* Même position que le logo en temps normal */
+    left: 4px; /* Même position que le logo normal */
     border-color: var(--cyan-500);
 }
 
@@ -306,22 +306,22 @@ body:not(.dark-mode) .title-app h2 {
         0 0 50px rgba(0, 194, 209, 0.4);
 }
 
-/* ===== CARD FONCTIONNALITÉS - Orange ===== */
+/* ===== CARD FONCTIONNALITÉS - Cyan ===== */
 .dashboard-card--features {
-    width: 20vw;
+    width: 23vw;
     min-width: 350px;
     top: 60vh;
-    left: 45%;
+    left: 50%;
     transform: translateX(-50%);
-    border-color: var(--orange-500);
+    border-color: var(--cyan-500);
 }
 
 .dashboard-card--features:hover {
     transform: translateX(-45%) translateY(-5px);
-    border-color: var(--orange-400);
+    border-color: var(--cyan-400);
     box-shadow: 
-        0 0 25px rgba(253, 171, 94, 0.6),
-        0 0 50px rgba(253, 171, 94, 0.4);
+        0 0 25px rgba(0, 194, 209, 0.6),
+        0 0 50px rgba(0, 194, 209, 0.4);
 }
 
 /* ===== CONTENU DES CARDS ===== */
@@ -386,4 +386,63 @@ body:not(.dark-mode) .card-title {
 body:not(.dark-mode) .card-text,
 body:not(.dark-mode) .card-list li {
     color: var(--neutral-700);
+}
+
+/* ==================== MASQUAGE DU LOGO SUR PAGE HOME ==================== */
+/* Le logo du base.html.twig est masqué uniquement sur la page d'accueil */
+.logo {
+    display: none;
+}
+
+/* ========================================
+   IMAGES DÉCORATIVES AVEC BORDURE ORANGE
+   ======================================== */
+
+.decorative-image {
+    position: absolute;
+}
+
+.decorative-image img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    
+    /* Border orange collée - même style que hero */
+    border: 3px solid var(--orange-500);
+    border-radius: var(--radius-lg);
+    
+    /* Drop-shadow - même style que hero */
+    filter: drop-shadow(0 15px 40px rgba(0, 194, 209, 0.4));
+    
+    /* Transition pour le hover */
+    transition: all var(--transition-base);
+}
+
+/* HOVER : Glow intensifié - même effet que hero */
+.decorative-image img:hover {
+    transform: translateY(-5px);
+    border-color: var(--orange-400);
+    box-shadow: 
+        0 0 30px rgba(253, 171, 94, 0.8),
+        0 0 60px rgba(253, 171, 94, 0.6);
+}
+
+/* Image de la loupe (en haut à droite) */
+.decorative-image--loupe {
+    top: 5vh;
+    right: 28vw;
+    width: 5vw;
+    max-width: 180px;
+    z-index: 5;
+    transform: scaleX(-1);
+}
+
+/* Image du diagramme KPI (en bas à droite) */
+.decorative-image--kpi {
+    bottom: 8vh;
+    right: 20vw;
+    width: 8vw;
+    max-width: 200px;
+    z-index: 5;
 }
