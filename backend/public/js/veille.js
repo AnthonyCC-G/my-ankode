@@ -7,6 +7,12 @@
         let totalPages = 1;
         let currentFilter = 'all'; // 'all' ou 'favorites'
         let currentSearchKeyword = '';
+
+    // Variables de filtrage/tri
+    let allArticles = []; // Stocke TOUS les articles charges
+    let currentSourceFilter = 'all';
+    let currentStatusFilter = 'all';
+    let currentSortOrder = 'desc';
         
     // ===== GESTION ACCORDEON FAVORIS (Desktop uniquement) =====
     const favoritesToggle = document.getElementById('favorites-toggle');
@@ -67,6 +73,16 @@
     loadArticles(currentPage);
     loadFavoritesSidebar();
     
+    // ===== GESTION BOUTONS DE TRI =====
+    const filterButtons = document.querySelectorAll('.filter-btn');
+
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const filterType = this.dataset.filterType;
+            toggleFilter(filterType, this);
+        });
+    });
+
     // ===== GESTION RECHERCHE =====
     const searchInput = document.getElementById('search-input');
     const searchBtn = document.getElementById('search-btn');
@@ -94,14 +110,44 @@
     
     if (resetBtn) {
         resetBtn.addEventListener('click', function() {
+            // Reinitialiser la recherche
             searchInput.value = '';
             currentSearchKeyword = '';
             currentPage = 1;
+            
+            // Reinitialiser les filtres
+            currentSourceFilter = 'all';
+            currentStatusFilter = 'all';
+            currentSortOrder = 'desc';
+            
+            // Remettre les boutons visuellement
+            const sourceBtn = document.querySelector('[data-filter-type="source"]');
+            const statusBtn = document.querySelector('[data-filter-type="status"]');
+            const dateBtn = document.querySelector('[data-filter-type="date"]');
+            
+            if (sourceBtn) {
+                sourceBtn.textContent = 'Tous';
+                sourceBtn.dataset.currentState = 'all';
+            }
+            if (statusBtn) {
+                statusBtn.textContent = 'Tous';
+                statusBtn.dataset.currentState = 'all';
+            }
+            if (dateBtn) {
+                // Garder le SVG et changer le texte
+                const textNode = Array.from(dateBtn.childNodes).find(node => node.nodeType === 3);
+                if (textNode) {
+                    textNode.textContent = 'Récents';
+                }
+                dateBtn.dataset.currentState = 'desc';
+            }
+            
+            // Recharger les articles
             loadArticles(currentPage);
-            showFeedback('Recherche reinitalisee', 'info');
+            showFeedback('Recherche et filtres reinitialises', 'info');
         });
     }
-   
+    
     
     // ===== FONCTION : CHARGER LES ARTICLES =====
     async function loadArticles(page) {
@@ -112,7 +158,8 @@
             const data = await response.json();
             
             if (response.ok) {
-                displayArticles(data.articles);
+                allArticles = data.articles; // Stocker tous les articles
+                applyFiltersAndDisplay(); // Appliquer les filtres actifs
                 updateTitle('Tous les articles');
             } else {
                 showError('Erreur lors du chargement des articles');
@@ -121,6 +168,79 @@
             console.error('Erreur:', error);
             showError('Impossible de charger les articles');
         }
+    }
+
+    // ===== FONCTION : TOGGLE FILTRE =====
+    function toggleFilter(filterType, button) {
+        if (filterType === 'source') {
+            const states = ['all', 'Korben.info', 'Dev.to'];
+            const labels = ['Tous', 'Korben', 'Dev.to'];
+            const currentIndex = states.indexOf(currentSourceFilter);
+            const nextIndex = (currentIndex + 1) % states.length;
+            
+            currentSourceFilter = states[nextIndex];
+            button.textContent = labels[nextIndex];
+            button.dataset.currentState = states[nextIndex];
+            
+        } else if (filterType === 'status') {
+            const states = ['all', 'read', 'unread'];
+            const labels = ['Tous', 'Lus', 'Non lus'];
+            const currentIndex = states.indexOf(currentStatusFilter);
+            const nextIndex = (currentIndex + 1) % states.length;
+            
+            currentStatusFilter = states[nextIndex];
+            button.textContent = labels[nextIndex];
+            button.dataset.currentState = states[nextIndex];
+            
+        } else if (filterType === 'date') {
+            const states = ['desc', 'asc'];
+            const labels = ['Récents', 'Anciens'];
+            const currentIndex = states.indexOf(currentSortOrder);
+            const nextIndex = (currentIndex + 1) % states.length;
+            
+            currentSortOrder = states[nextIndex];
+            
+            // Garder le SVG et changer le texte
+            const textNode = Array.from(button.childNodes).find(node => node.nodeType === 3);
+            if (textNode) {
+                textNode.textContent = labels[nextIndex];
+            }
+            button.dataset.currentState = states[nextIndex];
+        }
+        
+        applyFiltersAndDisplay();
+    }
+
+    // ===== FONCTION : APPLIQUER FILTRES ET AFFICHER =====
+    function applyFiltersAndDisplay() {
+        let filtered = [...allArticles];
+        
+        // Filtre par source
+        if (currentSourceFilter !== 'all') {
+            filtered = filtered.filter(article => article.source === currentSourceFilter);
+        }
+        
+        // Filtre par statut
+        if (currentStatusFilter === 'read') {
+            filtered = filtered.filter(article => article.isRead === true);
+        } else if (currentStatusFilter === 'unread') {
+            filtered = filtered.filter(article => article.isRead === false);
+        }
+        
+        // Tri par date
+        filtered.sort((a, b) => {
+            const dateA = new Date(a.publishedAt.split('/').reverse().join('-'));
+            const dateB = new Date(b.publishedAt.split('/').reverse().join('-'));
+            
+            if (currentSortOrder === 'desc') {
+                return dateB - dateA; // Plus recents en premier
+            } else {
+                return dateA - dateB; // Plus anciens en premier
+            }
+        });
+        
+        displayArticles(filtered);
+        showFeedback(`${filtered.length} article(s) affiche(s)`, 'info');
     }
     
     // ===== FONCTION : RECHERCHER LES ARTICLES =====

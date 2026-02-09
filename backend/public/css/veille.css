@@ -73,6 +73,18 @@ body:not(.dark-mode) .veille-articles {
     margin: 0 0 var(--spacing-md) 0;
 }
 
+/* Header du bloc recherche avec titre + feedback */
+.search-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.search-header .block-title {
+    margin: 0;
+}
+
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    BLOC 1 : RECHERCHE (Ligne 1, Colonne 1)
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
@@ -86,7 +98,7 @@ body:not(.dark-mode) .veille-articles {
 .search-controls {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-xs);
 }
 
 /* Input group avec boutons */
@@ -164,17 +176,77 @@ body:not(.dark-mode) .search-input {
     color: #ffffff;
 }
 
-/* Messages feedback */
+/* ===== BOUTONS DE TRI ===== */
+.filter-buttons {
+    display: flex;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-xs);
+}
+
+.filter-btn {
+    flex: 1;
+    padding: 8px 12px;
+    font-family: var(--font-main);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
+    background: transparent;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    white-space: nowrap;
+}
+
+.filter-btn svg {
+    width: 14px;
+    height: 14px;
+    transition: transform var(--transition-base);
+}
+
+.filter-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    transform: translateY(-1px);
+}
+
+.filter-btn.active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--cyan-900);
+    font-weight: var(--font-weight-semibold);
+}
+
+.filter-btn.active svg {
+    color: var(--cyan-900);
+}
+
+/* Rotation fleche pour tri date ascendant */
+.filter-btn[data-current-state="asc"] svg {
+    transform: rotate(180deg);
+}
+
+/* Mode Light */
+body:not(.dark-mode) .filter-btn.active {
+    color: var(--cyan-900);
+}
+
+
+/* Messages feedback - A droite du titre */
 .search-feedback {
-    min-height: 30px;
-    margin-top: auto;
+    min-height: auto;
 }
 
 .search-feedback .alert {
-    padding: var(--spacing-xs) var(--spacing-sm);
-    font-size: var(--font-size-sm);
+    padding: 4px 12px;
+    font-size: var(--font-size-xs);
     border-radius: var(--radius-sm);
     margin: 0;
+    white-space: nowrap;
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -744,15 +816,15 @@ body:not(.dark-mode) .veille-sources {
 /* ===== TABS : Cachés en desktop, visibles en mobile ===== */
 .articles-tabs {
     display: none; /* Caché par défaut (desktop) */
-    gap: var(--spacing-sm);
-    margin-bottom: var(--spacing-md);
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-sm);
     border-bottom: 2px solid var(--border-color);
     padding-bottom: 2px;
 }
 
 .tab-btn {
     flex: 1;
-    padding: var(--spacing-sm) var(--spacing-md);
+    padding: var(--spacing-xs) var(--spacing-sm);
     background: transparent;
     border: none;
     border-bottom: 3px solid transparent;
@@ -804,7 +876,7 @@ body:not(.dark-mode) .veille-sources {
     .veille-header {
         width: 100%;
         padding-top: 80px;
-        padding-bottom: var(--spacing-md);
+        padding-bottom: var(--spacing-sm);
         padding-left: var(--spacing-md);
         padding-right: var(--spacing-md);
     }
@@ -821,7 +893,7 @@ body:not(.dark-mode) .veille-sources {
     .veille-grid {
         display: flex;
         flex-direction: column;
-        gap: var(--spacing-md);
+        gap: var(--spacing-sm);
         padding-left: var(--spacing-md);
         padding-right: var(--spacing-md);
         padding-bottom: 120px; /* Espace pour bottom-nav */
@@ -841,10 +913,26 @@ body:not(.dark-mode) .veille-sources {
         width: 100%;
         min-height: auto;
     }
+
+    /* Adapter les boutons de tri en mobile */
+    .filter-buttons {
+        gap: 4px;
+    }
+
+    .filter-btn {
+        padding: 4px 6px;
+        font-size: 11px;
+    }
+
+    .filter-btn svg {
+        width: 12px;
+        height: 12px;
+    }
+
     
     /* ===== BLOC FAVORIS : Caché en mobile (remplacé par tabs) ===== */
     .veille-favorites {
-        display: none !important;
+        display: none;
     }
     
     /* ===== BLOC ARTICLES ===== */
@@ -864,7 +952,7 @@ body:not(.dark-mode) .veille-sources {
         flex-direction: column;
         align-items: flex-start;
         gap: var(--spacing-xs);
-        margin-bottom: var(--spacing-sm);
+        margin-bottom: var(--spacing-xs);
     }
     
     /* ===== CARROUSEL : Scroll horizontal tactile simplifié ===== */
@@ -892,8 +980,8 @@ body:not(.dark-mode) .veille-sources {
     .article-card {
         flex: 0 0 280px;
         min-width: 280px;
-        height: 400px;
-        max-height: 400px;
+        height: 350px;
+        max-height: 350px;
         padding: var(--spacing-md);
     }
     
@@ -915,8 +1003,8 @@ body:not(.dark-mode) .veille-sources {
         order: 3;
         width: 100%;
         max-width: 100%;
-        margin-top: var(--spacing-sm);
-        padding: var(--spacing-sm);
+        margin-top: var(--spacing-xs);
+        padding: var(--spacing-xs);
     }
     
     .sources-credits {
