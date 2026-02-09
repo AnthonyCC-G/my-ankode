@@ -236,6 +236,7 @@ body:not(.dark-mode) .title-app h2 {
     max-height: 320px;
     height: auto;
     object-fit: contain;
+    opacity: 0.5;
     
     /* Border orange collée */
     border: 3px solid var(--orange-500);
@@ -435,6 +436,7 @@ body:not(.dark-mode) .card-list li {
     width: 5vw;
     max-width: 180px;
     z-index: 5;
+    opacity: 0.5;
     transform: scaleX(-1);
 }
 
@@ -444,6 +446,7 @@ body:not(.dark-mode) .card-list li {
     right: 20vw;
     width: 8vw;
     max-width: 200px;
+    opacity: 0.5;
     z-index: 5;
 }
 

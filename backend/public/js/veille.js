@@ -7,6 +7,18 @@
         let totalPages = 1;
         let currentFilter = 'all'; // 'all' ou 'favorites'
         let currentSearchKeyword = '';
+
+    // Variables de filtrage/tri
+    let allArticles = []; // Stocke TOUS les articles charges
+    let currentSourceFilter = 'all';
+    let currentStatusFilter = 'all';
+    let currentSortOrder = 'desc';
+
+    // Variables pour les favoris
+    let allFavorites = []; // Stocke TOUS les favoris
+    let currentFavSourceFilter = 'all';
+    let currentFavStatusFilter = 'all';
+    let currentFavSortOrder = 'desc';
         
     // ===== GESTION ACCORDEON FAVORIS (Desktop uniquement) =====
     const favoritesToggle = document.getElementById('favorites-toggle');
@@ -67,6 +79,16 @@
     loadArticles(currentPage);
     loadFavoritesSidebar();
     
+    // ===== GESTION BOUTONS DE TRI =====
+    const filterButtons = document.querySelectorAll('.filter-btn');
+
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const filterType = this.dataset.filterType;
+            toggleFilter(filterType, this);
+        });
+    });
+
     // ===== GESTION RECHERCHE =====
     const searchInput = document.getElementById('search-input');
     const searchBtn = document.getElementById('search-btn');
@@ -94,14 +116,44 @@
     
     if (resetBtn) {
         resetBtn.addEventListener('click', function() {
+            // Reinitialiser la recherche
             searchInput.value = '';
             currentSearchKeyword = '';
             currentPage = 1;
+            
+            // Reinitialiser les filtres
+            currentSourceFilter = 'all';
+            currentStatusFilter = 'all';
+            currentSortOrder = 'desc';
+            
+            // Remettre les boutons visuellement
+            const sourceBtn = document.querySelector('[data-filter-type="source"]');
+            const statusBtn = document.querySelector('[data-filter-type="status"]');
+            const dateBtn = document.querySelector('[data-filter-type="date"]');
+            
+            if (sourceBtn) {
+                sourceBtn.textContent = 'Tous';
+                sourceBtn.dataset.currentState = 'all';
+            }
+            if (statusBtn) {
+                statusBtn.textContent = 'Tous';
+                statusBtn.dataset.currentState = 'all';
+            }
+            if (dateBtn) {
+                // Garder le SVG et changer le texte
+                const textNode = Array.from(dateBtn.childNodes).find(node => node.nodeType === 3);
+                if (textNode) {
+                    textNode.textContent = 'Récents';
+                }
+                dateBtn.dataset.currentState = 'desc';
+            }
+            
+            // Recharger les articles
             loadArticles(currentPage);
-            showFeedback('Recherche reinitalisee', 'info');
+            showFeedback('Recherche et filtres reinitialises', 'info');
         });
     }
-   
+    
     
     // ===== FONCTION : CHARGER LES ARTICLES =====
     async function loadArticles(page) {
@@ -112,7 +164,8 @@
             const data = await response.json();
             
             if (response.ok) {
-                displayArticles(data.articles);
+                allArticles = data.articles; // Stocker tous les articles
+                applyFiltersAndDisplay(); // Appliquer les filtres actifs
                 updateTitle('Tous les articles');
             } else {
                 showError('Erreur lors du chargement des articles');
@@ -121,6 +174,116 @@
             console.error('Erreur:', error);
             showError('Impossible de charger les articles');
         }
+    }
+
+    // ===== FONCTION : TOGGLE FILTRE =====
+    function toggleFilter(filterType, button) {
+        const target = button.dataset.target; // 'favorites' ou undefined (articles)
+        
+        if (filterType === 'source') {
+            const states = ['all', 'Korben.info', 'Dev.to'];
+            const labels = ['Tous', 'Korben', 'Dev.to'];
+            
+            if (target === 'favorites') {
+                const currentIndex = states.indexOf(currentFavSourceFilter);
+                const nextIndex = (currentIndex + 1) % states.length;
+                currentFavSourceFilter = states[nextIndex];
+            } else {
+                const currentIndex = states.indexOf(currentSourceFilter);
+                const nextIndex = (currentIndex + 1) % states.length;
+                currentSourceFilter = states[nextIndex];
+            }
+            
+            const nextIndex = target === 'favorites' 
+                ? states.indexOf(currentFavSourceFilter)
+                : states.indexOf(currentSourceFilter);
+            button.textContent = labels[nextIndex];
+            button.dataset.currentState = states[nextIndex];
+            
+        } else if (filterType === 'status') {
+            const states = ['all', 'read', 'unread'];
+            const labels = ['Tous', 'Lus', 'Non lus'];
+            
+            if (target === 'favorites') {
+                const currentIndex = states.indexOf(currentFavStatusFilter);
+                const nextIndex = (currentIndex + 1) % states.length;
+                currentFavStatusFilter = states[nextIndex];
+            } else {
+                const currentIndex = states.indexOf(currentStatusFilter);
+                const nextIndex = (currentIndex + 1) % states.length;
+                currentStatusFilter = states[nextIndex];
+            }
+            
+            const nextIndex = target === 'favorites'
+                ? states.indexOf(currentFavStatusFilter)
+                : states.indexOf(currentStatusFilter);
+            button.textContent = labels[nextIndex];
+            button.dataset.currentState = states[nextIndex];
+            
+        } else if (filterType === 'date') {
+            const states = ['desc', 'asc'];
+            const labels = ['Récents', 'Anciens'];
+            
+            if (target === 'favorites') {
+                const currentIndex = states.indexOf(currentFavSortOrder);
+                const nextIndex = (currentIndex + 1) % states.length;
+                currentFavSortOrder = states[nextIndex];
+            } else {
+                const currentIndex = states.indexOf(currentSortOrder);
+                const nextIndex = (currentIndex + 1) % states.length;
+                currentSortOrder = states[nextIndex];
+            }
+            
+            const nextIndex = target === 'favorites'
+                ? states.indexOf(currentFavSortOrder)
+                : states.indexOf(currentSortOrder);
+            
+            // Garder le SVG et changer le texte
+            const textNode = Array.from(button.childNodes).find(node => node.nodeType === 3);
+            if (textNode) {
+                textNode.textContent = labels[nextIndex];
+            }
+            button.dataset.currentState = states[nextIndex];
+        }
+        
+        // Appliquer les filtres selon la cible
+        if (target === 'favorites') {
+            applyFavoritesFilters();
+        } else {
+            applyFiltersAndDisplay();
+        }
+    }
+
+    // ===== FONCTION : APPLIQUER FILTRES ET AFFICHER =====
+    function applyFiltersAndDisplay() {
+        let filtered = [...allArticles];
+        
+        // Filtre par source
+        if (currentSourceFilter !== 'all') {
+            filtered = filtered.filter(article => article.source === currentSourceFilter);
+        }
+        
+        // Filtre par statut
+        if (currentStatusFilter === 'read') {
+            filtered = filtered.filter(article => article.isRead === true);
+        } else if (currentStatusFilter === 'unread') {
+            filtered = filtered.filter(article => article.isRead === false);
+        }
+        
+        // Tri par date
+        filtered.sort((a, b) => {
+            const dateA = new Date(a.publishedAt.split('/').reverse().join('-'));
+            const dateB = new Date(b.publishedAt.split('/').reverse().join('-'));
+            
+            if (currentSortOrder === 'desc') {
+                return dateB - dateA; // Plus recents en premier
+            } else {
+                return dateA - dateB; // Plus anciens en premier
+            }
+        });
+        
+        displayArticles(filtered);
+        showFeedback(`${filtered.length} article(s) affiche(s)`, 'info');
     }
     
     // ===== FONCTION : RECHERCHER LES ARTICLES =====
@@ -166,46 +329,105 @@
         }
     }
     
+    // ===== FONCTION : APPLIQUER FILTRES SUR FAVORIS =====
+    function applyFavoritesFilters() {
+        let filtered = [...allFavorites];
+        
+        // Filtre par source
+        if (currentFavSourceFilter !== 'all') {
+            filtered = filtered.filter(article => article.source === currentFavSourceFilter);
+        }
+        
+        // Filtre par statut
+        if (currentFavStatusFilter === 'read') {
+            filtered = filtered.filter(article => article.isRead === true);
+        } else if (currentFavStatusFilter === 'unread') {
+            filtered = filtered.filter(article => article.isRead === false);
+        }
+        
+        // Tri par date
+        filtered.sort((a, b) => {
+            const dateA = new Date(a.publishedAt.split('/').reverse().join('-'));
+            const dateB = new Date(b.publishedAt.split('/').reverse().join('-'));
+            
+            if (currentFavSortOrder === 'desc') {
+                return dateB - dateA;
+            } else {
+                return dateA - dateB;
+            }
+        });
+        
+        // Afficher les favoris filtres
+        displayFavoritesList(filtered);
+    }
+
+    // ===== FONCTION : AFFICHER LA LISTE DES FAVORIS =====
+    function displayFavoritesList(favorites) {
+        const favoritesList = document.getElementById('favorites-list');
+        
+        if (!favoritesList) return;
+        
+        if (favorites.length === 0) {
+            favoritesList.innerHTML = '<p class="favorites-empty">Aucun favori</p>';
+            return;
+        }
+        
+        favoritesList.innerHTML = '';
+        
+        favorites.slice(0, 10).forEach(article => {
+            const item = document.createElement('div');
+            item.className = 'favorite-item';
+            
+            item.innerHTML = `
+                <a href="${article.url}" target="_blank" class="favorite-link">${article.title}</a>
+                <button class="btn-unfavorite" data-id="${article.id}" title="Retirer des favoris">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M6 18L18 6M6 6l12 12" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            `;
+            
+            favoritesList.appendChild(item);
+        });
+        
+        addUnfavoriteListeners();
+    }
+
     // ===== FONCTION : CHARGER LA SIDEBAR FAVORIS + METTRE A JOUR BADGE =====
     async function loadFavoritesSidebar() {
         try {
             const response = await fetch('/api/articles/favorites');
             const data = await response.json();
             
-            const favoritesList = document.getElementById('favorites-list');
+            if (!response.ok) {
+                throw new Error('Erreur chargement favoris');
+            }
+            
+            // Stocker tous les favoris pour le filtrage
+            allFavorites = data.favorites;
+            
             const favoritesBadge = document.getElementById('favorites-badge');
+            const favoritesCount = document.getElementById('favorites-count');
             
-            // Mettre à jour le badge (mobile)
+            // Mettre à jour les compteurs (mobile ET desktop)
+            const count = allFavorites.length;
+            
             if (favoritesBadge) {
-                favoritesBadge.textContent = data.favorites.length;
+                favoritesBadge.textContent = count;
+            }
+            if (favoritesCount) {
+                favoritesCount.textContent = `(${count})`;
             }
             
-            // Mettre à jour la sidebar (desktop uniquement)
-            if (favoritesList && response.ok && data.favorites.length > 0) {
-                favoritesList.innerHTML = '';
-                data.favorites.slice(0, 10).forEach(article => {
-                    const item = document.createElement('div');
-                    item.className = 'favorite-item';
-                    
-                    item.innerHTML = `
-                        <a href="${article.url}" target="_blank" class="favorite-link">${article.title}</a>
-                        <button class="btn-unfavorite" data-id="${article.id}" title="Retirer des favoris">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path d="M6 18L18 6M6 6l12 12" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                        </button>
-                    `;
-                    
-                    favoritesList.appendChild(item);
-                });
-                
-                addUnfavoriteListeners();
-                
-            } else if (favoritesList) {
-                favoritesList.innerHTML = '<p class="favorites-empty">Aucun favori</p>';
-            }
+            // Appliquer les filtres et afficher (remplace l'ancien code d'affichage)
+            applyFavoritesFilters();
+            
         } catch (error) {
             console.error('Erreur chargement favoris sidebar:', error);
+            const favoritesList = document.getElementById('favorites-list');
+            if (favoritesList) {
+                favoritesList.innerHTML = '<p class="favorites-empty">Erreur de chargement</p>';
+            }
         }
     }
 
