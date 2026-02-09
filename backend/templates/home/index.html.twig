@@ -2,59 +2,56 @@
 
 {% block title %}{{ pageTitle }}{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+{% endblock %}
+
 {% block body %}
     <div class="home-container">
-        {# Header avec logo et globe #}
-            <header class="home-header">
-                <div class="logo">
-                    <a href="{{ app.user ? path('app_dashboard') : path('app_home') }}">
-                        <img src="{{ asset('images/logo/logo-myankode.png') }}" alt="My Ankode Logo">
-                    </a>
-                </div>
-                <div class="globe-animation">
-                    <img src="{{ asset('images/background/globe-earth.png') }}" alt="" class="globe-earth">
-                </div>
-            </header>
+        {# Globe décoratif en haut à droite (derrière le contenu) #}
+        <div class="globe-animation">
+            <img src="{{ asset('images/background/globe-earth.png') }}" alt="" class="globe-earth">
+        </div>
+
         {# Contenu principal - Layout Grid asymétrique #}
-            <section class="home-main">
-                <div class="title-welcome">
-                    <h1>{ Bienvenue sur }</h1>
-                </div>
-                
-                <div class="title-app">
-                    <h2>{ My Ankode }</h2>
-                </div>
-                
-                <div class="cta-button">
-                    <a href="{{ path('app_auth') }}">{ S'inscrire / Se Connecter }</a>
+        <section class="home-main">
+            <div class="title-welcome">
+                <h1>{ Bienvenue sur }</h1>
+            </div>
+            
+            <div class="title-app">
+                <h2>{ My Ankode }</h2>
+            </div>
+            
+            <div class="cta-button">
+                <a href="{{ path('app_auth') }}">{ S'inscrire / Se Connecter }</a>
+            </div>
+
+            {# Cards Dashboard - Asymétriques #}
+            <div class="dashboard-cards">
+                <div class="dashboard-card dashboard-card--testimonial">
+                    <h3 class="card-title">{ Témoignage }</h3>
+                    <p class="card-text">
+                        "My Ankode m'a aidé à structurer mon apprentissage et suivre ma progression."
+                    </p>
+                    <span class="card-author">— A, Dev Junior</span>
                 </div>
 
-                {# ===== Cards Dashboard - Asymétriques ===== #}
-                <div class="dashboard-cards">
-                    {# Card Témoignage - Petite, en haut à gauche #}
-                    <div class="dashboard-card dashboard-card--testimonial">
-                        <h3 class="card-title">{ Témoignage }</h3>
-                        <p class="card-text">
-                            "My Ankode m'a aidé à structurer mon apprentissage et suivre ma progression."
-                        </p>
-                        <span class="card-author">— Alex, Dev Junior</span>
-                    </div>
-
-                    {# Card Fonctionnalités - Plus grande, au centre #}
-                    <div class="dashboard-card dashboard-card--features">
-                        <h3 class="card-title">{ Features }</h3>
-                        <ul class="card-list">
-                            <li> Veille techno RSS</li>
-                            <li> Kanban projets</li>
-                            <li> Snippets code</li>
-                            <li> Suivi DWWM</li>
-                        </ul>
-                    </div>
+                <div class="dashboard-card dashboard-card--features">
+                    <h3 class="card-title">{ Features }</h3>
+                    <ul class="card-list">
+                        <li> Veille techno RSS</li>
+                        <li> Kanban projets</li>
+                        <li> Snippets code</li>
+                        <li> Suivi des compétences</li>
+                    </ul>
                 </div>
-                
-                <div class="hero-image">
-                    <img src="{{ asset('images/hero-developer.png') }}" alt="Développeur travaillant sur My Ankode">
-                </div>
-            </section>
+            </div>
+            
+            <div class="hero-image">
+                <img src="{{ asset('images/hero-developer.png') }}" alt="Développeur travaillant sur My Ankode">
+            </div>
+        </section>
     </div>
 {% endblock %}

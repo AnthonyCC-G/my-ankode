@@ -1,4 +1,4 @@
-/* ==================== MY-ANKODE - Styles globaux ==================== */
+/* ==================== MY-ANKODE - Styles globaux de base ==================== */
 
 /* ==================== RESET & BASE ==================== */
 * {
@@ -12,10 +12,10 @@ body {
     height: 100vh;
     margin: 0;
     padding: 0;
-    overflow: hidden; /* Pas de scroll sur desktop - esprit dashboard */
+    overflow: hidden;
     font-family: var(--font-main);
     font-size: var(--font-size-base);
-    background: linear-gradient(180deg,var(--custom-dark-modal) 0%, var(--custom-border) 82%, var(--custom-border) 100%);
+    background: linear-gradient(180deg, var(--custom-dark-modal) 0%, var(--custom-border) 82%, var(--custom-border) 100%);
     color: var(--text-primary);
     transition: background var(--transition-slow), color var(--transition-base);
 }
@@ -26,7 +26,6 @@ body:not(.dark-mode) {
     color: var(--text-primary);
 }
 
-
 /* ==================== VISIBILITY HELPERS ==================== */
 .desktop-only {
     display: block;
@@ -36,9 +35,7 @@ body:not(.dark-mode) {
     display: none;
 }
 
-/* ==================== HEADER & GLOBE ANIMÉ ==================== */
-
-/* ==================== LOGO ==================== */
+/* ==================== LOGO DESKTOP ==================== */
 .logo {
     position: fixed;
     top: 1px;
@@ -50,7 +47,6 @@ body:not(.dark-mode) {
     display: inline-block;
     transition: transform var(--transition-base);
 }
-
 
 .logo a:hover {
     transform: scale(1.05);
@@ -66,445 +62,11 @@ body:not(.dark-mode) .logo img {
     filter: drop-shadow(0 2px 8px rgba(0, 102, 204, 0.3));
 }
 
-
-.home-header {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 600px; /* Juste l'espace pour le globe */
-    height: 500px;
-    pointer-events: none; /* Ne bloque pas les clics */
-}
-
-/* Conteneur des globes */
-.globe-animation {
-    position: absolute;
-    top: -10vh; /* Déborde de 10% de la hauteur */
-    right: -5vw; /* Déborde de 10% de la largeur */
-    width: 25vw; /* 35% de la largeur viewport */
-    height: 25vw; /* Garde le ratio carré */
-    overflow: visible;
-    z-index: var(--z-base);
-    pointer-events: auto;
-}
-
-/* Globe Terre - Rotation lente horaire */
-.globe-earth {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    animation: rotate-clockwise 80s linear infinite;
-    opacity: 0.7; /* Réduit l'intensité visuelle - AJOUT */
-}
-
-/* Animations */
-@keyframes rotate-clockwise {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-@keyframes rotate-counter-clockwise {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(-360deg); }
-}
-
-/* Optimisation performance GPU */
-.globe-earth {
-    will-change: transform;
-    backface-visibility: hidden;
-    transform: translateZ(0);
-}
-
-/* ==================== CONTENU PRINCIPAL HOME ==================== */
-
-.home-container {
-    width: 100vw;
-    height: 100vh;
+/* ==================== MAIN CONTENT ==================== */
+.main-content {
     position: relative;
-    overflow: hidden;
+    z-index: var(--z-content);
 }
-
-.home-main {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(4, 1fr);
-    gap: 5px;
-    width: 100%;
-    height: calc(100vh - 80px); /* 100vh moins la hauteur du footer */
-    padding: var(--spacing-xl);
-    padding-bottom: calc(var(--spacing-xl) + 100px); /* Espace pour mascotte */
-}
-
-
-
-/* Div1 - "Bienvenue sur" */
-/* ===== LIGNE VERTICALE - "Bienvenue sur" ===== */
-.title-welcome h1::before {
-    content: '';
-    position: absolute;
-    left: -20px; /* À GAUCHE du texte */
-    top: 0; /* Commence à la hauteur du texte */
-    height: 160px; /* Descend en dessous */
-    width: 3px;
-    background: var(--cyan-500);
-    opacity: 0.6;
-    border-radius: 2px;
-}
-
-
-.title-welcome {
-    grid-column: span 2 / span 2;
-    grid-column-start: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-
-/* Style H1*/
-.title-welcome h1 {
-    position: relative;
-    font-family: var(--font-main);
-    font-size: clamp(1.5rem, 3vw, 3rem); /* 24px min → 3vw → 48px max */
-    font-weight: var(--font-weight-normal);
-    color: var(--text-primary);
-    margin: 0;
-    letter-spacing: 0.05em;
-}
-
-
-/* Div2 - "My Ankode" */
-
-/* ===== LIGNE VERTICALE - "My Ankode" ===== */
-.title-app h2::before {
-    content: '';
-    position: absolute;
-    left: -25px;
-    top: 0;
-    height: 150px; /* Plus long car le titre est plus gros */
-    width: 3px;
-    background: var(--cyan-500);
-    opacity: 0.6;
-    border-radius: 2px;
-}
-
-.title-app {
-    grid-column: span 2 / span 2;
-    grid-column-start: 3;
-    grid-row-start: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Style H2*/
-.title-app h2 {
-    position: relative;
-    font-family: var(--font-main);
-    font-size: clamp(2.5rem, 5vw, 5rem); /* 40px min → 5vw → 80px max */
-    font-weight: var(--font-weight-bold);
-    color: var(--text-primary);
-    margin: 0;
-    letter-spacing: 0.05em;
-}
-
-
-/* Div3 - Bouton CTA */
-
-/* ===== LIGNE VERTICALE - "CTA" ===== */
-.cta-button a::before {
-    content: '';
-    position: absolute;
-    left: -20px;
-    top: 0;
-    height: 140px;
-    width: 3px;
-    background: var(--cyan-500);
-    opacity: 0.6;
-    border-radius: 2px;
-}
-
-.cta-button {
-    grid-column: span 2 / span 2;
-    grid-column-start: 4;
-    grid-row-start: 3;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/*
-.cta-button a {
-    position: relative;
-    display: inline-block;
-    font-family: var(--font-main);
-    font-size: clamp(1.25rem, 2.5vw, 2.5rem); 
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-accent);
-    text-decoration: none;
-    letter-spacing: 0.05em;
-    transition: all var(--transition-base);
-}
-*/
-
-/* ===== BOUTON CTA STYLISÉ ===== */
-.cta-button a {
-    position: relative;
-    display: inline-block;
-    
-    /* Style bouton */
-    padding: var(--spacing-md) var(--spacing-xl); /* 24px 48px */
-    background: linear-gradient(135deg, var(--orange-500) 0%, #FF8C42 100%);
-    border: 2px solid var(--orange-500);
-    border-radius: var(--radius-lg);
-    
-    /* Texte */
-    font-family: var(--font-main);
-    font-size: clamp(1.25rem, 2.5vw, 2rem); /* Responsive */
-    font-weight: var(--font-weight-semibold);
-    color: var(--neutral-900); /* Texte sombre sur fond orange */
-    text-decoration: none;
-    letter-spacing: 0.05em;
-    
-    /* Ombre et glow */
-    box-shadow: 
-        0 4px 15px rgba(253, 171, 94, 0.4),
-        0 0 30px rgba(253, 171, 94, 0.3);
-    
-    /* Animation pulse */
-    animation: pulse-cta 3s ease-in-out infinite;
-    
-    /* Transition pour le hover */
-    transition: all var(--transition-base);
-}
-
-/* Animation PULSE (douce) */
-@keyframes pulse-cta {
-    0%, 100% { 
-        transform: scale(1);
-        box-shadow: 
-            0 4px 15px rgba(253, 171, 94, 0.4),
-            0 0 30px rgba(253, 171, 94, 0.3);
-    }
-    50% { 
-        transform: scale(1.05);
-        box-shadow: 
-            0 6px 20px rgba(253, 171, 94, 0.6),
-            0 0 40px rgba(253, 171, 94, 0.5);
-    }
-}
-
-/* HOVER : Arrêt du pulse + Scale */
-.cta-button a:hover {
-    animation: none; /* Stop le pulse */
-    transform: scale(1.08);
-    background: linear-gradient(135deg, #FF8C42 0%, var(--orange-500) 100%); /* Inverse le gradient */
-    box-shadow: 
-        0 8px 25px rgba(253, 171, 94, 0.7),
-        0 0 50px rgba(253, 171, 94, 0.6);
-}
-
-/* ACTIVE : Effet "enfoncé" */
-.cta-button a:active {
-    transform: scale(1.02);
-    box-shadow: 
-        0 2px 10px rgba(253, 171, 94, 0.5),
-        0 0 20px rgba(253, 171, 94, 0.4);
-}
-
-/*
-.cta-button a:hover {
-    color: #FF8C42;
-    transform: translateY(-2px);
-    filter: drop-shadow(0 4px 12px rgba(253, 171, 94, 0.5));
-}
-*/
-
-/* Mode light */
-body:not(.dark-mode) .title-welcome h1,
-body:not(.dark-mode) .title-app h2 {
-    color: var(--text-primary);
-}
-
-
-/* Div4 - Image Hero */
-.hero-image {
-    grid-column: span 2 / span 2;
-    grid-row: span 3 / span 3;
-    grid-column-start: 1;
-    grid-row-start: 2;
-    display: flex;
-    align-items: flex-end; /* ← Aligne en BAS */
-    justify-content: flex-start; /* ← Aligne à GAUCHE */
-    padding-bottom: 20px; /* Distance depuis le footer */
-    padding-left: 20px; /* Distance depuis le bord gauche */
-}
-
-.hero-image img {
-    width: 60%;
-    max-width: 15vw;
-    max-height: 320px;
-    height: auto;
-    object-fit: contain;
-    
-    /* Border orange collée */
-    border: 3px solid var(--orange-500);
-    border-radius: var(--radius-lg);
-    
-    /* Glow orange de base */
-    box-shadow: 
-        0 0 20px rgba(253, 171, 94, 0.6),
-        0 0 40px rgba(253, 171, 94, 0.4);
-    
-    /* Drop-shadow */
-    filter: drop-shadow(0 15px 40px rgba(0, 194, 209, 0.4));
-    
-    /* Transition pour le hover */
-    transition: all var(--transition-base);
-}
-
-/* HOVER : Glow intensifié */
-.hero-image img:hover {
-    transform: translateY(-5px);
-    border-color: var(--orange-400);
-    box-shadow: 
-        0 0 30px rgba(253, 171, 94, 0.8),
-        0 0 60px rgba(253, 171, 94, 0.6);
-}
-
-/* ==================== DASHBOARD CARDS - BORDER + GLOW ONLY ==================== */
-
-.dashboard-cards {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 10;
-}
-
-/* ===== STYLE COMMUN DES CARDS - BORDER + GLOW ===== */
-.dashboard-card {
-    position: absolute;
-    padding: var(--spacing-md) var(--spacing-lg);
-    background: transparent; /* Pas de fond */
-    border: 3px solid var(--cyan-500);
-    border-radius: var(--radius-lg);
-    pointer-events: auto;
-    transition: all var(--transition-base);
-}
-
-.dashboard-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 
-        0 0 25px rgba(0, 194, 209, 0.6),
-        0 0 50px rgba(0, 194, 209, 0.4);
-}
-
-/* ===== CARD TÉMOIGNAGE - Cyan ===== */
-.dashboard-card--testimonial {
-    width: 28vw; /* 28% de la largeur viewport */
-    top: 28vh; /* 28% de la hauteur viewport */
-    left: 6vw; /* 6% de la largeur viewport */
-    border-color: var(--cyan-500);
-}
-
-.dashboard-card--testimonial:hover {
-    border-color: var(--cyan-400);
-    box-shadow: 
-        0 0 25px rgba(0, 194, 209, 0.6),
-        0 0 50px rgba(0, 194, 209, 0.4);
-}
-
-/* ===== CARD FONCTIONNALITÉS - Orange ===== */
-/* Card Features - Centrée horizontalement*/
-.dashboard-card--features {
-    width: 20vw;
-    min-width: 350px;
-    top: 60vh;
-    left: 45%;
-    transform: translateX(-50%);
-    border-color: var(--orange-500);
-}
-
-.dashboard-card--features:hover {
-    transform: translateX(-45%) translateY(-5px);
-    border-color: var(--orange-400);
-    box-shadow: 
-        0 0 25px rgba(253, 171, 94, 0.6),
-        0 0 50px rgba(253, 171, 94, 0.4);
-}
-
-
-/* ===== CONTENU DES CARDS ===== */
-.card-title {
-    font-family: var(--font-main);
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-semibold);
-    color: var(--text-primary);
-    margin: 0 0 var(--spacing-sm) 0;
-}
-
-.card-text {
-    font-size: var(--font-size-sm);
-    line-height: 1.6;
-    color: var(--text-secondary);
-    margin: 0 0 var(--spacing-sm) 0;
-}
-
-.card-author {
-    font-size: var(--font-size-xs);
-    font-style: italic;
-    color: var(--cyan-400);
-    display: block;
-}
-
-.card-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
-}
-
-.card-list li {
-    font-size: var(--font-size-sm);
-    color: var(--text-secondary);
-    padding-left: var(--spacing-sm);
-    position: relative;
-}
-
-.card-list li::before {
-    content: '▸';
-    position: absolute;
-    left: 0;
-    color: var(--orange-500);
-}
-
-/* ===== MODE LIGHT ===== */
-body:not(.dark-mode) .dashboard-card--testimonial {
-    border-color: var(--cyan-600);
-}
-
-body:not(.dark-mode) .dashboard-card--features {
-    border-color: var(--orange-500);
-}
-
-body:not(.dark-mode) .card-title {
-    color: var(--neutral-900);
-}
-
-body:not(.dark-mode) .card-text,
-body:not(.dark-mode) .card-list li {
-    color: var(--neutral-700);
-}
-
-
 
 /* ==================== FOOTER STICKY ==================== */
 .footer-sticky {
@@ -512,9 +74,8 @@ body:not(.dark-mode) .card-list li {
     bottom: 0;
     left: 0;
     width: 100%;
-    background: rgba(0,0,0,0.3);
+    background: rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(15px);
-    /*border-top: 1px solid var(--border-color);*/
     padding: var(--spacing-sm) 0;
     z-index: var(--z-sticky);
 }
@@ -554,7 +115,6 @@ body:not(.dark-mode) .card-list li {
 /* Footer en mode light */
 body:not(.dark-mode) .footer-sticky {
     background: rgba(245, 249, 252, 0.3);
-    /*border-top: 1px solid var(--border-color);*/
 }
 
 body:not(.dark-mode) .footer-link {
@@ -700,8 +260,7 @@ body:not(.dark-mode) .lightbulb:hover {
     visibility: visible;
 }
 
-/* ==================== BOTTOM NAVIGATION BAR (MOBILE) ==================== */
-/* ===== Header Mobile Fixe ===== */
+/* ==================== MOBILE HEADER ==================== */
 .mobile-header {
     position: fixed;
     top: 0;
@@ -709,7 +268,7 @@ body:not(.dark-mode) .lightbulb:hover {
     right: 0;
     height: 70px;
     
-    display: none; /* Caché par défaut, visible sur mobile */
+    display: none;
     align-items: center;
     justify-content: space-between;
     padding: 0 var(--spacing-md);
@@ -732,16 +291,16 @@ body:not(.dark-mode) .mobile-header {
 
 /* Username au centre du header mobile */
 .mobile-header__user {
-    flex: 1; /* Prend l'espace disponible entre logo et actions */
+    flex: 1;
     text-align: center;
     
-    font-size: var(--font-size-sm); /* Petite taille pour que ça rentre */
+    font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
     color: var(--text-primary);
     
-    white-space: nowrap; /* Empêche retour à la ligne */
+    white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; /* Ajoute ... si trop long */
+    text-overflow: ellipsis;
 }
 
 /* Mode Light */
@@ -811,7 +370,7 @@ body:not(.dark-mode) .mobile-header__legal:hover {
     height: 35px;
 }
 
-/* ===== Bottom Navigation ===== */
+/* ==================== BOTTOM NAVIGATION BAR (MOBILE) ==================== */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -823,7 +382,7 @@ body:not(.dark-mode) .mobile-header__legal:hover {
     backdrop-filter: blur(15px);
     border-top: 2px solid var(--border-color);
     
-    display: none; /* Caché par défaut, visible sur mobile */
+    display: none;
     justify-content: space-around;
     align-items: center;
     padding: var(--spacing-xs) 0;
@@ -867,13 +426,13 @@ body:not(.dark-mode) .bottom-nav {
 .bottom-nav-icon {
     width: 28px;
     height: 28px;
-    color: var(--cyan-500); /* Cyan par défaut */
+    color: var(--cyan-500);
     stroke-width: 2;
 }
 
 /* État ACTIVE - Icône orange */
 .bottom-nav-item.active .bottom-nav-icon {
-    color: var(--orange-500); /* Orange pour l'active */
+    color: var(--orange-500);
     transform: scale(1.15);
 }
 
@@ -905,30 +464,12 @@ body:not(.dark-mode) .bottom-nav-label {
 
 /* ==================== RESPONSIVE DESIGN ==================== */
 
-/* ===== TABLETTE ===== */
-@media (max-width: 1024px) {
-    .home-main {
-        flex-direction: column;
-        text-align: center;
-        gap: var(--spacing-2xl);
-    }
-    
-    .hero-illustration {
-        flex: 0 0 auto;
-        max-width: 500px;
-    }
-    
-    .hero-content {
-        align-items: center;
-    }
-}
-
 /* ===== MOBILE ===== */
 @media (max-width: 768px) {
     
     /* ===== VISIBILITY ===== */
     .desktop-only {
-        display: none !important;
+        display: none;
     }
     
     .mobile-only {
@@ -937,11 +478,11 @@ body:not(.dark-mode) .bottom-nav-label {
     
     /* ===== ACTIVATION de la mobile-header et bottom-nav ===== */
     .mobile-header {
-        display: flex; /* Active le header mobile */
+        display: flex;
     }
     
     .bottom-nav {
-        display: flex; /* Active la bottom-nav */
+        display: flex;
     }
     
     /* ===== BODY ===== */
@@ -949,8 +490,8 @@ body:not(.dark-mode) .bottom-nav-label {
         overflow-y: auto;
         height: auto;
         min-height: 100vh;
-        padding-top: 70px; /* Espace pour la mobile-header */
-        padding-bottom: 90px; /* Espace pour la bottom-nav */
+        padding-top: 70px;
+        padding-bottom: 90px;
     }
     
     /* ===== LOGO ===== */
@@ -961,18 +502,6 @@ body:not(.dark-mode) .bottom-nav-label {
 
     .logo img {
         width: 60px;
-    }
-    
-    /* ===== GLOBE ===== */
-    .home-header {
-        height: 350px;
-    }
-    
-    .globe-animation {
-        width: 320px;
-        height: 320px;
-        top: -80px;
-        right: -100px;
     }
     
     /* ===== FOOTER COMPACT ===== */
@@ -1009,69 +538,5 @@ body:not(.dark-mode) .bottom-nav-label {
     
     .character {
         width: 80px;
-    }
-    
-    /* ===== TITRES ET CONTENU MOBILE ===== */
-    .mobile-title {
-        text-align: center;
-        font-size: 1.5rem;
-        padding: 1rem;
-        color: var(--text-primary);
-    }
-    
-    .mobile-content {
-        padding: 1rem;
-        text-align: center;
-    }
-    
-    /* ===== HOME RESPONSIVE ===== */
-    .welcome-title {
-        font-size: var(--font-size-2xl);
-    }
-    
-    .app-title {
-        font-size: var(--font-size-4xl);
-    }
-    
-    .btn-cta {
-        font-size: var(--font-size-2xl);
-    }
-    
-    .hero-illustration {
-        max-width: 400px;
-    }
-}
-
-/* ===== PETIT MOBILE ===== */
-@media (max-width: 480px) {
-    .welcome-title {
-        font-size: var(--font-size-xl);
-    }
-    
-    .app-title {
-        font-size: var(--font-size-3xl);
-    }
-    
-    .btn-cta {
-        font-size: var(--font-size-xl);
-    }
-    
-    .hero-illustration {
-        max-width: 300px;
-    }
-    
-    .home-main {
-        padding-bottom: 120px;
-    }
-    
-    .home-header {
-        height: 220px;
-    }
-    
-    .globe-animation {
-        width: 180px;
-        height: 180px;
-        top: -30px;
-        right: -60px;
     }
 }
