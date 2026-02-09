@@ -29,6 +29,11 @@ let currentProjectId = null; // ID du projet actuellement sélectionné
 let projects = []; // Liste de tous les projets de l'utilisateur
 let tasks = []; // Liste des tâches du projet sélectionné
 
+// DRAG & DROP : Stocker la tâche en cours de déplacement // MVP
+let draggedTask = null; // Tâche actuellement déplacée
+let draggedElement = null; // Élément DOM de la carte
+let sourceColumn = null; // Colonne d'origine (pour le rollback)
+
 // ===== 3. INITIALISATION AU CHARGEMENT DU DOM =====
 document.addEventListener('DOMContentLoaded', function() {
     // Charger les projets au démarrage
@@ -435,7 +440,7 @@ function handleEditProject(project) {
         };
         
         try {
-            // 🔒 Utilisation de API.put avec CSRF automatique
+            // Utilisation de API.put avec CSRF automatique
             const result = await API.put(`/api/projects/${projectId}`, projectData);
 
             await loadProjects();
@@ -493,6 +498,11 @@ function displayTasks() {
     const inProgressContainer = document.getElementById('tasks-in-progress');
     const doneContainer = document.getElementById('tasks-done');
     
+    // DRAG & DROP : Transformer les colonnes en drop zones
+    setupDropZone(todoContainer, 'todo');
+    setupDropZone(inProgressContainer, 'in_progress');
+    setupDropZone(doneContainer, 'done');
+    
     if (!todoContainer || !inProgressContainer || !doneContainer) {
         console.error('[KANBAN] Conteneurs de tâches introuvables');
         return;
@@ -540,6 +550,26 @@ function createTaskCard(task) {
     card.className = 'task-card';
     card.dataset.taskId = task.id;
     
+    // NOUVELLE STRUCTURE : Ajouter une poignée de drag
+    const dragHandle = document.createElement('div');
+    dragHandle.className = 'task-drag-handle';
+    dragHandle.title = 'Glisser pour déplacer';
+    dragHandle.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="9" cy="5" r="1.5"/>
+            <circle cx="9" cy="12" r="1.5"/>
+            <circle cx="9" cy="19" r="1.5"/>
+            <circle cx="15" cy="5" r="1.5"/>
+            <circle cx="15" cy="12" r="1.5"/>
+            <circle cx="15" cy="19" r="1.5"/>
+        </svg>
+    `;
+    
+    // DRAG & DROP : Le drag se fait UNIQUEMENT sur la poignée
+    dragHandle.setAttribute('draggable', 'true');
+    dragHandle.addEventListener('dragstart', (e) => handleDragStart(e, task));
+    dragHandle.addEventListener('dragend', handleDragEnd);
+    
     // Header : Titre + Boutons actions
     const header = document.createElement('div');
     header.className = 'task-card-header';
@@ -551,7 +581,7 @@ function createTaskCard(task) {
     const actions = document.createElement('div');
     actions.className = 'task-card-actions';
     
-    // Bouton Modifier (crayon) - Maintenant fonctionnel !
+    // Bouton Modifier (crayon)
     const editBtn = document.createElement('button');
     editBtn.className = 'task-btn task-btn--edit';
     editBtn.title = 'Modifier';
@@ -561,7 +591,7 @@ function createTaskCard(task) {
         </svg>
     `;
     editBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // Empêche la propagation (au cas où)
+        e.stopPropagation();
         handleEditTask(task);
     });
     
@@ -569,7 +599,6 @@ function createTaskCard(task) {
     let actionBtn = null;
     
     if (task.status === 'todo') {
-        // Bouton "Démarrer" (passer en IN_PROGRESS)
         actionBtn = document.createElement('button');
         actionBtn.className = 'task-btn task-btn--start';
         actionBtn.title = 'Démarrer la tâche';
@@ -584,7 +613,6 @@ function createTaskCard(task) {
         });
     } 
     else if (task.status === 'in_progress') {
-        // Bouton "Terminer" (passer en DONE)
         actionBtn = document.createElement('button');
         actionBtn.className = 'task-btn task-btn--complete';
         actionBtn.title = 'Marquer comme terminé';
@@ -597,9 +625,8 @@ function createTaskCard(task) {
             handleUpdateTaskStatus(task.id, 'done');
         });
     }
-    // Si status = 'done' : pas de bouton d'action (tâche terminée)
     
-    // Bouton Supprimer (poubelle) - Toujours présent
+    // Bouton Supprimer (poubelle)
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'task-btn task-btn--delete';
     deleteBtn.title = 'Supprimer';
@@ -615,7 +642,7 @@ function createTaskCard(task) {
     // Assembler les boutons d'actions
     actions.appendChild(editBtn);
     if (actionBtn) {
-        actions.appendChild(actionBtn); // Ajouter le bouton contextuel (Démarrer ou Terminer)
+        actions.appendChild(actionBtn);
     }
     actions.appendChild(deleteBtn);
     
@@ -627,11 +654,12 @@ function createTaskCard(task) {
     description.className = 'task-card-description';
     description.textContent = task.description || 'Pas de description';
     
-    // Clic pour déplier (accordéon)
     description.addEventListener('click', () => {
         description.classList.toggle('expanded');
     });
     
+    // ASSEMBLAGE FINAL : Poignée + Header + Description
+    card.appendChild(dragHandle);
     card.appendChild(header);
     card.appendChild(description);
     
@@ -732,7 +760,7 @@ function hideTaskForm() {
         }
         
         try {
-            // 🔒 Utilisation de API.delete avec CSRF automatique
+            //  Utilisation de API.delete avec CSRF automatique
             await API.delete(`/api/tasks/${taskId}`);
 
             await loadTasks(currentProjectId);
@@ -830,7 +858,7 @@ function handleEditTask(task) {
         };
         
         try {
-            // 🔒 Utilisation de API.put avec CSRF automatique
+            // Utilisation de API.put avec CSRF automatique
             const result = await API.put(`/api/tasks/${taskId}`, taskData);
 
             await loadTasks(currentProjectId);
@@ -867,4 +895,110 @@ function showError(message) {
     alert(`Erreur : ${message}`);
     // Pour le MVP, on utilise alert
     // Post-MVP : Créer un composant toast comme dans la Veille
+}
+
+// ===== 26. DRAG & DROP : DÉBUT DU DÉPLACEMENT =====
+function handleDragStart(event, task) {
+    // Recevoir directement la tâche en paramètre
+    draggedTask = task;
+    draggedElement = event.currentTarget.closest('.task-card');
+    sourceColumn = draggedElement.closest('.tasks-container').id;
+    
+    //console.log('[DRAG START] Tâche:', draggedTask.title);
+    
+    // Style visuel
+    draggedElement.style.opacity = '0.5';
+    
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/html', draggedElement.innerHTML);
+}
+
+// ===== 27. DRAG & DROP : FIN DU DÉPLACEMENT =====
+function handleDragEnd(event) {
+    // Restaurer l'opacité normale
+    draggedElement.style.opacity = '1';
+    
+    // Retirer les styles de survol sur toutes les colonnes
+    document.querySelectorAll('.tasks-container').forEach(container => {
+        container.classList.remove('drag-over');
+    });
+}
+
+// ===== 28. DRAG & DROP : CONFIGURATION D'UNE DROP ZONE =====
+function setupDropZone(container, targetStatus) {
+    // Événement : Survol de la zone
+    container.addEventListener('dragover', (event) => {
+        event.preventDefault(); // autoriser le drop
+        event.dataTransfer.dropEffect = 'move';
+        
+        // Style visuel : highlight la colonne survolée
+        container.classList.add('drag-over');
+    });
+    
+    // Événement : Sortie de la zone
+    container.addEventListener('dragleave', () => {
+        container.classList.remove('drag-over');
+    });
+    
+    // Événement : Dépose de la carte
+    container.addEventListener('drop', async (event) => {
+        event.preventDefault();
+        container.classList.remove('drag-over');
+        
+        // Si on dépose dans la même colonne : rien à faire
+        if (sourceColumn === container.id) {
+            return;
+        }
+        
+        // Appeler la fonction de mise à jour
+        await handleDropTask(draggedTask, targetStatus, container);
+    });
+}
+
+// ===== 29. DRAG & DROP : GESTION DU DROP (OPTIMISTIC UI + API) =====
+async function handleDropTask(task, newStatus, targetContainer) {
+    // Vérifier que la tâche existe
+    if (!task) {
+        console.error('[KANBAN] Tâche introuvable dans le tableau tasks');
+        showError('Erreur : tâche introuvable');
+        return;
+    }
+    
+    const oldStatus = task.status;
+    
+    // Si on dépose dans la même colonne : rien à faire
+    if (oldStatus === newStatus) {
+        return;
+    }
+    
+    // 1 - PRINCIPE : OPTIMISTIC UI : Déplacer visuellement IMMÉDIATEMENT
+    task.status = newStatus; // Mettre à jour l'objet local
+    displayTasks(); // Rafraîchir l'affichage
+    
+    try {
+        // 2 - APPEL API : Persister le changement en base de données
+        await API.patch(`/api/tasks/${task.id}/status`, { status: newStatus });
+        
+        // 3 - SUCCÈS : Afficher un message
+        showSuccess(`Tâche déplacée vers "${getStatusLabel(newStatus)}" !`);
+        
+    } catch (error) {
+        // 4 - ERREUR : ROLLBACK (annuler le déplacement visuel)
+        console.error('[KANBAN] Erreur drag & drop:', error);
+        
+        task.status = oldStatus; // Restaurer l'ancien statut
+        displayTasks(); // Rafraîchir pour annuler le déplacement
+        
+        showError('Impossible de déplacer la tâche. Connexion perdue ?');
+    }
+}
+
+// ===== 30. HELPER : Convertir le statut en libellé français =====
+function getStatusLabel(status) {
+    const labels = {
+        'todo': 'À faire',
+        'in_progress': 'En cours',
+        'done': 'Terminé'
+    };
+    return labels[status] || status;
 }
