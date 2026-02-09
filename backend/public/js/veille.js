@@ -13,6 +13,12 @@
     let currentSourceFilter = 'all';
     let currentStatusFilter = 'all';
     let currentSortOrder = 'desc';
+
+    // Variables pour les favoris
+    let allFavorites = []; // Stocke TOUS les favoris
+    let currentFavSourceFilter = 'all';
+    let currentFavStatusFilter = 'all';
+    let currentFavSortOrder = 'desc';
         
     // ===== GESTION ACCORDEON FAVORIS (Desktop uniquement) =====
     const favoritesToggle = document.getElementById('favorites-toggle');
@@ -172,33 +178,65 @@
 
     // ===== FONCTION : TOGGLE FILTRE =====
     function toggleFilter(filterType, button) {
+        const target = button.dataset.target; // 'favorites' ou undefined (articles)
+        
         if (filterType === 'source') {
             const states = ['all', 'Korben.info', 'Dev.to'];
             const labels = ['Tous', 'Korben', 'Dev.to'];
-            const currentIndex = states.indexOf(currentSourceFilter);
-            const nextIndex = (currentIndex + 1) % states.length;
             
-            currentSourceFilter = states[nextIndex];
+            if (target === 'favorites') {
+                const currentIndex = states.indexOf(currentFavSourceFilter);
+                const nextIndex = (currentIndex + 1) % states.length;
+                currentFavSourceFilter = states[nextIndex];
+            } else {
+                const currentIndex = states.indexOf(currentSourceFilter);
+                const nextIndex = (currentIndex + 1) % states.length;
+                currentSourceFilter = states[nextIndex];
+            }
+            
+            const nextIndex = target === 'favorites' 
+                ? states.indexOf(currentFavSourceFilter)
+                : states.indexOf(currentSourceFilter);
             button.textContent = labels[nextIndex];
             button.dataset.currentState = states[nextIndex];
             
         } else if (filterType === 'status') {
             const states = ['all', 'read', 'unread'];
             const labels = ['Tous', 'Lus', 'Non lus'];
-            const currentIndex = states.indexOf(currentStatusFilter);
-            const nextIndex = (currentIndex + 1) % states.length;
             
-            currentStatusFilter = states[nextIndex];
+            if (target === 'favorites') {
+                const currentIndex = states.indexOf(currentFavStatusFilter);
+                const nextIndex = (currentIndex + 1) % states.length;
+                currentFavStatusFilter = states[nextIndex];
+            } else {
+                const currentIndex = states.indexOf(currentStatusFilter);
+                const nextIndex = (currentIndex + 1) % states.length;
+                currentStatusFilter = states[nextIndex];
+            }
+            
+            const nextIndex = target === 'favorites'
+                ? states.indexOf(currentFavStatusFilter)
+                : states.indexOf(currentStatusFilter);
             button.textContent = labels[nextIndex];
             button.dataset.currentState = states[nextIndex];
             
         } else if (filterType === 'date') {
             const states = ['desc', 'asc'];
             const labels = ['Récents', 'Anciens'];
-            const currentIndex = states.indexOf(currentSortOrder);
-            const nextIndex = (currentIndex + 1) % states.length;
             
-            currentSortOrder = states[nextIndex];
+            if (target === 'favorites') {
+                const currentIndex = states.indexOf(currentFavSortOrder);
+                const nextIndex = (currentIndex + 1) % states.length;
+                currentFavSortOrder = states[nextIndex];
+            } else {
+                const currentIndex = states.indexOf(currentSortOrder);
+                const nextIndex = (currentIndex + 1) % states.length;
+                currentSortOrder = states[nextIndex];
+            }
+            
+            const nextIndex = target === 'favorites'
+                ? states.indexOf(currentFavSortOrder)
+                : states.indexOf(currentSortOrder);
             
             // Garder le SVG et changer le texte
             const textNode = Array.from(button.childNodes).find(node => node.nodeType === 3);
@@ -208,7 +246,12 @@
             button.dataset.currentState = states[nextIndex];
         }
         
-        applyFiltersAndDisplay();
+        // Appliquer les filtres selon la cible
+        if (target === 'favorites') {
+            applyFavoritesFilters();
+        } else {
+            applyFiltersAndDisplay();
+        }
     }
 
     // ===== FONCTION : APPLIQUER FILTRES ET AFFICHER =====
@@ -286,18 +329,88 @@
         }
     }
     
+    // ===== FONCTION : APPLIQUER FILTRES SUR FAVORIS =====
+    function applyFavoritesFilters() {
+        let filtered = [...allFavorites];
+        
+        // Filtre par source
+        if (currentFavSourceFilter !== 'all') {
+            filtered = filtered.filter(article => article.source === currentFavSourceFilter);
+        }
+        
+        // Filtre par statut
+        if (currentFavStatusFilter === 'read') {
+            filtered = filtered.filter(article => article.isRead === true);
+        } else if (currentFavStatusFilter === 'unread') {
+            filtered = filtered.filter(article => article.isRead === false);
+        }
+        
+        // Tri par date
+        filtered.sort((a, b) => {
+            const dateA = new Date(a.publishedAt.split('/').reverse().join('-'));
+            const dateB = new Date(b.publishedAt.split('/').reverse().join('-'));
+            
+            if (currentFavSortOrder === 'desc') {
+                return dateB - dateA;
+            } else {
+                return dateA - dateB;
+            }
+        });
+        
+        // Afficher les favoris filtres
+        displayFavoritesList(filtered);
+    }
+
+    // ===== FONCTION : AFFICHER LA LISTE DES FAVORIS =====
+    function displayFavoritesList(favorites) {
+        const favoritesList = document.getElementById('favorites-list');
+        
+        if (!favoritesList) return;
+        
+        if (favorites.length === 0) {
+            favoritesList.innerHTML = '<p class="favorites-empty">Aucun favori</p>';
+            return;
+        }
+        
+        favoritesList.innerHTML = '';
+        
+        favorites.slice(0, 10).forEach(article => {
+            const item = document.createElement('div');
+            item.className = 'favorite-item';
+            
+            item.innerHTML = `
+                <a href="${article.url}" target="_blank" class="favorite-link">${article.title}</a>
+                <button class="btn-unfavorite" data-id="${article.id}" title="Retirer des favoris">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M6 18L18 6M6 6l12 12" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            `;
+            
+            favoritesList.appendChild(item);
+        });
+        
+        addUnfavoriteListeners();
+    }
+
     // ===== FONCTION : CHARGER LA SIDEBAR FAVORIS + METTRE A JOUR BADGE =====
     async function loadFavoritesSidebar() {
         try {
             const response = await fetch('/api/articles/favorites');
             const data = await response.json();
             
-            const favoritesList = document.getElementById('favorites-list');
+            if (!response.ok) {
+                throw new Error('Erreur chargement favoris');
+            }
+            
+            // Stocker tous les favoris pour le filtrage
+            allFavorites = data.favorites;
+            
             const favoritesBadge = document.getElementById('favorites-badge');
             const favoritesCount = document.getElementById('favorites-count');
             
-            /// Mettre à jour les compteurs (mobile ET desktop)
-            const count = data.favorites.length;
+            // Mettre à jour les compteurs (mobile ET desktop)
+            const count = allFavorites.length;
             
             if (favoritesBadge) {
                 favoritesBadge.textContent = count;
@@ -306,32 +419,15 @@
                 favoritesCount.textContent = `(${count})`;
             }
             
-            // Mettre à jour la sidebar (desktop uniquement)
-            if (favoritesList && response.ok && data.favorites.length > 0) {
-                favoritesList.innerHTML = '';
-                data.favorites.slice(0, 10).forEach(article => {
-                    const item = document.createElement('div');
-                    item.className = 'favorite-item';
-                    
-                    item.innerHTML = `
-                        <a href="${article.url}" target="_blank" class="favorite-link">${article.title}</a>
-                        <button class="btn-unfavorite" data-id="${article.id}" title="Retirer des favoris">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path d="M6 18L18 6M6 6l12 12" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                        </button>
-                    `;
-                    
-                    favoritesList.appendChild(item);
-                });
-                
-                addUnfavoriteListeners();
-                
-            } else if (favoritesList) {
-                favoritesList.innerHTML = '<p class="favorites-empty">Aucun favori</p>';
-            }
+            // Appliquer les filtres et afficher (remplace l'ancien code d'affichage)
+            applyFavoritesFilters();
+            
         } catch (error) {
             console.error('Erreur chargement favoris sidebar:', error);
+            const favoritesList = document.getElementById('favorites-list');
+            if (favoritesList) {
+                favoritesList.innerHTML = '<p class="favorites-empty">Erreur de chargement</p>';
+            }
         }
     }
 

@@ -76,6 +76,21 @@
         </button>
         
         <div id="favorites-accordion" class="favorites-accordion">
+            {# Boutons de tri pour favoris #}
+            <div class="filter-buttons filter-buttons--favorites">
+                <button class="filter-btn" data-filter-type="source" data-current-state="all" data-target="favorites">
+                    Tous
+                </button>
+                <button class="filter-btn" data-filter-type="status" data-current-state="all" data-target="favorites">
+                    Tous
+                </button>
+                <button class="filter-btn active" data-filter-type="date" data-current-state="desc" data-target="favorites">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                    Récents
+                </button>
+            </div>
             <div id="favorites-list" class="favorites-list">
                 <p class="favorites-empty">Chargement...</p>
             </div>

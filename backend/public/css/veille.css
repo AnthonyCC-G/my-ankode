@@ -301,14 +301,22 @@ body:not(.dark-mode) .filter-btn.active {
 
 /* Contenu accordeon */
 .favorites-accordion {
-    max-height: 120px; /* Hauteur pour 2 favoris (60px chacun environ) */
-    overflow: hidden;
+    max-height: 120px;
+    overflow: hidden; /* Pas de scroll ici */
     transition: max-height var(--transition-base);
+    display: flex;
+    flex-direction: column;
 }
 
 .favorites-accordion.open {
-    max-height: calc(100vh - 420px); /* S'etend completement */
-    overflow-y: auto;
+    max-height: calc(100vh - 600px); /* Hauteur maximale du bloc */
+    overflow: hidden; /* Toujours pas de scroll ICI */
+}
+
+/* Boutons de tri dans favoris - fixes en haut */
+.filter-buttons--favorites {
+    flex-shrink: 0; /* Ne se compresse jamais */
+    margin: var(--spacing-sm) var(--spacing-md) var(--spacing-xs);
 }
 
 /* Compteur favoris dans le titre (desktop uniquement) */
@@ -318,9 +326,20 @@ body:not(.dark-mode) .filter-btn.active {
     color: var(--text-secondary);
 }
 
-/* Liste favoris */
+/* Liste favoris - scrollable sans scrollbar visible */
 .favorites-list {
-    padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md); /* MODIF : Padding-top ajouté */
+    padding: var(--spacing-xs) var(--spacing-md) var(--spacing-md);
+    flex: 1 1 auto; /* Prend l'espace disponible */
+    max-height: calc(100vh - 420px); /* Limite la hauteur */
+    overflow-y: auto; /* Scroll UNIQUEMENT ici */
+    
+    /* Cacher la scrollbar */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+}
+
+.favorites-list::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
 }
 
 .favorites-empty {
