@@ -279,6 +279,7 @@ body:not(.dark-mode) .filter-btn.active {
     transition: background var(--transition-base);
 }
 
+
 .favorites-header:hover {
     background: rgba(0, 194, 209, 0.05);
 }
@@ -308,6 +309,13 @@ body:not(.dark-mode) .filter-btn.active {
 .favorites-accordion.open {
     max-height: calc(100vh - 420px); /* S'etend completement */
     overflow-y: auto;
+}
+
+/* Compteur favoris dans le titre (desktop uniquement) */
+.favorites-count {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-normal);
+    color: var(--text-secondary);
 }
 
 /* Liste favoris */

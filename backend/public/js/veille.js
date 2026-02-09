@@ -294,10 +294,16 @@
             
             const favoritesList = document.getElementById('favorites-list');
             const favoritesBadge = document.getElementById('favorites-badge');
+            const favoritesCount = document.getElementById('favorites-count');
             
-            // Mettre à jour le badge (mobile)
+            /// Mettre à jour les compteurs (mobile ET desktop)
+            const count = data.favorites.length;
+            
             if (favoritesBadge) {
-                favoritesBadge.textContent = data.favorites.length;
+                favoritesBadge.textContent = count;
+            }
+            if (favoritesCount) {
+                favoritesCount.textContent = `(${count})`;
             }
             
             // Mettre à jour la sidebar (desktop uniquement)
