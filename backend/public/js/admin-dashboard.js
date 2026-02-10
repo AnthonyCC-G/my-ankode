@@ -28,14 +28,6 @@
 })();
 
 // ============================================================
-// SECTION 1 : CHARGEMENT DES STATISTIQUES AU DEMARRAGE
-// ============================================================
-
-document.addEventListener('DOMContentLoaded', function() {
-    loadAllStats();
-});
-
-// ============================================================
 // SECTION 2 : FONCTION PRINCIPALE DE CHARGEMENT
 // ============================================================
 
@@ -161,3 +153,54 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+
+// ============================================================
+// SECTION 7 : MEMORISATION DU TAB ACTIF (localStorage)
+// ============================================================
+
+/**
+ * Sauvegarde le tab actif dans localStorage
+ */
+function saveActiveTab() {
+    const tabs = document.querySelectorAll('#adminTabs button[data-bs-toggle="tab"]');
+    
+    tabs.forEach(tab => {
+        tab.addEventListener('shown.bs.tab', function (event) {
+            const activeTabId = event.target.getAttribute('id');
+            localStorage.setItem('adminActiveTab', activeTabId);
+        });
+    });
+}
+
+/**
+ * Restaure le dernier tab actif au chargement de la page
+ */
+function restoreActiveTab() {
+    const savedTabId = localStorage.getItem('adminActiveTab');
+    
+    if (savedTabId) {
+        const savedTab = document.getElementById(savedTabId);
+        
+        if (savedTab) {
+            // Activer le tab sauvegardé
+            const tab = new bootstrap.Tab(savedTab);
+            tab.show();
+        }
+    }
+}
+
+// ============================================================
+// SECTION 8 : INITIALISATION AU CHARGEMENT
+// ============================================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Charger les statistiques
+    loadAllStats();
+    
+    // Restaurer le tab actif
+    restoreActiveTab();
+    
+    // Sauvegarder les changements de tabs
+    saveActiveTab();
+});

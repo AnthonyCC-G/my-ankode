@@ -1,22 +1,22 @@
 /* ========================================
    ADMIN DASHBOARD - MY-ANKODE
-   Layout Grid 2x3 + Header comme Snippets
+   Dashboard avec Tabs Bootstrap + Stats Grid
    ======================================== */
 
 /* ==================== HEADER TITRE DE PAGE ==================== */
 .admin-header {
     width: 100%;
     text-align: center;
-    padding: var(--spacing-xl) var(--spacing-lg);
-    margin-top: 80px; /* Espace pour la navbar fixe */
-    margin-bottom: var(--spacing-xs);
+    padding: var(--spacing-lg) var(--spacing-md);
+    margin-top: 70px; /* Réduit de 80px à 70px */
+    margin-bottom: var(--spacing-sm); /* Réduit */
 }
 
 .admin-title {
-    font-size: var(--font-size-3xl);
+    font-size: var(--font-size-2xl); /* Réduit de 3xl à 2xl */
     font-weight: var(--font-weight-bold);
     color: var(--text-primary);
-    margin: 0 0 var(--spacing-sm) 0;
+    margin: 0 0 var(--spacing-xs) 0; /* Réduit */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -30,43 +30,97 @@
 
 .admin-title .badge {
     background-color: var(--color-error);
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-xs); /* Réduit */
     vertical-align: middle;
 }
 
 .admin-intro {
-    font-size: var(--font-size-base);
+    font-size: var(--font-size-sm); /* Réduit de base à sm */
     color: var(--text-secondary);
     margin: 0 auto;
-    max-width: 800px;
-    line-height: 1.6;
+    max-width: 900px;
+    line-height: 1.5;
 }
 
 /* ==================== CONTENEUR PRINCIPAL ==================== */
 .admin-main {
-    padding: 0 var(--spacing-lg) var(--spacing-3xl);
-    max-width: 1400px;
-    margin: 0 auto;
+    padding: 0 var(--spacing-md) 100px;
+    max-width: 1600px; /* Augmenté de 1500px à 1600px */
+    margin: 0 0 0 40px; /* Réduit de 60px à 40px pour gagner à droite */
 }
 
-/* ==================== GRID 2x3 ==================== */
+/* ==================== NAVIGATION TABS BOOTSTRAP ==================== */
+.admin-tabs {
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: var(--spacing-md); /* Réduit de xl à md */
+}
+
+.admin-tabs .nav-link {
+    color: var(--text-secondary);
+    border: none;
+    border-bottom: 3px solid transparent;
+    padding: var(--spacing-sm) var(--spacing-md); /* Réduit */
+    font-weight: var(--font-weight-medium);
+    transition: all var(--transition-base);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: var(--font-size-sm); /* Réduit */
+}
+
+.admin-tabs .nav-link i {
+    font-size: var(--font-size-base); /* Réduit */
+}
+
+.admin-tabs .nav-link:hover {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+    background-color: transparent;
+}
+
+.admin-tabs .nav-link.active {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+    background-color: transparent;
+    font-weight: var(--font-weight-bold);
+}
+
+/* Mode clair */
+body:not(.dark-mode) .admin-tabs .nav-link {
+    color: var(--neutral-600);
+}
+
+body:not(.dark-mode) .admin-tabs .nav-link:hover,
+body:not(.dark-mode) .admin-tabs .nav-link.active {
+    color: var(--cyan-700);
+    border-bottom-color: var(--cyan-700);
+}
+
+/* ==================== CONTENU DES TABS ==================== */
+.admin-tab-content {
+    min-height: 400px; /* Réduit de 500px */
+    max-height: calc(100vh - 280px); /* Limite la hauteur max */
+}
+
+/* ==================== TAB 1 : GRID STATISTIQUES 2x3 ==================== */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--spacing-sm);
-    margin-top: var(--spacing-lg);
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-sm); /* Gap encore plus petit */
+    margin-top: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg); /* Espace avant le footer */
 }
 
 /* ==================== CARDS DE STATISTIQUES ==================== */
 .stat-card {
     background-color: var(--bg-secondary);
     border: 2px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-xl);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-sm) var(--spacing-md); /* Padding vertical réduit */
     text-align: center;
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-sm);
     transition: all var(--transition-base);
-    min-height: 200px;
+    min-height: 130px; /* Encore un peu plus compact */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -74,35 +128,35 @@
 }
 
 .stat-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-3px);
     box-shadow: var(--shadow-cyan-hover);
     border-color: var(--color-primary);
 }
 
 body:not(.dark-mode) .stat-card {
     background-color: var(--bg-tertiary);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-md);
 }
 
 body:not(.dark-mode) .stat-card:hover {
-    box-shadow: var(--shadow-xl);
+    box-shadow: var(--shadow-lg);
 }
 
 /* ==================== ICÔNES DES STATS ==================== */
 .stat-icon {
-    width: 80px;
-    height: 80px;
+    width: 50px;
+    height: 50px;
     border-radius: var(--radius-full);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: var(--font-size-4xl);
-    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-2xl);
+    margin-bottom: var(--spacing-sm);
 }
 
 /* Icône Utilisateurs - Cyan */
 .bg-primary-subtle {
-    background-color: rgba(0, 194, 209, 0.2);
+    background-color: rgba(0, 194, 209, 0.15);
 }
 
 .stat-icon i.text-primary {
@@ -111,7 +165,7 @@ body:not(.dark-mode) .stat-card:hover {
 
 /* Icône Projets - Vert */
 .bg-success-subtle {
-    background-color: rgba(81, 207, 102, 0.2);
+    background-color: rgba(81, 207, 102, 0.15);
 }
 
 .stat-icon i.text-success {
@@ -120,7 +174,7 @@ body:not(.dark-mode) .stat-card:hover {
 
 /* Icône Tâches - Orange */
 .bg-warning-subtle {
-    background-color: rgba(253, 171, 94, 0.2);
+    background-color: rgba(253, 171, 94, 0.15);
 }
 
 .stat-icon i.text-warning {
@@ -129,7 +183,7 @@ body:not(.dark-mode) .stat-card:hover {
 
 /* Icône Articles - Cyan clair */
 .bg-info-subtle {
-    background-color: rgba(125, 211, 219, 0.2);
+    background-color: rgba(125, 211, 219, 0.15);
 }
 
 .stat-icon i.text-info {
@@ -138,7 +192,7 @@ body:not(.dark-mode) .stat-card:hover {
 
 /* Icône Snippets - Gris */
 .bg-secondary-subtle {
-    background-color: rgba(108, 117, 125, 0.2);
+    background-color: rgba(108, 117, 125, 0.15);
 }
 
 .stat-icon i.text-secondary {
@@ -147,7 +201,7 @@ body:not(.dark-mode) .stat-card:hover {
 
 /* Icône Compétences - Rouge */
 .bg-danger-subtle {
-    background-color: rgba(255, 107, 107, 0.2);
+    background-color: rgba(255, 107, 107, 0.15);
 }
 
 .stat-icon i.text-danger {
@@ -156,10 +210,10 @@ body:not(.dark-mode) .stat-card:hover {
 
 /* ==================== NOMBRES DES STATS ==================== */
 .stat-number {
-    font-size: var(--font-size-5xl);
+    font-size: var(--font-size-4xl);
     font-weight: var(--font-weight-bold);
     color: var(--color-primary);
-    margin: var(--spacing-sm) 0;
+    margin: var(--spacing-xs) 0;
 }
 
 body:not(.dark-mode) .stat-number {
@@ -184,10 +238,114 @@ body:not(.dark-mode) .stat-number {
 
 /* ==================== LABELS DES STATS ==================== */
 .stat-label {
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
     color: var(--text-secondary);
     margin: 0;
+}
+
+/* ==================== TAB 2 : DOCUMENTATION API ==================== */
+.api-doc-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.api-doc-intro {
+    background-color: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    text-align: center;
+}
+
+.api-doc-intro h2 {
+    color: var(--color-primary);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    margin: 0 0 var(--spacing-xs) 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+}
+
+.api-doc-intro p {
+    color: var(--text-primary); /* Changé de text-secondary à text-primary pour meilleur contraste */
+    margin: 0;
+    font-size: var(--font-size-sm);
+}
+
+body:not(.dark-mode) .api-doc-intro {
+    background-color: var(--bg-tertiary);
+}
+
+body:not(.dark-mode) .api-doc-intro h2 {
+    color: var(--cyan-700);
+}
+
+body:not(.dark-mode) .api-doc-intro p {
+    color: var(--text-secondary); /* En light mode on garde secondary */
+}
+
+/* Iframe Swagger UI */
+.api-doc-iframe {
+    width: 100%;
+    height: calc(100vh - 500px); /* Ajusté pour remplir jusqu'au footer */
+    min-height: 500px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background-color: #e0f7fa;
+    overflow: auto; /* Important pour la scrollbar */
+}
+
+/* Mode clair : fond blanc */
+body:not(.dark-mode) .api-doc-iframe {
+    background-color: #ffffff;
+}
+
+/* ==================== TABS 3 & 4 : PLACEHOLDERS ==================== */
+.placeholder-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--spacing-3xl) var(--spacing-lg);
+    min-height: 400px;
+}
+
+.placeholder-title {
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin: 0 0 var(--spacing-md) 0;
+}
+
+.placeholder-text {
+    font-size: var(--font-size-lg);
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto var(--spacing-xl) auto;
+    line-height: 1.6;
+}
+
+.placeholder-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    background-color: var(--color-accent);
+    color: var(--neutral-900);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--radius-full);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-base);
+}
+
+.placeholder-badge i {
+    font-size: var(--font-size-lg);
 }
 
 /* ==================== MESSAGES FLASH ==================== */
@@ -213,3 +371,46 @@ body:not(.dark-mode) .stat-number {
     font-size: var(--font-size-3xl);
 }
 
+/* ==================== SCROLLBAR PERSONNALISEE ==================== */
+/* Wrapper pour pouvoir personnaliser la scrollbar */
+.api-doc-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Scrollbar générale de la page (Firefox) */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-primary) var(--bg-secondary);
+}
+
+/* Scrollbar Webkit (Chrome, Edge, Safari) - appliquée globalement */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-primary);
+    border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--cyan-400);
+}
+
+/* Mode clair */
+body:not(.dark-mode) ::-webkit-scrollbar-thumb {
+    background: var(--cyan-600);
+}
+
+body:not(.dark-mode) ::-webkit-scrollbar-thumb:hover {
+    background: var(--cyan-700);
+}

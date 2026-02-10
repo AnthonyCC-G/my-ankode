@@ -1,0 +1,15 @@
+# config/routes/nelmio_api_doc.yaml
+
+# Route pour le JSON OpenAPI (données brutes)
+app.swagger:
+    path: /api/doc.json
+    methods: GET
+    defaults: 
+        _controller: nelmio_api_doc.controller.swagger
+
+# Route pour la documentation Swagger UI (interface graphique)
+app.swagger_ui:
+    path: /api/doc
+    methods: GET
+    defaults: 
+        _controller: nelmio_api_doc.controller.swagger_ui

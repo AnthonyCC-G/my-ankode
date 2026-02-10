@@ -1,0 +1,58 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: 'MY-ANKODE API Documentation'
+            description: |
+                Documentation complète de l'API REST de MY-ANKODE.
+                
+                ## Architecture hybride
+                - **PostgreSQL** : Utilisateurs, Projets, Tâches, Compétences (données relationnelles)
+                - **MongoDB** : Articles de veille, Snippets de code (données documentaires)
+                
+                ## Authentification
+                - Session-based authentication (Symfony Security)
+                - CSRF protection sur tous les endpoints mutants (POST/PUT/DELETE)
+                
+                ## Conventions
+                - Format de réponse : JSON
+                - Codes HTTP standards (200, 201, 400, 401, 403, 404, 500)
+                - Timestamps au format ISO 8601
+                
+                ---
+                **Projet de certification DWWM - Anthony CATAN-CAVERY - 2025**
+            version: '1.0.0'
+            contact:
+                name: 'Anthony CATAN-CAVERY'
+                email: 'contact@my-ankode.dev'
+        
+        tags:
+            - name: 'Admin - Statistiques'
+              description: 'Endpoints de statistiques globales (accès ROLE_ADMIN uniquement)'
+            - name: 'Projets'
+              description: 'Gestion des projets Kanban'
+            - name: 'Tâches'
+              description: 'Gestion des tâches dans les projets'
+            - name: 'Veille Technologique'
+              description: 'Articles RSS stockés dans MongoDB'
+            - name: 'Snippets'
+              description: 'Bibliothèque de snippets de code (MongoDB)'
+            - name: 'Compétences'
+              description: 'Suivi des compétences DWWM'
+            - name: 'Utilisateurs'
+              description: 'Gestion des utilisateurs et authentification'
+    
+    areas:
+        path_patterns:
+            - ^/api          # Tous les endpoints /api
+            - ^/admin/dashboard/api  # Stats admin
+        
+        # Exclure certaines routes si besoin
+        # path_patterns_exclude:
+        #     - ^/api/doc$
+
+    models:
+        names:
+            - { alias: User, type: App\Entity\User }
+            - { alias: Project, type: App\Entity\Project }
+            - { alias: Task, type: App\Entity\Task }
+            - { alias: Competence, type: App\Entity\Competence }
