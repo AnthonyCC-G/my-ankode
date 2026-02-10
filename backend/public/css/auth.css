@@ -4,6 +4,7 @@
    Style "Code" pour développeurs
    ============================================ */
 
+
 /* ===== CONTAINER PRINCIPAL ===== */
 .auth-container {
     display: grid;
@@ -11,8 +12,9 @@
     gap: var(--spacing-xl);
     max-width: 1200px;
     margin: 0 auto;
-    padding-top: var(--spacing-md);
-    min-height: calc(100vh - 110px);
+    padding-top: var(--spacing-sm);
+    padding-bottom: var(--spacing-sm);
+    /*min-height: calc(100vh - 110px);*/
 }
 
 /* ===== MESSAGES FLASH ===== */
@@ -187,8 +189,9 @@
 /* ===== SPACER INVISIBLE (côté connexion uniquement) ===== */
 .form-group--spacer {
     visibility: hidden;
-    height: 0;
-    min-height: 0;
+    /* Compense exactement 1 form-group : label + input + error + gap */
+    height: 11rem;
+    min-height: 11rem;
     margin: 0;
     padding: 0;
     overflow: hidden;
@@ -323,6 +326,30 @@
 .btn--primary:active {
     transform: translateY(0);
 }
+
+/* ===== ILLUSTRATIONS DÉCORATIVES ===== */
+.auth-illustration {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: var(--spacing-lg) 0;
+    min-height: 140px;
+}
+
+.auth-illustration__img {
+    max-width: 140px;
+    max-height: 140px;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    transition: transform var(--transition-base);
+}
+
+.auth-illustration__img:hover {
+    transform: scale(1.05);
+}
+
+
 
 /* ===== RESPONSIVE - TABLETTE ===== */
 @media (max-width: 1024px) {
