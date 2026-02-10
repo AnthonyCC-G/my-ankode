@@ -252,12 +252,13 @@ body:not(.dark-mode) .snippets-block--list .block-header {
 
 body:not(.dark-mode) .btn-new-snippet {
     background: var(--orange-600);
-    color: var(--neutral-100);
+    color: var(--neutral-900);
     border-color: var(--orange-700);
 }
 
 body:not(.dark-mode) .btn-new-snippet:hover {
     background: var(--orange-700);
+    color: var(--orange-500); 
 }
 
 /* Boutons expand/collapse */
@@ -290,17 +291,17 @@ body:not(.dark-mode) .btn-new-snippet:hover {
 
 /* ===== FORMULAIRE DE SNIPPET ===== */
 .snippet-form {
-    padding: var(--spacing-md);
+    padding: var(--spacing-sm);
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: var(--spacing-sm);
 }
 
 /* Ligne de formulaire (row) */
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--spacing-md);
+    gap: var(--spacing-sm);
 }
 
 /* Ligne split 50/50 pour Code + Description */
@@ -312,7 +313,7 @@ body:not(.dark-mode) .btn-new-snippet:hover {
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-xs);
+    gap: 4px;
 }
 
 .form-group--half {
@@ -328,7 +329,7 @@ body:not(.dark-mode) .btn-new-snippet:hover {
 
 /* Inputs */
 .form-input {
-    padding: var(--spacing-sm);
+    padding: var(--spacing-xs);
     background: var(--bg-input);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
@@ -346,7 +347,7 @@ body:not(.dark-mode) .btn-new-snippet:hover {
 
 /* Textarea */
 .form-textarea {
-    padding: var(--spacing-sm);
+    padding: var(--spacing-xs);
     background: var(--bg-input);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
@@ -354,8 +355,10 @@ body:not(.dark-mode) .btn-new-snippet:hover {
     font-size: var(--font-size-base);
     font-family: var(--font-main);
     resize: vertical;
+    min-height: 80px;
+    max-height: 120px;   /* ← AJOUT : limite la hauteur */
+    overflow-y: auto;    /* ← AJOUT : scroll interne si besoin */
     transition: all var(--transition-fast);
-    overflow-y: auto;
 }
 
 /* Textarea pour le code (police monospace) */
@@ -406,6 +409,36 @@ body:not(.dark-mode) .btn-new-snippet:hover {
 .btn-secondary:hover {
     background: var(--neutral-300);
     transform: translateY(-2px);
+}
+
+/* ===== MODE DARK - Inputs plus foncés ===== */
+body.dark-mode .snippets-block--config .form-input,
+body.dark-mode .snippets-block--config .form-textarea {
+    background: var(--cyan-900);      /* Très foncé */
+    border: 1px solid var(--cyan-600); /* Bordure cyan moyenne */
+    color: var(--text-primary);
+}
+
+body.dark-mode .snippets-block--config .form-input:focus,
+body.dark-mode .snippets-block--config .form-textarea:focus {
+    background: var(--cyan-800);       /* Légèrement plus clair au focus */
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 194, 209, 0.2);
+}
+
+/* ===== MODE LIGHT - Inputs clairs et lisibles ===== */
+body:not(.dark-mode) .snippets-block--config .form-input,
+body:not(.dark-mode) .snippets-block--config .form-textarea {
+    background: var(--neutral-100);    /* Blanc cassé */
+    border: 1px solid var(--cyan-300); /* Bordure cyan claire */
+    color: var(--neutral-900);         /* Texte foncé */
+}
+
+body:not(.dark-mode) .snippets-block--config .form-input:focus,
+body:not(.dark-mode) .snippets-block--config .form-textarea:focus {
+    background: #ffffff;               /* Blanc pur au focus */
+    border-color: var(--cyan-500);
+    box-shadow: 0 0 0 3px rgba(0, 194, 209, 0.1);
 }
 
 /* ==================== BLOC 3 : ASIDE RAPIDE ==================== */
