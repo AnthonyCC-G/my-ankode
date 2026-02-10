@@ -41,8 +41,25 @@ security:
 
     # Note: Only the *first* matching rule is applied
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        # Routes publiques (accessibles sans authentification)
+        - { path: ^/auth, roles: PUBLIC_ACCESS }
+        - { path: ^/registration, roles: PUBLIC_ACCESS }
+        - { path: ^/mentions-legales, roles: PUBLIC_ACCESS }
+        - { path: ^/faq, roles: PUBLIC_ACCESS }
+        - { path: ^/$, roles: PUBLIC_ACCESS }  # Page d'accueil uniquement
+    
+        # Route administrateur
+        - { path: ^/admin, roles: ROLE_ADMIN }
+    
+        # Routes utilisateurs authentifiés
+        - { path: ^/dashboard, roles: ROLE_USER }
+        - { path: ^/veille, roles: ROLE_USER }
+        - { path: ^/kanban, roles: ROLE_USER }
+        - { path: ^/snippets, roles: ROLE_USER }
+        - { path: ^/competences, roles: ROLE_USER }
+        
+        # Par défaut, bloquer tout le reste (sécurité)
+        - { path: ^/, roles: ROLE_USER }
 
 when@test:
     security:
