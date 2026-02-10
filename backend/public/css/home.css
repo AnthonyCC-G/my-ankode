@@ -27,18 +27,24 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
-    animation: rotate-clockwise 80s linear infinite;
+    animation: globe-pulse 10s ease-in-out infinite;
     opacity: 0.5;
     
     /* Optimisation performance GPU */
-    will-change: transform;
+    will-change: transform, opacity;
     backface-visibility: hidden;
     transform: translateZ(0);
 }
 
-@keyframes rotate-clockwise {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+@keyframes globe-pulse {
+    0%, 100% { 
+        transform: scale(1);
+        opacity: 0.5;
+    }
+    50% { 
+        transform: scale(1.05);
+        opacity: 0.6;
+    }
 }
 
 /* ==================== GRID LAYOUT PRINCIPAL ==================== */

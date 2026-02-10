@@ -8,118 +8,133 @@
 {% endblock %}
 
 {% block body %}
-<div class="auth-container">
-    
-    {# ===== MESSAGES FLASH ===== #}
-    {% for message in app.flashes('success') %}
-        <div class="flash-message flash-message--success">
-            <span>{{ message }}</span>
-            <button type="button" class="flash-message__close" onclick="this.parentElement.remove()">×</button>
+    <div class="auth-page-wrapper">
+        <div class="auth-container">
+            
+            {# ===== MESSAGES FLASH ===== #}
+            {% for message in app.flashes('success') %}
+                <div class="flash-message flash-message--success">
+                    <span>{{ message }}</span>
+                    <button type="button" class="flash-message__close" onclick="this.parentElement.remove()">×</button>
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="flash-message flash-message--error">
+                    <span>{{ message }}</span>
+                    <button type="button" class="flash-message__close" onclick="this.parentElement.remove()">×</button>
+                </div>
+            {% endfor %}
+
+            {# ===== DIV2 : BLOC INSCRIPTION ===== #}
+            <section class="auth-block auth-block--register">
+                <h2 class="auth-block__title">if (!compte) { S'inscrire }</h2>
+                
+                {{ form_start(registrationForm, {'attr': {'class': 'auth-form', 'novalidate': 'novalidate'}}) }}
+                
+                {# Username #}
+                <div class="form-group">
+                    {{ form_label(registrationForm.username, 'username =', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.username, {'attr': {'class': 'form-input', 'placeholder': 'Votre identifiant'}}) }}
+                    <div class="form-error">{{ form_errors(registrationForm.username) }}</div>
+                </div>
+
+                {# Email #}
+                <div class="form-group">
+                    {{ form_label(registrationForm.email, 'email =', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.email, {'attr': {'class': 'form-input', 'placeholder': 'votre@email.com'}}) }}
+                    <div class="form-error">{{ form_errors(registrationForm.email) }}</div>
+                </div>
+
+                {# Mot de passe #}
+                <div class="form-group">
+                    {{ form_label(registrationForm.plainPassword, 'motDePasse =', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-input', 'placeholder': 'Mot de passe'}}) }}
+                    <div class="form-error">{{ form_errors(registrationForm.plainPassword) }}</div>
+                </div>
+
+                {# IMAGE JENNY #} 
+                <div class="auth-illustration">
+                    <img src="{{ asset('images/Jenny.png') }}" alt="" class="auth-illustration__img">
+                </div>
+
+                {# Checkbox CGU #}
+                <div class="form-group form-group--checkbox">
+                    {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-checkbox'}}) }}
+                    {{ form_label(registrationForm.agreeTerms, "J'accepte les conditions d'utilisation", {'label_attr': {'class': 'form-label-checkbox'}}) }}
+                    <div class="form-error">{{ form_errors(registrationForm.agreeTerms) }}</div>
+                </div>
+
+                <button type="submit" class="btn btn--primary">S'inscrire</button>
+
+                {{ form_end(registrationForm) }}
+                
+                {#<p class="auth-block__closing">}</p>#}
+            </section>
+
+            {# ===== DIV3 : BLOC CONNEXION ===== #}
+            <section class="auth-block auth-block--login">
+                <h2 class="auth-block__title"> else { Se connecter }</h2>
+
+                {# Erreurs de connexion #}
+                {% if login_error %}
+                    <div class="flash-message flash-message--error">
+                        {{ login_error.messageKey|trans(login_error.messageData, 'security') }}
+                    </div>
+                {% endif %}
+
+                <form method="post" action="{{ path('app_auth') }}" class="auth-form">
+                    {# Email #}
+                    <div class="form-group">
+                        <label for="inputEmail" class="form-label">email =</label>
+                        <input type="email" 
+                            id="inputEmail" 
+                            name="email" 
+                            class="form-input" 
+                            value="{{ last_username }}" 
+                            required 
+                            autofocus
+                            placeholder="votre@email.com">
+                    </div>
+
+                    {# Mot de passe #}
+                    <div class="form-group">
+                        <label for="inputPassword" class="form-label">motDePasse =</label>
+                        <input type="password" 
+                            id="inputPassword" 
+                            name="password" 
+                            class="form-input" 
+                            required
+                            placeholder="Votre mot de passe">
+                    </div>
+
+                    {#  SPACER INVISIBLE pour aligner David avec Jenny #}
+                    <div class="form-group form-group--spacer" aria-hidden="true"></div>
+
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                    {# IMAGE DAVID #}
+                    <div class="auth-illustration">
+                        <img src="{{ asset('images/David.png') }}" alt="" class="auth-illustration__img">
+                    </div>
+
+                    {# Remember me #}
+                    <div class="form-group form-group--checkbox">
+                        <input type="checkbox" 
+                            class="form-checkbox" 
+                            id="remember_me" 
+                            name="_remember_me">
+                        <label class="form-label-checkbox" for="remember_me">
+                            Se souvenir de moi
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn--primary">Se connecter</button>
+                </form>
+                
+                {#<p class="auth-block__closing">}</p>#}
+            </section>
+
         </div>
-    {% endfor %}
-
-    {% for message in app.flashes('error') %}
-        <div class="flash-message flash-message--error">
-            <span>{{ message }}</span>
-            <button type="button" class="flash-message__close" onclick="this.parentElement.remove()">×</button>
-        </div>
-    {% endfor %}
-
-    {# ===== DIV2 : BLOC INSCRIPTION ===== #}
-    <section class="auth-block auth-block--register">
-        <h2 class="auth-block__title">if (!compte) { S'inscrire }</h2>
-        
-        {{ form_start(registrationForm, {'attr': {'class': 'auth-form', 'novalidate': 'novalidate'}}) }}
-        
-        {# Username #}
-        <div class="form-group">
-            {{ form_label(registrationForm.username, 'username =', {'label_attr': {'class': 'form-label'}}) }}
-            {{ form_widget(registrationForm.username, {'attr': {'class': 'form-input', 'placeholder': 'Votre identifiant'}}) }}
-            <div class="form-error">{{ form_errors(registrationForm.username) }}</div>
-        </div>
-
-        {# Email #}
-        <div class="form-group">
-            {{ form_label(registrationForm.email, 'email =', {'label_attr': {'class': 'form-label'}}) }}
-            {{ form_widget(registrationForm.email, {'attr': {'class': 'form-input', 'placeholder': 'votre@email.com'}}) }}
-            <div class="form-error">{{ form_errors(registrationForm.email) }}</div>
-        </div>
-
-        {# Mot de passe #}
-        <div class="form-group">
-            {{ form_label(registrationForm.plainPassword, 'motDePasse =', {'label_attr': {'class': 'form-label'}}) }}
-            {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-input', 'placeholder': 'Mot de passe'}}) }}
-            <div class="form-error">{{ form_errors(registrationForm.plainPassword) }}</div>
-        </div>
-
-        {# Checkbox CGU #}
-        <div class="form-group form-group--checkbox">
-            {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-checkbox'}}) }}
-            {{ form_label(registrationForm.agreeTerms, "J'accepte les conditions d'utilisation", {'label_attr': {'class': 'form-label-checkbox'}}) }}
-            <div class="form-error">{{ form_errors(registrationForm.agreeTerms) }}</div>
-        </div>
-
-        <button type="submit" class="btn btn--primary">S'inscrire</button>
-
-        {{ form_end(registrationForm) }}
-        
-        {#<p class="auth-block__closing">}</p>#}
-    </section>
-
-    {# ===== DIV3 : BLOC CONNEXION ===== #}
-    <section class="auth-block auth-block--login">
-        <h2 class="auth-block__title"> else { Se connecter }</h2>
-
-        {# Erreurs de connexion #}
-        {% if login_error %}
-            <div class="flash-message flash-message--error">
-                {{ login_error.messageKey|trans(login_error.messageData, 'security') }}
-            </div>
-        {% endif %}
-
-        <form method="post" action="{{ path('app_auth') }}" class="auth-form">
-            {# Email #}
-            <div class="form-group">
-                <label for="inputEmail" class="form-label">email =</label>
-                <input type="email" 
-                       id="inputEmail" 
-                       name="email" 
-                       class="form-input" 
-                       value="{{ last_username }}" 
-                       required 
-                       autofocus
-                       placeholder="votre@email.com">
-            </div>
-
-            {# Mot de passe #}
-            <div class="form-group">
-                <label for="inputPassword" class="form-label">motDePasse =</label>
-                <input type="password" 
-                       id="inputPassword" 
-                       name="password" 
-                       class="form-input" 
-                       required
-                       placeholder="Votre mot de passe">
-            </div>
-
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-
-            {# Remember me #}
-            <div class="form-group form-group--checkbox">
-                <input type="checkbox" 
-                       class="form-checkbox" 
-                       id="remember_me" 
-                       name="_remember_me">
-                <label class="form-label-checkbox" for="remember_me">
-                    Se souvenir de moi
-                </label>
-            </div>
-
-            <button type="submit" class="btn btn--primary">Se connecter</button>
-        </form>
-        
-        {#<p class="auth-block__closing">}</p>#}
-    </section>
-
-</div>
+    </div>
 {% endblock %}
