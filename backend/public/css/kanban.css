@@ -200,7 +200,7 @@
 
 /* ===== FORMULAIRE PROJET ===== */
 .project-form-container {
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
     padding: var(--spacing-md);
     background: rgba(0, 194, 209, 0.05);
     border: 1px solid var(--color-primary);
@@ -208,7 +208,7 @@
 }
 
 .project-form .form-group {
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: var(--spacing-xs);
 }
 
 .project-form label {
@@ -241,13 +241,15 @@
 
 .project-form .form-textarea {
     resize: vertical;
-    min-height: 60px;
+    min-height: 50px;
+    max-height: 80px;  /* ← AJOUT : hauteur max = 4-5 lignes */
+    overflow-y: auto;
 }
 
 .form-actions {
     display: flex;
-    gap: var(--spacing-sm);
-    margin-top: var(--spacing-md);
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
 }
 
 .btn {
