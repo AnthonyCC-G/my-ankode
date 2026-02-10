@@ -7,7 +7,7 @@
 /* ==================== HEADER COMPETENCES ==================== */
 .competences-header {
     text-align: center;
-    padding: var(--spacing-xl) var(--spacing-lg);
+    padding: var(--spacing-lg) var(--spacing-md);
     /*padding-top: 120px; COPIE SNIPPETS : padding-top important */
     margin-top: 80px; /* COPIE SNIPPETS : margin-top pour navbar */
     margin-bottom: var(--spacing-md);
@@ -38,23 +38,23 @@
 /* ==================== MAIN CONTAINER : 2 COLONNES ==================== */
 .competences-main {
     display: flex;
-    gap: var(--spacing-xl); /* Plus d'espace entre colonnes */
+    gap: var(--spacing-lg); /* Plus d'espace entre colonnes */
     height: calc(100vh - 340px); /* HAUTEUR FIXE pour eviter debordement */
     padding-left: 100px; /* Rapproche de la sidebar : 120px -> 100px */
     padding-right: 220px; /* Reserve 200px + marge pour mascotte */
-    padding-bottom: 140px; /* Espace pour le footer */
+    padding-bottom: 100px; /* Espace pour le footer */
 }
 
 /* ===== COLONNE GAUCHE : CONFIGURATION (Formulaire) ===== */
 .competences-config {
     flex: 0 0 420px; /* Largeur fixe 420px (elargi pour aeration) */
     background: var(--bg-secondary);
-    border: 2px solid var(--border-color);
+    border: 2px solid var(--gold-700);
     border-radius: var(--radius-lg);
     padding: var(--spacing-md);
     height: 100%; /* Utilise toute la hauteur disponible */
     max-height: 100%; /* Ne depasse jamais la hauteur du conteneur */
-    overflow-y: auto; /* Scroll interne si contenu depasse */
+    overflow-y: hidden; /* Scroll interne si contenu depasse */
     overflow-x: hidden; /* Pas de scroll horizontal */
     position: sticky;
     top: 100px; /* Stick sous la navbar */
@@ -65,7 +65,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
 }
 
 .block-title {
@@ -79,7 +79,7 @@
 .btn-new-competence {
     display: flex;
     align-items: center;
-    gap: var(--spacing-xs);
+    gap: var(--spacing-sm);
     padding: var(--spacing-xs) var(--spacing-sm);
     background: var(--gold-500);
     color: #ffffff;
@@ -141,39 +141,39 @@
 .competence-form {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-sm); /* Reduit de md a sm pour compacter */
+    gap: var(--spacing-xs); /* Reduit de xs a 4px pour compacter */
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 4px; /* Reduit de 8px a 4px pour compacter */
+    gap: 2px; /* Reduit de 4px a 2px pour compacter */
 }
 
 .form-label {
     display: flex;
     align-items: center;
     gap: var(--spacing-xs);
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-xs);
     font-weight: var(--font-weight-medium);
     color: var(--text-primary);
 }
 
 .form-icon {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     color: var(--gold-500);
 }
 
 .form-input,
 .form-textarea {
     width: 100%;
-    padding: var(--spacing-sm);
+    padding: var(--spacing-xs);
     background: var(--bg-input);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     color: var(--text-primary);
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-xs);
     font-family: var(--font-main);
     transition: all var(--transition-base);
 }
@@ -187,11 +187,13 @@
 
 .form-textarea {
     resize: vertical;
-    min-height: 60px; /* Reduit de 80px a 60px */
+    min-height: 40px; /* Reduit de 60px a 40px */
+    max-height: 40px;    /* ← AJOUT : limite la hauteur */
+    overflow-y: auto;    /* ← AJOUT : scroll interne */
 }
 
 .form-hint {
-    font-size: var(--font-size-xs);
+    font-size: 10px;
     color: var(--text-muted);
     font-style: italic;
 }
@@ -205,8 +207,8 @@
 /* ===== ETOILES CLIQUABLES (Niveau 1-5) ===== */
 .stars-container {
     display: flex;
-    gap: var(--spacing-xs);
-    font-size: 2rem;
+    gap: 4px;
+    font-size: 1.5rem;
     cursor: pointer;
     user-select: none;
 }
@@ -232,7 +234,7 @@
 
 /* Description du niveau */
 .level-description {
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-xs);
     color: var(--text-secondary);
     font-weight: var(--font-weight-medium);
     margin: 0;
@@ -241,8 +243,8 @@
 /* ===== BOUTONS D'ACTION ===== */
 .form-actions {
     display: flex;
-    gap: var(--spacing-sm);
-    margin-top: var(--spacing-sm);
+    gap: var(--spacing-xs);
+    margin-top: 4px;
 }
 
 .btn-submit,
@@ -251,11 +253,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--spacing-xs);
-    padding: var(--spacing-sm) var(--spacing-md);
+    gap: 4px;
+    padding: var(--spacing-xs) var(--spacing-sm);
     border: none;
     border-radius: var(--radius-md);
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-xs);
     font-weight: var(--font-weight-medium);
     cursor: pointer;
     transition: all var(--transition-base);
@@ -272,8 +274,8 @@
 }
 
 .btn-submit svg {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
 }
 
 .btn-cancel {
@@ -302,7 +304,7 @@
     max-height: 100%; /* Ne depasse jamais la hauteur du conteneur */
     overflow: hidden; /* Cache le debordement (scroll dans .competences-cards) */
     background: var(--bg-secondary); /* Background pour integrer le header */
-    border: 2px solid var(--border-color);
+    border: 2px solid var(--gold-700);
     border-radius: var(--radius-lg);
     padding: var(--spacing-md);
 }
@@ -408,7 +410,7 @@
 /* ===== CARD COMPETENCE ===== */
 .competence-card {
     background: var(--bg-secondary);
-    border: 2px solid var(--border-color);
+    border: 2px solid var(--gold-700);
     border-radius: var(--radius-lg);
     padding: var(--spacing-lg); /* Plus de padding pour cards spacieuses */
     transition: all var(--transition-base);
