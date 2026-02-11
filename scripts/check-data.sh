@@ -18,14 +18,15 @@ RED='\033[0;31m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# Variables de comptage
 TOTAL_ERRORS=0
 
 echo "📊 POSTGRESQL - Base relationnelle"
 echo "-----------------------------------"
 
-# Compter les utilisateurs
-USER_COUNT=$(php bin/console dbal:run-sql "SELECT COUNT(*) FROM \"user\"" --quiet 2>/dev/null | tail -1 | tr -d ' ')
+# Compter les utilisateurs (SANS --quiet pour éviter le bug)
+USER_COUNT=$(php bin/console dbal:run-sql "SELECT COUNT(*) as total FROM user_" 2>/dev/null | grep -oP '\d+' | tail -1)
+if [ -z "$USER_COUNT" ]; then USER_COUNT=0; fi
+
 if [ "$USER_COUNT" -gt 0 ] 2>/dev/null; then
     echo -e "   ${GREEN}✅${NC} Users : ${USER_COUNT} utilisateur(s)"
 else
@@ -34,7 +35,9 @@ else
 fi
 
 # Compter les projets
-PROJECT_COUNT=$(php bin/console dbal:run-sql "SELECT COUNT(*) FROM project" --quiet 2>/dev/null | tail -1 | tr -d ' ')
+PROJECT_COUNT=$(php bin/console dbal:run-sql "SELECT COUNT(*) as total FROM project" 2>/dev/null | grep -oP '\d+' | tail -1)
+if [ -z "$PROJECT_COUNT" ]; then PROJECT_COUNT=0; fi
+
 if [ "$PROJECT_COUNT" -gt 0 ] 2>/dev/null; then
     echo -e "   ${GREEN}✅${NC} Projects : ${PROJECT_COUNT} projet(s)"
 else
@@ -43,7 +46,9 @@ else
 fi
 
 # Compter les tâches
-TASK_COUNT=$(php bin/console dbal:run-sql "SELECT COUNT(*) FROM task" --quiet 2>/dev/null | tail -1 | tr -d ' ')
+TASK_COUNT=$(php bin/console dbal:run-sql "SELECT COUNT(*) as total FROM task" 2>/dev/null | grep -oP '\d+' | tail -1)
+if [ -z "$TASK_COUNT" ]; then TASK_COUNT=0; fi
+
 if [ "$TASK_COUNT" -gt 0 ] 2>/dev/null; then
     echo -e "   ${GREEN}✅${NC} Tasks : ${TASK_COUNT} tâche(s)"
 else
@@ -51,7 +56,9 @@ else
 fi
 
 # Compter les compétences
-COMPETENCE_COUNT=$(php bin/console dbal:run-sql "SELECT COUNT(*) FROM competence" --quiet 2>/dev/null | tail -1 | tr -d ' ')
+COMPETENCE_COUNT=$(php bin/console dbal:run-sql "SELECT COUNT(*) as total FROM competence" 2>/dev/null | grep -oP '\d+' | tail -1)
+if [ -z "$COMPETENCE_COUNT" ]; then COMPETENCE_COUNT=0; fi
+
 if [ "$COMPETENCE_COUNT" -gt 0 ] 2>/dev/null; then
     echo -e "   ${GREEN}✅${NC} Competences : ${COMPETENCE_COUNT} compétence(s)"
 else
@@ -62,12 +69,9 @@ echo ""
 echo "📰 MONGODB - Base documentaire"
 echo "-----------------------------------"
 
-# Compter les articles (via commande Symfony personnalisée ou MongoDB direct)
-# Note: Cette commande suppose que tu as accès à mongosh ou à une commande doctrine:mongodb
-ARTICLE_COUNT=$(php bin/console doctrine:mongodb:query "db.articles.countDocuments({})" 2>/dev/null | grep -oP '\d+' | head -1)
-if [ -z "$ARTICLE_COUNT" ]; then
-    ARTICLE_COUNT=0
-fi
+# Compter les articles (via mongosh local)
+ARTICLE_COUNT=$(mongosh my_ankode --quiet --eval "db.articles.countDocuments()" 2>/dev/null | grep -oP '\d+' | head -1)
+if [ -z "$ARTICLE_COUNT" ]; then ARTICLE_COUNT=0; fi
 
 if [ "$ARTICLE_COUNT" -gt 0 ] 2>/dev/null; then
     echo -e "   ${GREEN}✅${NC} Articles : ${ARTICLE_COUNT} article(s)"
@@ -77,10 +81,8 @@ else
 fi
 
 # Compter les snippets
-SNIPPET_COUNT=$(php bin/console doctrine:mongodb:query "db.snippets.countDocuments({})" 2>/dev/null | grep -oP '\d+' | head -1)
-if [ -z "$SNIPPET_COUNT" ]; then
-    SNIPPET_COUNT=0
-fi
+SNIPPET_COUNT=$(mongosh my_ankode --quiet --eval "db.snippets.countDocuments()" 2>/dev/null | grep -oP '\d+' | head -1)
+if [ -z "$SNIPPET_COUNT" ]; then SNIPPET_COUNT=0; fi
 
 if [ "$SNIPPET_COUNT" -gt 0 ] 2>/dev/null; then
     echo -e "   ${GREEN}✅${NC} Snippets : ${SNIPPET_COUNT} snippet(s)"
@@ -97,7 +99,7 @@ if [ $TOTAL_ERRORS -eq 0 ]; then
     echo "   Vous pouvez lancer votre présentation."
 else
     echo -e "${RED}❌ ERREURS DÉTECTÉES : ${TOTAL_ERRORS}${NC}"
-    echo "   ${YELLOW}⚠️  Lancez le script de reset :${NC}"
+    echo -e "   ${YELLOW}⚠️  Lancez le script de reset :${NC}"
     echo "      bash scripts/reset-all-fixtures.sh"
 fi
 
