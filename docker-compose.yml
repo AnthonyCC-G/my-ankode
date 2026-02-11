@@ -2,6 +2,10 @@
 # MY-ANKODE - Configuration Docker Compose
 # Projet de certification DWWM
 # ============================================
+# Variables chargées depuis :
+# - .env.docker (credentials bidons - versionné)
+# - .env.docker.local (credentials réels - NON versionné)
+# ============================================
 
 services:
   # ==========================================
@@ -19,9 +23,10 @@ services:
     environment:
       APP_ENV: dev
       APP_SECRET: changeme_in_production
-      DATABASE_URL: postgresql://ankode_user:ankode_password@postgres:5432/my_ankode?serverVersion=16&charset=utf8
-      MONGODB_URL: mongodb://mongo:27017
-      MONGODB_DB: my_ankode
+      # Utilise les variables Docker pour connexion interne
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?serverVersion=16&charset=utf8
+      MONGODB_URL: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017
+      MONGODB_DB: ${POSTGRES_DB}
     depends_on:
       postgres:
         condition: service_healthy
@@ -42,17 +47,18 @@ services:
     image: postgres:16-alpine
     container_name: my-ankode-postgres
     ports:
-      - "5432:5432"
+      # Port exposé décalé pour éviter conflit avec PostgreSQL Windows
+      - "${POSTGRES_PORT:-5433}:5432"
     environment:
-      POSTGRES_DB: my_ankode
-      POSTGRES_USER: ankode_user
-      POSTGRES_PASSWORD: ankode_password
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
       - my-ankode-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ankode_user -d my_ankode"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -64,7 +70,12 @@ services:
     image: mongo:6
     container_name: my-ankode-mongo
     ports:
-      - "27017:27017"
+      # Port exposé décalé pour éviter conflit avec MongoDB Windows
+      - "${MONGO_PORT:-27018}:27017"
+    environment:
+      # Activation de l'authentification MongoDB
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     volumes:
       - mongo-data:/data/db
     networks:
@@ -82,10 +93,10 @@ services:
     image: dpage/pgadmin4:latest
     container_name: my-ankode-pgadmin
     ports:
-      - "5050:80"
+      - "${PGADMIN_PORT:-5050}:80"
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@myankode.com
-      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
     volumes:
       - pgadmin-data:/var/lib/pgadmin
     networks:
@@ -100,9 +111,12 @@ services:
     image: mongo-express:latest
     container_name: my-ankode-mongo-express
     ports:
-      - "8081:8081"
+      - "${ME_CONFIG_PORT:-8081}:8081"
     environment:
-      ME_CONFIG_MONGODB_URL: mongodb://mongo:27017/
+      # Connexion à MongoDB avec authentification
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${ME_CONFIG_MONGODB_ADMINUSERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${ME_CONFIG_MONGODB_ADMINPASSWORD}
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017/
       ME_CONFIG_BASICAUTH_USERNAME: admin
       ME_CONFIG_BASICAUTH_PASSWORD: admin
     networks:
