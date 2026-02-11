@@ -19,59 +19,61 @@ class UserFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        // 1️ ADMIN 
-        $admin = new User();
-        $admin->setEmail('anthony@test.com');
-        $admin->setUsername('anthony_dev');
-        $admin->setRoles(['ROLE_USER', 'ROLE_ADMIN']); // Les deux rôles explicites
+        // 1- ANTHONY - ADMIN (Formateur/Mentor)
+        // Compte le plus ancien (6 mois) = fondateur de la plateforme
+        $anthony = new User();
+        $anthony->setEmail('anthony@test.com');
+        $anthony->setUsername('anthony_dev');
+        $anthony->setRoles(['ROLE_USER', 'ROLE_ADMIN']);
         
-        $hashedPassword = $this->passwordHasher->hashPassword(
-            $admin,
-            'password123'
-        );
-        $admin->setPassword($hashedPassword);
-        $admin->setCreatedAt(new \DateTimeImmutable());
-
-        $manager->persist($admin);
+        $hashedPassword = $this->passwordHasher->hashPassword($anthony, 'password123');
+        $anthony->setPassword($hashedPassword);
+        $anthony->setCreatedAt(new \DateTimeImmutable('-6 months'));
         
-        // Référence pour tests admin futurs
-        $this->addReference('user_anthony', $admin);
+        $manager->persist($anthony);
+        $this->addReference('user_anthony', $anthony);
 
-        // 2️ ALICE - Utilisatrice lambda #1 (reprend les données d'Anthony)
+        // 2- ALICE - Dev Junior Frontend (Fan de React/Angular)
+        // Inscrite il y a 3 mois
         $alice = new User();
         $alice->setEmail('alice@test.com');
-        $alice->setUsername('alice_user');
-        $alice->setRoles(['ROLE_USER']); // Simple utilisatrice
+        $alice->setUsername('alice_codes');
+        $alice->setRoles(['ROLE_USER']);
         
-        $hashedPasswordAlice = $this->passwordHasher->hashPassword(
-            $alice,
-            'password123'
-        );
+        $hashedPasswordAlice = $this->passwordHasher->hashPassword($alice, 'password123');
         $alice->setPassword($hashedPasswordAlice);
-        $alice->setCreatedAt(new \DateTimeImmutable());
-
-        $manager->persist($alice);
+        $alice->setCreatedAt(new \DateTimeImmutable('-3 months'));
         
-        // Référence pour ProjectFixtures, TaskFixtures, CompetenceFixtures
+        $manager->persist($alice);
         $this->addReference('user_alice', $alice);
 
-        // 3️ MARIE - Utilisatrice lambda #2 (garde ses données)
-        $marie = new User();
-        $marie->setEmail('marie@test.com');
-        $marie->setUsername('marie_user');
-        $marie->setRoles(['ROLE_USER']); // Simple utilisatrice
+        // 3- BOB - Dev Junior Backend (Adore Symfony)
+        // Inscrit il y a 2 mois
+        $bob = new User();
+        $bob->setEmail('bob@test.com');
+        $bob->setUsername('bob_debug');
+        $bob->setRoles(['ROLE_USER']);
         
-        $hashedPasswordMarie = $this->passwordHasher->hashPassword(
-            $marie,
-            'password123'
-        );
-        $marie->setPassword($hashedPasswordMarie);
-        $marie->setCreatedAt(new \DateTimeImmutable());
+        $hashedPasswordBob = $this->passwordHasher->hashPassword($bob, 'password123');
+        $bob->setPassword($hashedPasswordBob);
+        $bob->setCreatedAt(new \DateTimeImmutable('-2 months'));
+        
+        $manager->persist($bob);
+        $this->addReference('user_bob', $bob);
 
-        $manager->persist($marie);
+        // 4- CLARA - Dev en Reconversion (Ex-prof de maths)
+        // Nouvelle venue (1 mois)
+        $clara = new User();
+        $clara->setEmail('clara@test.com');
+        $clara->setUsername('clara_learns');
+        $clara->setRoles(['ROLE_USER']);
         
-        // Référence pour ProjectFixtures, TaskFixtures, CompetenceFixtures
-        $this->addReference('user_marie', $marie);
+        $hashedPasswordClara = $this->passwordHasher->hashPassword($clara, 'password123');
+        $clara->setPassword($hashedPasswordClara);
+        $clara->setCreatedAt(new \DateTimeImmutable('-1 month'));
+        
+        $manager->persist($clara);
+        $this->addReference('user_clara', $clara);
 
         $manager->flush();
     }
