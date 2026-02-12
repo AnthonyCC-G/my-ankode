@@ -1,30 +1,69 @@
-// PAGE VEILLE - Gestion complete avec API REST
+// ============================================================================
+// PAGE VEILLE - Gestion complète avec API REST
+// ============================================================================
+// Structure :
+//   1. VARIABLES GLOBALES
+//   2. INITIALISATION & CHARGEMENT
+//   3. GESTION UI DESKTOP (Accordéon Favoris)
+//   4. GESTION UI MOBILE (Tabs)
+//   5. GESTION FILTRES & RECHERCHE
+//   6. CHARGEMENT ARTICLES (API)
+//   7. CHARGEMENT FAVORIS (API)
+//   8. AFFICHAGE & RENDU
+//   9. ACTIONS ARTICLES (Lu/Favori/Lien)
+//  10. CARROUSEL (Navigation)
+//  11. UTILITAIRES
+// ============================================================================
 
-    document.addEventListener('DOMContentLoaded', function() {
-        
-    // ===== VARIABLES GLOBALES =====
-        let currentPage = 1;
-        let totalPages = 1;
-        let currentFilter = 'all'; // 'all' ou 'favorites'
-        let currentSearchKeyword = '';
-
-    // Variables de filtrage/tri
-    let allArticles = []; // Stocke TOUS les articles charges
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // ========================================================================
+    // 1. VARIABLES GLOBALES
+    // ========================================================================
+    
+    // --- Pagination ---
+    let currentPage = 1;
+    let totalPages = 1;
+    let totalArticles = 0;
+    
+    // --- Filtres principaux ---
+    let currentFilter = 'all'; // 'all' ou 'favorites'
+    let currentSearchKeyword = '';
+    
+    // --- Filtres articles ---
+    let allArticles = []; // Cache tous les articles chargés
     let currentSourceFilter = 'all';
-    let currentStatusFilter = 'all';
-    let currentSortOrder = 'desc';
-
-    // Variables pour les favoris
-    let allFavorites = []; // Stocke TOUS les favoris
+    let currentStatusFilter = 'all'; // 'all', 'read', 'unread'
+    let currentSortOrder = 'desc'; // 'desc', 'asc'
+    
+    // --- Filtres favoris ---
+    let allFavorites = []; // Cache tous les favoris
     let currentFavSourceFilter = 'all';
     let currentFavStatusFilter = 'all';
     let currentFavSortOrder = 'desc';
-        
-    // ===== GESTION ACCORDEON FAVORIS (Desktop uniquement) =====
+    
+    // --- Sources disponibles (chargées depuis API) ---
+    let availableSources = [];
+    
+    
+    // ========================================================================
+    // 2. INITIALISATION & CHARGEMENT
+    // ========================================================================
+    
+    // --- Chargement initial au démarrage de la page ---
+    loadArticles(currentPage);
+    loadFavoritesSidebar();
+    loadAvailableSources();
+    
+    
+    // ========================================================================
+    // 3. GESTION UI DESKTOP - Accordéon Favoris
+    // ========================================================================
+    
     const favoritesToggle = document.getElementById('favorites-toggle');
     const favoritesAccordion = document.getElementById('favorites-accordion');
     const veilleGrid = document.querySelector('.veille-grid');
-
+    
     if (favoritesToggle && favoritesAccordion && veilleGrid) {
         favoritesToggle.addEventListener('click', function() {
             // Désactiver en mobile (≤ 768px)
@@ -38,16 +77,19 @@
             veilleGrid.classList.toggle('favorites-expanded');
         });
     }
-
-        // ===== GESTION TABS MOBILE (Tous / Favoris) =====
+    
+    
+    // ========================================================================
+    // 4. GESTION UI MOBILE - Tabs (Tous / Favoris)
+    // ========================================================================
+    
     const tabAll = document.getElementById('tab-all');
     const tabFavorites = document.getElementById('tab-favorites');
-    const favoritesBadge = document.getElementById('favorites-badge');
-
+    
     if (tabAll && tabFavorites) {
-        // Clic sur tab "Tous"
+        // --- Tab "Tous" ---
         tabAll.addEventListener('click', function() {
-            if (this.classList.contains('active')) return; // Déjà actif
+            if (this.classList.contains('active')) return;
             
             // Switch tabs
             tabAll.classList.add('active');
@@ -60,9 +102,9 @@
             loadArticles(currentPage);
         });
         
-        // Clic sur tab "Favoris"
+        // --- Tab "Favoris" ---
         tabFavorites.addEventListener('click', function() {
-            if (this.classList.contains('active')) return; // Déjà actif
+            if (this.classList.contains('active')) return;
             
             // Switch tabs
             tabFavorites.classList.add('active');
@@ -73,23 +115,32 @@
             loadFavoritesArticles();
         });
     }
-
-
-    // ===== CHARGEMENT INITIAL =====
-    loadArticles(currentPage);
-    loadFavoritesSidebar();
     
-    // ===== GESTION BOUTONS DE TRI =====
+    
+    // ========================================================================
+    // 5. GESTION FILTRES & RECHERCHE
+    // ========================================================================
+    
+    // --- 5.1 Select Source (nouveau système) ---
+    const sourceFilter = document.getElementById('source-filter');
+    if (sourceFilter) {
+        sourceFilter.addEventListener('change', function() {
+            currentSourceFilter = this.value;
+            currentPage = 1;
+            loadArticles(currentPage);
+        });
+    }
+    
+    // --- 5.2 Boutons Status & Date (ancien système toggle) ---
     const filterButtons = document.querySelectorAll('.filter-btn');
-
     filterButtons.forEach(btn => {
         btn.addEventListener('click', function() {
             const filterType = this.dataset.filterType;
             toggleFilter(filterType, this);
         });
     });
-
-    // ===== GESTION RECHERCHE =====
+    
+    // --- 5.3 Recherche ---
     const searchInput = document.getElementById('search-input');
     const searchBtn = document.getElementById('search-btn');
     const resetBtn = document.getElementById('reset-btn');
@@ -116,31 +167,30 @@
     
     if (resetBtn) {
         resetBtn.addEventListener('click', function() {
-            // Reinitialiser la recherche
+            // Réinitialiser la recherche
             searchInput.value = '';
             currentSearchKeyword = '';
             currentPage = 1;
             
-            // Reinitialiser les filtres
+            // Réinitialiser les filtres
             currentSourceFilter = 'all';
             currentStatusFilter = 'all';
             currentSortOrder = 'desc';
             
-            // Remettre les boutons visuellement
-            const sourceBtn = document.querySelector('[data-filter-type="source"]');
+            // Réinitialiser le select visually
+            if (sourceFilter) {
+                sourceFilter.value = 'all';
+            }
+            
+            // Réinitialiser les boutons
             const statusBtn = document.querySelector('[data-filter-type="status"]');
             const dateBtn = document.querySelector('[data-filter-type="date"]');
             
-            if (sourceBtn) {
-                sourceBtn.textContent = 'Tous';
-                sourceBtn.dataset.currentState = 'all';
-            }
             if (statusBtn) {
                 statusBtn.textContent = 'Tous';
                 statusBtn.dataset.currentState = 'all';
             }
             if (dateBtn) {
-                // Garder le SVG et changer le texte
                 const textNode = Array.from(dateBtn.childNodes).find(node => node.nodeType === 3);
                 if (textNode) {
                     textNode.textContent = 'Récents';
@@ -150,23 +200,50 @@
             
             // Recharger les articles
             loadArticles(currentPage);
-            showFeedback('Recherche et filtres reinitialises', 'info');
+            showFeedback('Recherche et filtres réinitialisés', 'info');
         });
     }
     
     
-    // ===== FONCTION : CHARGER LES ARTICLES =====
+    // ========================================================================
+    // 6. CHARGEMENT ARTICLES (API)
+    // ========================================================================
+    
+    /**
+     * Charge les articles depuis l'API avec filtres et pagination
+     * @param {number} page - Numéro de page
+     */
     async function loadArticles(page) {
         try {
             showLoading();
             
-            const response = await fetch(`/api/articles?page=${page}`);
+            // Construire l'URL avec filtres
+            let url = `/api/articles?page=${page}`;
+            if (currentSourceFilter !== 'all') {
+                url += `&source=${encodeURIComponent(currentSourceFilter)}`;
+            }
+            
+            const response = await fetch(url);
             const data = await response.json();
             
             if (response.ok) {
-                allArticles = data.articles; // Stocker tous les articles
-                applyFiltersAndDisplay(); // Appliquer les filtres actifs
-                updateTitle('Tous les articles');
+                allArticles = data.articles;
+                
+                // NOUVEAU : Stocker les infos de pagination
+                currentPage = data.pagination.currentPage;
+                totalPages = data.pagination.totalPages;
+                totalArticles = data.pagination.totalArticles;
+                
+                console.log('📊 Pagination:', { currentPage, totalPages, totalArticles });
+                
+                applyFiltersAndDisplay();
+                updatePagination(); // NOUVEAU : Appel fonction pagination
+                
+                // Titre dynamique selon filtre
+                const title = currentSourceFilter !== 'all' 
+                    ? `Articles - ${currentSourceFilter}` 
+                    : 'Tous les articles';
+                updateTitle(title);
             } else {
                 showError('Erreur lors du chargement des articles');
             }
@@ -175,32 +252,179 @@
             showError('Impossible de charger les articles');
         }
     }
-
-    // ===== FONCTION : TOGGLE FILTRE =====
-    function toggleFilter(filterType, button) {
-        const target = button.dataset.target; // 'favorites' ou undefined (articles)
-        
-        if (filterType === 'source') {
-            const states = ['all', 'Korben.info', 'Dev.to'];
-            const labels = ['Tous', 'Korben', 'Dev.to'];
+    
+    /**
+     * Recherche d'articles par mot-clé
+     * @param {string} keyword - Mot-clé de recherche
+     */
+    async function searchArticles(keyword) {
+        try {
+            showLoading();
+            currentSearchKeyword = keyword;
             
-            if (target === 'favorites') {
-                const currentIndex = states.indexOf(currentFavSourceFilter);
-                const nextIndex = (currentIndex + 1) % states.length;
-                currentFavSourceFilter = states[nextIndex];
+            const response = await fetch(`/api/articles/search?q=${encodeURIComponent(keyword)}`);
+            const data = await response.json();
+            
+            if (response.ok) {
+                displayArticles(data.articles);
+                updateTitle(`Résultats pour "${keyword}"`);
+                showFeedback(`${data.count} article(s) trouvé(s)`, 'success');
             } else {
-                const currentIndex = states.indexOf(currentSourceFilter);
-                const nextIndex = (currentIndex + 1) % states.length;
-                currentSourceFilter = states[nextIndex];
+                showError('Erreur lors de la recherche');
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+            showError('Impossible de rechercher les articles');
+        }
+    }
+    
+    /**
+     * Charge les sources disponibles depuis l'API
+     */
+    async function loadAvailableSources() {
+        try {
+            const response = await fetch('/api/articles/sources');
+            const data = await response.json();
+            
+            if (response.ok) {
+                availableSources = data.sources;
+                populateSourceFilter();
+            }
+        } catch (error) {
+            console.error('Erreur chargement sources:', error);
+        }
+    }
+    
+    /**
+     * Peuple le select des sources avec les données de l'API
+     */
+    function populateSourceFilter() {
+        const sourceSelect = document.getElementById('source-filter');
+        
+        if (!sourceSelect) return;
+        
+        sourceSelect.innerHTML = '<option value="all">Toutes les sources</option>';
+        
+        availableSources.forEach(source => {
+            const option = document.createElement('option');
+            option.value = source;
+            option.textContent = source;
+            sourceSelect.appendChild(option);
+        });
+    }
+    
+    
+    // ========================================================================
+    // 7. CHARGEMENT FAVORIS (API)
+    // ========================================================================
+    
+    /**
+     * Charge les favoris de l'utilisateur
+     */
+    async function loadFavoritesArticles() {
+        try {
+            showLoading();
+            
+            const response = await fetch('/api/articles/favorites');
+            const data = await response.json();
+            
+            if (response.ok) {
+                displayArticles(data.favorites);
+                updateTitle('Mes favoris');
+                showFeedback(`${data.count} favori(s)`, 'info');
+            } else {
+                showError('Erreur lors du chargement des favoris');
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+            showError('Impossible de charger les favoris');
+        }
+    }
+    
+    /**
+     * Charge la sidebar favoris (desktop) + met à jour les badges (mobile)
+     */
+    async function loadFavoritesSidebar() {
+        try {
+            const response = await fetch('/api/articles/favorites');
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error('Erreur chargement favoris');
             }
             
-            const nextIndex = target === 'favorites' 
-                ? states.indexOf(currentFavSourceFilter)
-                : states.indexOf(currentSourceFilter);
-            button.textContent = labels[nextIndex];
-            button.dataset.currentState = states[nextIndex];
+            allFavorites = data.favorites;
             
-        } else if (filterType === 'status') {
+            // Mettre à jour les compteurs
+            const favoritesBadge = document.getElementById('favorites-badge');
+            const favoritesCount = document.getElementById('favorites-count');
+            const count = allFavorites.length;
+            
+            if (favoritesBadge) {
+                favoritesBadge.textContent = count;
+            }
+            if (favoritesCount) {
+                favoritesCount.textContent = `(${count})`;
+            }
+            
+            // Afficher la liste filtrée
+            applyFavoritesFilters();
+            
+        } catch (error) {
+            console.error('Erreur chargement favoris sidebar:', error);
+            const favoritesList = document.getElementById('favorites-list');
+            if (favoritesList) {
+                favoritesList.innerHTML = '<p class="favorites-empty">Erreur de chargement</p>';
+            }
+        }
+    }
+    
+    /**
+     * Retire un article des favoris depuis la sidebar
+     * @param {string} articleId - ID de l'article
+     */
+    async function removeFavoriteFromSidebar(articleId) {
+        try {
+            const data = await API.delete(`/api/articles/${articleId}/favorite`);
+            
+            if (data.success) {
+                loadFavoritesSidebar();
+                
+                if (currentFilter === 'favorites') {
+                    loadFavoritesArticles();
+                }
+                
+                // Mettre à jour le bouton dans le carrousel
+                const btn = document.querySelector(`.btn-favorite[data-id="${articleId}"]`);
+                if (btn) {
+                    btn.classList.remove('active');
+                    const svg = btn.querySelector('svg');
+                    svg.setAttribute('fill', 'none');
+                }
+                
+                showFeedback('Article retiré des favoris', 'success');
+            }
+        } catch (error) {
+            console.error('Erreur retrait favori:', error);
+            showFeedback('Erreur lors du retrait', 'error');
+        }
+    }
+    
+    
+    // ========================================================================
+    // 8. AFFICHAGE & RENDU
+    // ========================================================================
+    
+    /**
+     * Toggle les filtres (Status, Date)
+     * NOTE: Le filtre Source est géré par le <select>, pas ici
+     * @param {string} filterType - Type de filtre ('status' ou 'date')
+     * @param {HTMLElement} button - Bouton cliqué
+     */
+    function toggleFilter(filterType, button) {
+        const target = button.dataset.target; // 'favorites' ou undefined
+        
+        if (filterType === 'status') {
             const states = ['all', 'read', 'unread'];
             const labels = ['Tous', 'Lus', 'Non lus'];
             
@@ -253,17 +477,20 @@
             applyFiltersAndDisplay();
         }
     }
-
-    // ===== FONCTION : APPLIQUER FILTRES ET AFFICHER =====
+    
+    /**
+     * Applique les filtres côté client et affiche les articles
+     */
     function applyFiltersAndDisplay() {
         let filtered = [...allArticles];
         
-        // Filtre par source
+        // NOTE: Filtre source déjà appliqué côté backend
+        // On garde ce code au cas où on charge tous les articles
         if (currentSourceFilter !== 'all') {
             filtered = filtered.filter(article => article.source === currentSourceFilter);
         }
         
-        // Filtre par statut
+        // Filtre statut
         if (currentStatusFilter === 'read') {
             filtered = filtered.filter(article => article.isRead === true);
         } else if (currentStatusFilter === 'unread') {
@@ -276,69 +503,28 @@
             const dateB = new Date(b.publishedAt.split('/').reverse().join('-'));
             
             if (currentSortOrder === 'desc') {
-                return dateB - dateA; // Plus recents en premier
+                return dateB - dateA;
             } else {
-                return dateA - dateB; // Plus anciens en premier
+                return dateA - dateB;
             }
         });
         
         displayArticles(filtered);
-        showFeedback(`${filtered.length} article(s) affiche(s)`, 'info');
+        showFeedback(`${filtered.length} article(s) affiché(s)`, 'info');
     }
     
-    // ===== FONCTION : RECHERCHER LES ARTICLES =====
-    async function searchArticles(keyword) {
-        try {
-            showLoading();
-            currentSearchKeyword = keyword;
-            
-            const response = await fetch(`/api/articles/search?q=${encodeURIComponent(keyword)}`);
-            const data = await response.json();
-            
-            if (response.ok) {
-                displayArticles(data.articles);
-                updateTitle(`Resultats pour "${keyword}"`);
-                showFeedback(`${data.count} article(s) trouve(s)`, 'success');
-            } else {
-                showError('Erreur lors de la recherche');
-            }
-        } catch (error) {
-            console.error('Erreur:', error);
-            showError('Impossible de rechercher les articles');
-        }
-    }
-    
-    // ===== FONCTION : CHARGER LES FAVORIS =====
-    async function loadFavoritesArticles() {
-        try {
-            showLoading();
-            
-            const response = await fetch('/api/articles/favorites');
-            const data = await response.json();
-            
-            if (response.ok) {
-                displayArticles(data.favorites);
-                updateTitle('Mes favoris');
-                showFeedback(`${data.count} favori(s)`, 'info');
-            } else {
-                showError('Erreur lors du chargement des favoris');
-            }
-        } catch (error) {
-            console.error('Erreur:', error);
-            showError('Impossible de charger les favoris');
-        }
-    }
-    
-    // ===== FONCTION : APPLIQUER FILTRES SUR FAVORIS =====
+    /**
+     * Applique les filtres sur les favoris
+     */
     function applyFavoritesFilters() {
         let filtered = [...allFavorites];
         
-        // Filtre par source
+        // Filtre source
         if (currentFavSourceFilter !== 'all') {
             filtered = filtered.filter(article => article.source === currentFavSourceFilter);
         }
         
-        // Filtre par statut
+        // Filtre statut
         if (currentFavStatusFilter === 'read') {
             filtered = filtered.filter(article => article.isRead === true);
         } else if (currentFavStatusFilter === 'unread') {
@@ -357,11 +543,44 @@
             }
         });
         
-        // Afficher les favoris filtres
         displayFavoritesList(filtered);
     }
-
-    // ===== FONCTION : AFFICHER LA LISTE DES FAVORIS =====
+    
+    /**
+     * Affiche les articles dans le carrousel
+     * @param {Array} articles - Liste des articles à afficher
+     */
+    function displayArticles(articles) {
+        const container = document.getElementById('articles-container');
+        
+        if (!container) return;
+        
+        if (articles.length === 0) {
+            container.innerHTML = '<div class="articles-loading"><p>Aucun article trouvé</p></div>';
+            return;
+        }
+        
+        const grid = document.createElement('div');
+        grid.className = 'articles-grid';
+        
+        articles.forEach(article => {
+            const card = createArticleCard(article);
+            grid.appendChild(card);
+        });
+        
+        container.innerHTML = '';
+        container.appendChild(grid);
+        
+        addArticleEventListeners();
+        
+        // Mettre à jour les boutons carrousel
+        requestAnimationFrame(updateCarouselButtonsIfExists);
+    }
+    
+    /**
+     * Affiche la liste des favoris dans la sidebar
+     * @param {Array} favorites - Liste des favoris
+     */
     function displayFavoritesList(favorites) {
         const favoritesList = document.getElementById('favorites-list');
         
@@ -392,128 +611,12 @@
         
         addUnfavoriteListeners();
     }
-
-    // ===== FONCTION : CHARGER LA SIDEBAR FAVORIS + METTRE A JOUR BADGE =====
-    async function loadFavoritesSidebar() {
-        try {
-            const response = await fetch('/api/articles/favorites');
-            const data = await response.json();
-            
-            if (!response.ok) {
-                throw new Error('Erreur chargement favoris');
-            }
-            
-            // Stocker tous les favoris pour le filtrage
-            allFavorites = data.favorites;
-            
-            const favoritesBadge = document.getElementById('favorites-badge');
-            const favoritesCount = document.getElementById('favorites-count');
-            
-            // Mettre à jour les compteurs (mobile ET desktop)
-            const count = allFavorites.length;
-            
-            if (favoritesBadge) {
-                favoritesBadge.textContent = count;
-            }
-            if (favoritesCount) {
-                favoritesCount.textContent = `(${count})`;
-            }
-            
-            // Appliquer les filtres et afficher (remplace l'ancien code d'affichage)
-            applyFavoritesFilters();
-            
-        } catch (error) {
-            console.error('Erreur chargement favoris sidebar:', error);
-            const favoritesList = document.getElementById('favorites-list');
-            if (favoritesList) {
-                favoritesList.innerHTML = '<p class="favorites-empty">Erreur de chargement</p>';
-            }
-        }
-    }
-
-
-    // ===== FONCTION : EVENT LISTENERS POUR DEFAVORIS SIDEBAR =====
-    function addUnfavoriteListeners() {
-        document.querySelectorAll('.btn-unfavorite').forEach(btn => {
-            btn.addEventListener('click', async function(e) {
-                e.stopPropagation(); // Empeche le clic de se propager
-                const articleId = this.dataset.id;
-                await removeFavoriteFromSidebar(articleId);
-            });
-        });
-    }
-
-    // ===== FONCTION : RETIRER UN FAVORI DEPUIS LA SIDEBAR =====
-    async function removeFavoriteFromSidebar(articleId) {
-        try {
-            // 🔒 Utilisation de API.delete avec CSRF automatique
-            const data = await API.delete(`/api/articles/${articleId}/favorite`);
-            
-            if (data.success) {
-                // Recharger la sidebar favoris
-                loadFavoritesSidebar();
-                
-                // Si on est dans la vue favoris, recharger aussi
-                if (currentFilter === 'favorites') {
-                    loadFavoritesArticles();
-                }
-                
-                // Mettre a jour le bouton dans le carrousel si l'article est visible
-                const btn = document.querySelector(`.btn-favorite[data-id="${articleId}"]`);
-                if (btn) {
-                    btn.classList.remove('active');
-                    const svg = btn.querySelector('svg');
-                    svg.setAttribute('fill', 'none');
-                }
-                
-                showFeedback('Article retire des favoris', 'success');
-            }
-        } catch (error) {
-            console.error('Erreur retrait favori:', error);
-            showFeedback('Erreur lors du retrait', 'error');
-        }
-    }
     
-    // ===== FONCTION : AFFICHER LES ARTICLES =====
-    function displayArticles(articles) {
-        const container = document.getElementById('articles-container');
-        
-        if (!container) return;
-        
-        if (articles.length === 0) {
-            container.innerHTML = '<div class="articles-loading"><p>Aucun article trouve</p></div>';
-            return;
-        }
-        
-        const grid = document.createElement('div');
-        grid.className = 'articles-grid';
-        
-        articles.forEach(article => {
-            const card = createArticleCard(article);
-            grid.appendChild(card);
-        });
-        
-        container.innerHTML = '';
-        container.appendChild(grid);
-        
-        addArticleEventListeners();
-        
-        // Mettre a jour les boutons carrousel apres le rendu
-        requestAnimationFrame(updateCarouselButtonsIfExists);
-    }
-    
-    // ===== FONCTION : NETTOYER LE TEXTE (enlever sauts de ligne) =====
-    function cleanText(text) {
-        if (!text) return '';
-        
-        return text
-            .replace(/\n+/g, ' ')      // Tous les sauts de ligne → 1 espace
-            .replace(/\r+/g, ' ')      // Retours chariot aussi
-            .replace(/\s{2,}/g, ' ')   // Espaces multiples → 1 seul espace
-            .trim();                   // Enlève espaces début/fin
-    }
-
-    // ===== FONCTION : CREER UNE CARD =====
+    /**
+     * Crée une card article
+     * @param {Object} article - Données de l'article
+     * @returns {HTMLElement} Card article
+     */
     function createArticleCard(article) {
         const card = document.createElement('div');
         card.className = `article-card ${article.isRead ? 'read' : ''}`;
@@ -545,7 +648,14 @@
         return card;
     }
     
-    // ===== FONCTION : AJOUTER LES EVENT LISTENERS =====
+    
+    // ========================================================================
+    // 9. ACTIONS ARTICLES (Lu / Favori / Lien)
+    // ========================================================================
+    
+    /**
+     * Ajoute les event listeners sur les boutons d'action
+     */
     function addArticleEventListeners() {
         // Bouton "Marquer comme lu"
         document.querySelectorAll('.btn-read').forEach(btn => {
@@ -573,10 +683,25 @@
         });
     }
     
-    // ===== FONCTION : TOGGLE READ STATUS =====
+    /**
+     * Ajoute les event listeners sur les boutons défavoris sidebar
+     */
+    function addUnfavoriteListeners() {
+        document.querySelectorAll('.btn-unfavorite').forEach(btn => {
+            btn.addEventListener('click', async function(e) {
+                e.stopPropagation();
+                const articleId = this.dataset.id;
+                await removeFavoriteFromSidebar(articleId);
+            });
+        });
+    }
+    
+    /**
+     * Toggle le statut lu/non lu d'un article
+     * @param {string} articleId - ID de l'article
+     */
     async function toggleReadStatus(articleId) {
         try {
-            // Utilisation de API.patch avec CSRF automatique
             const data = await API.patch(`/api/articles/${articleId}/mark-read`);
             
             if (data.success) {
@@ -591,10 +716,13 @@
         }
     }
     
-    // ===== FONCTION : TOGGLE FAVORITE =====
+    /**
+     * Toggle favori/non favori
+     * @param {string} articleId - ID de l'article
+     * @param {boolean} isCurrentlyFavorite - État actuel
+     */
     async function toggleFavorite(articleId, isCurrentlyFavorite) {
         try {
-            // Utilisation de API.post ou API.delete avec CSRF automatique
             let data;
             if (isCurrentlyFavorite) {
                 data = await API.delete(`/api/articles/${articleId}/favorite`);
@@ -610,21 +738,141 @@
                 const isFavorite = btn.classList.contains('active');
                 svg.setAttribute('fill', isFavorite ? 'currentColor' : 'none');
                 
-                // Recharger la sidebar favoris
                 loadFavoritesSidebar();
                 
-                // Si on est dans la vue favoris, recharger
                 if (currentFilter === 'favorites') {
                     loadFavoritesArticles();
                 }
             }
         } catch (error) {
             console.error('Erreur toggle favorite:', error);
-            showFeedback('Erreur lors de la mise a jour', 'error');
+            showFeedback('Erreur lors de la mise à jour', 'error');
         }
     }
     
-    // ===== FONCTION : METTRE A JOUR LE TITRE =====
+    
+    // ========================================================================
+    // 10. CARROUSEL - Navigation
+    // ========================================================================
+    
+    const carouselPrev = document.getElementById('carousel-prev');
+    const carouselNext = document.getElementById('carousel-next');
+    const articlesContainer = document.getElementById('articles-container');
+    
+    if (carouselPrev && carouselNext && articlesContainer) {
+        
+        // Bouton précédent
+        carouselPrev.addEventListener('click', function() {
+            const scrollAmount = 420;
+            articlesContainer.scrollBy({
+                left: -scrollAmount,
+                behavior: 'smooth'
+            });
+        });
+        
+        // Bouton suivant
+        carouselNext.addEventListener('click', function() {
+            const scrollAmount = 420;
+            articlesContainer.scrollBy({
+                left: scrollAmount,
+                behavior: 'smooth'
+            });
+        });
+        
+        // Convertir scroll vertical (molette) en scroll horizontal
+        articlesContainer.addEventListener('wheel', function(e) {
+            e.preventDefault();
+            articlesContainer.scrollBy({
+                left: e.deltaY,
+                behavior: 'auto'
+            });
+        }, { passive: false });
+        
+        // Mise à jour boutons et gradients lors du scroll
+        articlesContainer.addEventListener('scroll', function() {
+            requestAnimationFrame(updateCarouselButtonsIfExists);
+        });
+    }
+    
+    
+    // ========================================================================
+    // 10.5 PAGINATION
+    // ========================================================================
+    
+    const paginationPrev = document.getElementById('pagination-prev');
+    const paginationNext = document.getElementById('pagination-next');
+    
+    // --- Event listeners pagination ---
+    if (paginationPrev && paginationNext) {
+        paginationPrev.addEventListener('click', function() {
+            if (currentPage > 1) {
+                loadArticles(currentPage - 1);
+                // Scroll vers le début du carrousel
+                if (articlesContainer) {
+                    articlesContainer.scrollTo({ left: 0, behavior: 'smooth' });
+                }
+            }
+        });
+        
+        paginationNext.addEventListener('click', function() {
+            if (currentPage < totalPages) {
+                loadArticles(currentPage + 1);
+                if (articlesContainer) {
+                    articlesContainer.scrollTo({ left: 0, behavior: 'smooth' });
+                }
+            }
+        });
+    }
+    
+    /**
+     * Met à jour l'affichage de la pagination
+     */
+    function updatePagination() {
+        const paginationContainer = document.getElementById('pagination-container');
+        const paginationInfo = document.getElementById('pagination-info');
+        const paginationPrev = document.getElementById('pagination-prev');
+        const paginationNext = document.getElementById('pagination-next');
+        
+        
+        // Toujours afficher la pagination (même avec 1 page)
+        if (paginationContainer) {
+            paginationContainer.style.display = 'flex';
+        }
+        if (paginationInfo) {
+            paginationInfo.textContent = `Page ${currentPage} / ${totalPages}`;
+        }
+        if (paginationPrev) {
+            paginationPrev.disabled = currentPage === 1;
+        }
+        if (paginationNext) {
+            paginationNext.disabled = currentPage >= totalPages;
+        }
+    }
+    
+    
+    // ========================================================================
+    // 11. UTILITAIRES
+    // ========================================================================
+    
+    /**
+     * Nettoie le texte (sauts de ligne, espaces multiples)
+     * @param {string} text - Texte à nettoyer
+     * @returns {string} Texte nettoyé
+     */
+    function cleanText(text) {
+        if (!text) return '';
+        
+        return text
+            .replace(/\n+/g, ' ')
+            .replace(/\r+/g, ' ')
+            .replace(/\s{2,}/g, ' ')
+            .trim();
+    }
+    
+    /**
+     * Met à jour le titre de la section articles
+     * @param {string} title - Nouveau titre
+     */
     function updateTitle(title) {
         const titleElement = document.getElementById('articles-title');
         if (titleElement) {
@@ -632,8 +880,9 @@
         }
     }
     
-    
-    // ===== FONCTION : AFFICHER LE LOADING =====
+    /**
+     * Affiche l'état de chargement
+     */
     function showLoading() {
         const container = document.getElementById('articles-container');
         if (container) {
@@ -646,7 +895,11 @@
         }
     }
     
-    // ===== FONCTION : AFFICHER UN MESSAGE =====
+    /**
+     * Affiche un message de feedback
+     * @param {string} message - Message à afficher
+     * @param {string} type - Type de message ('info', 'success', 'error')
+     */
     function showFeedback(message, type = 'info') {
         const feedback = document.getElementById('search-feedback');
         if (!feedback) return;
@@ -660,7 +913,10 @@
         }, 3000);
     }
     
-    // ===== FONCTION : AFFICHER UNE ERREUR =====
+    /**
+     * Affiche un message d'erreur
+     * @param {string} message - Message d'erreur
+     */
     function showError(message) {
         const container = document.getElementById('articles-container');
         if (container) {
@@ -672,7 +928,9 @@
         }
     }
     
-    // ===== FONCTION UTILITAIRE : METTRE A JOUR BOUTONS CARROUSEL =====
+    /**
+     * Met à jour les boutons et gradients du carrousel
+     */
     function updateCarouselButtonsIfExists() {
         const carouselPrev = document.getElementById('carousel-prev');
         const carouselNext = document.getElementById('carousel-next');
@@ -683,20 +941,18 @@
             const scrollLeft = articlesContainer.scrollLeft;
             const maxScroll = articlesContainer.scrollWidth - articlesContainer.clientWidth;
             
-            // Desactiver boutons
+            // Désactiver boutons
             carouselPrev.disabled = scrollLeft <= 0;
             carouselNext.disabled = scrollLeft >= maxScroll - 1;
             
-            // Gerer gradients lateraux
+            // Gérer gradients latéraux
             if (carouselWrapper) {
-                // Gradient gauche visible si on peut scroller a gauche
                 if (scrollLeft > 10) {
                     carouselWrapper.style.setProperty('--gradient-left-opacity', '1');
                 } else {
                     carouselWrapper.style.setProperty('--gradient-left-opacity', '0');
                 }
                 
-                // Gradient droit visible si on peut scroller a droite
                 if (scrollLeft < maxScroll - 10) {
                     carouselWrapper.style.setProperty('--gradient-right-opacity', '1');
                 } else {
@@ -705,66 +961,5 @@
             }
         }
     }
-
-
-    // ===== GESTION CARROUSEL : NAVIGATION AVEC FLECHES =====
-    const carouselPrev = document.getElementById('carousel-prev');
-    const carouselNext = document.getElementById('carousel-next');
-    const articlesContainer = document.getElementById('articles-container');
-
-    if (carouselPrev && carouselNext && articlesContainer) {
-        
-        // Fonction pour scroller vers la gauche
-        carouselPrev.addEventListener('click', function() {
-            const scrollAmount = 420;
-            articlesContainer.scrollBy({
-                left: -scrollAmount,
-                behavior: 'smooth'
-            });
-        });
-        
-        // Fonction pour scroller vers la droite
-        carouselNext.addEventListener('click', function() {
-            const scrollAmount = 420;
-            articlesContainer.scrollBy({
-                left: scrollAmount,
-                behavior: 'smooth'
-            });
-
-        // Convertir scroll vertical (molette) en scroll horizontal
-        articlesContainer.addEventListener('wheel', function(e) {
-            // Empecher le scroll vertical de la page
-            e.preventDefault();
-            
-            // Convertir deltaY (vertical) en scroll horizontal
-            articlesContainer.scrollBy({
-                left: e.deltaY,
-                behavior: 'auto' // Pas smooth pour la molette
-            });
-        }, { passive: false }); // passive:false pour permettre preventDefault
-
-        });
-
-
-        
-        // Fonction pour activer/desactiver les boutons selon la position
-        function updateCarouselButtons() {
-            const scrollLeft = articlesContainer.scrollLeft;
-            const maxScroll = articlesContainer.scrollWidth - articlesContainer.clientWidth;
-            
-            carouselPrev.disabled = scrollLeft <= 0;
-            carouselNext.disabled = scrollLeft >= maxScroll - 1;
-        }
-        
-        // Ecouter le scroll pour mettre a jour les boutons
-        articlesContainer.addEventListener('scroll', updateCarouselButtons);
-
-        // Mettre a jour aussi les gradients lors du scroll
-        articlesContainer.addEventListener('scroll', function() {
-            requestAnimationFrame(updateCarouselButtonsIfExists);
-        });
-
-    }
     
-}); // FIN du DOMContentLoaded
-
+}); // FIN DOMContentLoaded

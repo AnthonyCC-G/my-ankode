@@ -236,6 +236,57 @@ body:not(.dark-mode) .filter-btn.active {
 }
 
 
+/* ===== SELECT FILTRE SOURCE ===== */
+.filter-select {
+    flex: 1;
+    padding: 8px 12px;
+    font-family: var(--font-main);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
+    background: transparent;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    appearance: none; /* Enlève le style natif */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2300c2d1'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 14px;
+    padding-right: 32px; /* Espace pour la flèche */
+}
+
+.filter-select:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    transform: translateY(-1px);
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 194, 209, 0.1);
+}
+
+/* Options du select */
+.filter-select option {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    padding: var(--spacing-xs);
+}
+
+/* Mode Light */
+body:not(.dark-mode) .filter-select {
+    background-color: transparent;
+}
+
+body:not(.dark-mode) .filter-select option {
+    background: #ffffff;
+    color: var(--neutral-900);
+}
+
 /* Messages feedback - A droite du titre */
 .search-feedback {
     min-height: auto;
@@ -447,7 +498,7 @@ body:not(.dark-mode) .filter-btn.active {
     padding-bottom: var(--spacing-xs);
 }
 
-/* Header avec titre et compteur */
+/* Header avec titre et pagination */
 .articles-header {
     display: flex;
     justify-content: space-between;
@@ -455,12 +506,7 @@ body:not(.dark-mode) .filter-btn.active {
     margin-bottom: var(--spacing-xs);
 }
 
-.articles-counter {
-    font-size: var(--font-size-sm);
-    color: var(--text-muted);
-    font-style: italic;
-    margin: 0;
-}
+
 
 
 /* Quand Favoris est etendu, Articles SE REDUIT */
@@ -585,7 +631,8 @@ body:not(.dark-mode) .carousel-wrapper::after {
 .article-card {
     flex: 0 0 300px;
     min-width: 300px;
-    height: auto; /* hauteur */
+    height: 230px; /*  HAUTEUR FIXE */
+    max-height: 230px;
     background: rgba(0, 194, 209, 0.05);
     border: 2px solid var(--gold-700); /* ← MODIF : Cards */
     border-radius: var(--radius-md);
@@ -745,41 +792,55 @@ body:not(.dark-mode) .carousel-wrapper::after {
 
 /* Pagination - En dessous du carrousel */
 .pagination-container {
-    margin-top: var(--spacing-lg);
-    padding: var(--spacing-md);
     display: flex;
-    justify-content: center;
     align-items: center;
     gap: var(--spacing-sm);
-    background: rgba(0, 77, 99, 0.15);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border-color);
 }
 
-.pagination-btn {
-    padding: var(--spacing-xs) var(--spacing-sm);
-    font-size: var(--font-size-sm);
+.pagination-btn--small {
+    width: 32px;
+    height: 32px;
+    padding: 0;
     background: transparent;
     border: 2px solid var(--border-color);
-    border-radius: var(--radius-md);
+    border-radius: 50%; /* Boutons ronds */
     cursor: pointer;
     transition: all var(--transition-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.pagination-btn:hover {
+.pagination-btn--small svg {
+    width: 16px;
+    height: 16px;
+    color: var(--text-primary);
+}
+
+.pagination-btn--small:hover:not(:disabled) {
     background: rgba(0, 194, 209, 0.1);
     border-color: var(--color-primary);
+    transform: scale(1.1);
 }
 
-.pagination-btn.active {
-    background: var(--color-primary);
-    color: var(--cyan-900);
-    border-color: var(--color-primary);
-}
-
-.pagination-btn:disabled {
+.pagination-btn--small:disabled {
     opacity: 0.3;
     cursor: not-allowed;
+    border-color: var(--border-color);
+}
+
+.pagination-info {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
+    min-width: 80px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* Mode Light */
+body:not(.dark-mode) .pagination-btn--small svg {
+    color: var(--neutral-900);
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -925,6 +986,7 @@ body:not(.dark-mode) .veille-sources {
         padding-right: var(--spacing-md);
         padding-bottom: 120px; /* Espace pour bottom-nav */
         min-height: auto;
+        height: auto;
     }
     
     /* ===== DÉSACTIVER les règles .favorites-expanded ===== */
@@ -956,6 +1018,13 @@ body:not(.dark-mode) .veille-sources {
         height: 12px;
     }
 
+        /* Adapter le select en mobile */
+    .filter-select {
+        padding: 4px 24px 4px 6px;
+        font-size: 11px;
+        background-size: 12px;
+        background-position: right 4px center;
+    }
     
     /* ===== BLOC FAVORIS : Caché en mobile (remplacé par tabs) ===== */
     .veille-favorites {
@@ -974,12 +1043,28 @@ body:not(.dark-mode) .veille-sources {
         display: flex;
     }
     
-    /* Header articles : Stack vertical */
+    /* Header articles : Stack vertical pour faire de la place */
     .articles-header {
         flex-direction: column;
         align-items: flex-start;
         gap: var(--spacing-xs);
         margin-bottom: var(--spacing-xs);
+    }
+    
+    /* Pagination plus compacte en mobile */
+    .pagination-info {
+        font-size: 11px;
+        min-width: 70px;
+    }
+    
+    .pagination-btn--small {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .pagination-btn--small svg {
+        width: 14px;
+        height: 14px;
     }
     
     /* ===== CARROUSEL : Scroll horizontal tactile simplifié ===== */
@@ -1036,5 +1121,25 @@ body:not(.dark-mode) .veille-sources {
     
     .sources-credits {
         font-size: 10px;
+    }
+
+    @media (max-width: 400px) {
+        .search-btn,
+        .reset-btn {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .search-btn svg,
+        .reset-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .search-input {
+            height: 40px;
+            padding: 8px 10px;
+            font-size: 14px;
+        }
     }
 }

@@ -44,14 +44,20 @@
                 </button>
             </div>
             
-            {# Boutons de tri #}
+            {# Select source + Boutons statut/date #}
             <div class="filter-buttons">
-                <button class="filter-btn" data-filter-type="source" data-current-state="all">
-                    Tous
-                </button>
+                {# Select pour les sources #}
+                <select id="source-filter" class="filter-select">
+                    <option value="all">Toutes les sources</option>
+                    {# Peuplé dynamiquement par JS #}
+                </select>
+                
+                {# Bouton statut (lu/non lu) #}
                 <button class="filter-btn" data-filter-type="status" data-current-state="all">
                     Tous
                 </button>
+                
+                {# Bouton date (récent/ancien) #}
                 <button class="filter-btn active" data-filter-type="date" data-current-state="desc">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -101,7 +107,22 @@
     <div class="veille-articles">
         <div class="articles-header">
             <h3 id="articles-title" class="block-title">Tous les articles</h3>
-            <p class="articles-counter">Voici les premiers articles</p>
+            {# Pagination compacte (Desktop) #}
+            <div id="pagination-container" class="pagination-container" style="display: none;">
+                <button id="pagination-prev" class="pagination-btn pagination-btn--small" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                
+                <span id="pagination-info" class="pagination-info">Page 1 / 1</span>
+                
+                <button id="pagination-next" class="pagination-btn pagination-btn--small" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
         </div>
     
         {# ===== TABS MOBILE UNIQUEMENT (cachés en desktop) ===== #}
