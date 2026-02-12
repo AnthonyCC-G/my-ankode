@@ -57,24 +57,78 @@ document.addEventListener('DOMContentLoaded', function() {
     
     
     // ========================================================================
-    // 3. GESTION UI DESKTOP - Accordéon Favoris
+    // 3. GESTION UI DESKTOP - Accordéons Recherche & Favoris (EXCLUSIFS)
     // ========================================================================
     
+    const searchToggle = document.getElementById('search-toggle');
+    const searchAccordion = document.getElementById('search-accordion');
     const favoritesToggle = document.getElementById('favorites-toggle');
     const favoritesAccordion = document.getElementById('favorites-accordion');
     const veilleGrid = document.querySelector('.veille-grid');
     
+    // --- Toggle Recherche (NOUVEAU) ---
+    if (searchToggle && searchAccordion && veilleGrid) {
+        searchToggle.addEventListener('click', function() {
+            // Désactiver en mobile (≤ 768px)
+            if (window.innerWidth <= 768) return;
+            
+            const isSearchExpanded = veilleGrid.classList.contains('search-expanded');
+            
+            if (isSearchExpanded) {
+                // Rétracter recherche
+                veilleGrid.classList.remove('search-expanded');
+                searchToggle.classList.remove('active');
+                searchAccordion.classList.remove('open');
+            } else {
+                // Étendre recherche
+                veilleGrid.classList.add('search-expanded');
+                searchToggle.classList.add('active');
+                searchAccordion.classList.add('open');
+                
+                // Rétracter favoris si étendu
+                if (veilleGrid.classList.contains('favorites-expanded')) {
+                    veilleGrid.classList.remove('favorites-expanded');
+                    if (favoritesToggle) {
+                        favoritesToggle.classList.remove('active');
+                    }
+                    if (favoritesAccordion) {
+                        favoritesAccordion.classList.remove('open');
+                    }
+                }
+            }
+        });
+    }
+    
+    // --- Toggle Favoris (MODIFIÉ pour exclusivité) ---
     if (favoritesToggle && favoritesAccordion && veilleGrid) {
         favoritesToggle.addEventListener('click', function() {
             // Désactiver en mobile (≤ 768px)
             if (window.innerWidth <= 768) return;
             
-            // Toggle accordéon
-            this.classList.toggle('active');
-            favoritesAccordion.classList.toggle('open');
+            const isFavoritesExpanded = veilleGrid.classList.contains('favorites-expanded');
             
-            // Toggle grille étendue
-            veilleGrid.classList.toggle('favorites-expanded');
+            if (isFavoritesExpanded) {
+                // Rétracter favoris
+                veilleGrid.classList.remove('favorites-expanded');
+                this.classList.remove('active');
+                favoritesAccordion.classList.remove('open');
+            } else {
+                // Étendre favoris
+                veilleGrid.classList.add('favorites-expanded');
+                this.classList.add('active');
+                favoritesAccordion.classList.add('open');
+                
+                // Rétracter recherche si étendue
+                if (veilleGrid.classList.contains('search-expanded')) {
+                    veilleGrid.classList.remove('search-expanded');
+                    if (searchToggle) {
+                        searchToggle.classList.remove('active');
+                    }
+                    if (searchAccordion) {
+                        searchAccordion.classList.remove('open');
+                    }
+                }
+            }
         });
     }
     
@@ -237,7 +291,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('📊 Pagination:', { currentPage, totalPages, totalArticles });
                 
                 applyFiltersAndDisplay();
-                updatePagination(); // NOUVEAU : Appel fonction pagination
+                updatePagination();
+                updateArticlesCount(totalArticles); 
                 
                 // Titre dynamique selon filtre
                 const title = currentSourceFilter !== 'all' 
@@ -510,7 +565,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         displayArticles(filtered);
-        showFeedback(`${filtered.length} article(s) affiché(s)`, 'info');
+        updateArticlesCount(filtered.length);
     }
     
     /**
@@ -880,6 +935,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    /**
+     * Met à jour le compteur d'articles
+     * @param {number} count - Nombre d'articles
+     */
+    function updateArticlesCount(count) {
+        const countElement = document.getElementById('articles-count');
+        if (countElement) {
+            countElement.textContent = `(${count})`;
+        }
+    }
+
+
     /**
      * Affiche l'état de chargement
      */

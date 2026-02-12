@@ -73,6 +73,10 @@ body:not(.dark-mode) .veille-articles {
     margin: 0 0 var(--spacing-md) 0;
 }
 
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   BLOC 1 : RECHERCHE (Ligne 1, Colonne 1)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 /* Header du bloc recherche avec titre + feedback */
 .search-header {
     display: flex;
@@ -85,14 +89,12 @@ body:not(.dark-mode) .veille-articles {
     margin: 0;
 }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   BLOC 1 : RECHERCHE (Ligne 1, Colonne 1)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 .veille-search {
     grid-column: 1;
     grid-row: 1;
     display: flex;
     flex-direction: column;
+    transition: grid-row var(--transition-base);
 }
 
 .search-controls {
@@ -506,7 +508,13 @@ body:not(.dark-mode) .filter-select option {
     margin-bottom: var(--spacing-xs);
 }
 
-
+/* Compteur articles (comme favoris) */
+.articles-count {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-normal);
+    color: var(--text-secondary);
+    margin-left: 4px; 
+}
 
 
 /* Quand Favoris est etendu, Articles SE REDUIT */
@@ -651,7 +659,7 @@ body:not(.dark-mode) .carousel-wrapper::after {
 }
 
 .article-card.read {
-    opacity: 0.6;
+    opacity: 0.5;
 }
 
 .article-title {
@@ -1141,5 +1149,207 @@ body:not(.dark-mode) .veille-sources {
             padding: 8px 10px;
             font-size: 14px;
         }
+    }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   BLOC RECHERCHE EXTENSIBLE - ALIGNEMENT PARFAIT
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* Modifier .veille-search existant - AJOUTER transition */
+.veille-search {
+    transition: grid-row var(--transition-base);
+}
+
+/*  Le .search-header EXISTE DÉJÀ 
+   On modifie juste son comportement pour contenir le toggle */
+
+/* Header recherche avec toggle (identique à Favoris) */
+.search-header-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: background var(--transition-base);
+    border-radius: var(--radius-sm);
+}
+
+.search-header-toggle:hover {
+    background: rgba(0, 194, 209, 0.05);
+}
+
+.search-header-toggle .block-title {
+    margin: 0;
+}
+
+.search-header-toggle .accordion-icon {
+    width: 24px;
+    height: 24px;
+    color: var(--text-primary);
+    transition: transform var(--transition-base);
+}
+
+.search-header-toggle.active .accordion-icon {
+    transform: rotate(180deg);
+}
+
+/* Accordéon recherche (zone extensible) */
+.search-accordion {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height var(--transition-base);
+    margin-top: 0;
+}
+
+.search-accordion.open {
+    max-height: 600px;
+    overflow: visible;
+    margin-top: 0; /* Pas d'espace supplémentaire */
+}
+
+/* ===== ZONE TEASER "PROCHAINEMENT" ===== */
+
+.feature-teaser {
+    padding: var(--spacing-md);
+}
+
+/* Mode Light */
+body:not(.dark-mode) .feature-teaser {
+    background: linear-gradient(135deg, 
+        rgba(0, 194, 209, 0.06), 
+        rgba(253, 171, 94, 0.06));
+}
+
+/* Titre "Prochainement" */
+.feature-teaser-title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-primary);
+    margin: 0 0 var(--spacing-md) 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+}
+
+.feature-teaser-title svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* Feature item */
+.feature-item {
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: flex-start;
+    margin-bottom: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    background: rgba(0, 77, 99, 0.15);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--color-accent);
+}
+
+.feature-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Mode Light */
+body:not(.dark-mode) .feature-item {
+    background: rgba(148, 163, 184, 0.1);
+}
+
+/* Icône emoji */
+.feature-item-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+/* Contenu feature */
+.feature-item-content {
+    flex: 1;
+}
+
+.feature-item-title {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.feature-item-desc {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    line-height: 1.4;
+    font-style: italic;
+}
+
+/* ===== GRILLE DYNAMIQUE : ÉTAT RECHERCHE ÉTENDUE ===== */
+
+.veille-grid.search-expanded .veille-search {
+    grid-row: 1 / 3;
+}
+
+.veille-grid.search-expanded .veille-articles {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+/* ===== RESPONSIVE MOBILE ===== */
+@media (max-width: 768px) {
+    /* Toggle visible et fonctionnel en mobile */
+    .search-header-toggle {
+        cursor: pointer;
+        pointer-events: auto;
+    }
+    
+    .search-header-toggle .accordion-icon {
+        display: block;
+    }
+    
+    /* Accordéon fonctionnel en mobile */
+    .search-accordion {
+        display: block;
+    }
+    
+    .search-accordion.open {
+        max-height: 500px;
+        overflow: visible;
+    }
+    
+    /* Désactiver l'état grid-expanded en mobile */
+    .veille-grid.search-expanded .veille-search {
+        grid-column: unset;
+        grid-row: unset;
+    }
+    
+    .veille-grid.search-expanded .veille-articles {
+        grid-column: unset;
+        grid-row: unset;
+    }
+    
+    /* Adapter tailles en mobile */
+    .feature-teaser {
+        padding: var(--spacing-sm);
+    }
+    
+    .feature-item {
+        padding: var(--spacing-xs);
+        margin-bottom: var(--spacing-xs);
+    }
+    
+    .feature-item-icon {
+        font-size: 20px;
+    }
+    
+    .feature-item-title {
+        font-size: var(--font-size-sm);
+    }
+    
+    .feature-item-desc {
+        font-size: var(--font-size-xs);
     }
 }
