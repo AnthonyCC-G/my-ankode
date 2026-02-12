@@ -20,10 +20,15 @@
     {# ===== BLOC 1 : RECHERCHE (Ligne 1, Colonne 1) ===== #}
     <div class="veille-search">
         <div class="search-header">
-            <h3 class="block-title">Recherche</h3>
-            <div id="search-feedback" class="search-feedback"></div>
+            <button id="search-toggle" class="search-header-toggle">
+                <h3 class="block-title">Recherche</h3>
+                <svg class="accordion-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
         </div>
         
+        {# Contenu principal (toujours visible) #}
         <div class="search-controls">
             <div class="search-input-group">
                 <input 
@@ -44,14 +49,20 @@
                 </button>
             </div>
             
-            {# Boutons de tri #}
+            {# Select source + Boutons statut/date #}
             <div class="filter-buttons">
-                <button class="filter-btn" data-filter-type="source" data-current-state="all">
-                    Tous
-                </button>
+                {# Select pour les sources #}
+                <select id="source-filter" class="filter-select">
+                    <option value="all">Toutes les sources</option>
+                    {# Peuplé dynamiquement par JS #}
+                </select>
+                
+                {# Bouton statut (lu/non lu) #}
                 <button class="filter-btn" data-filter-type="status" data-current-state="all">
                     Tous
                 </button>
+                
+                {# Bouton date (récent/ancien) #}
                 <button class="filter-btn active" data-filter-type="date" data-current-state="desc">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -59,10 +70,52 @@
                     Récents
                 </button>
             </div>
-            
+        </div>
+        
+        {# Zone extensible "Features à venir" #}
+        <div id="search-accordion" class="search-accordion">
+            <div class="feature-teaser">
+                <h4 class="feature-teaser-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    Prochainement
+                </h4>
+                
+                <div class="feature-item">
+                    <div class="feature-item-icon">📡</div>
+                    <div class="feature-item-content">
+                        <div class="feature-item-title">Flux RSS personnalisés</div>
+                        <div class="feature-item-desc">
+                            Ajoutez vos propres sources de veille technique et créez votre collection personnalisée
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-item-icon">🏷️</div>
+                    <div class="feature-item-content">
+                        <div class="feature-item-title">Recherches favorites</div>
+                        <div class="feature-item-desc">
+                            Créez des tags cliquables pour accéder instantanément à vos thèmes récurrents
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-item-icon">💾</div>
+                    <div class="feature-item-content">
+                        <div class="feature-item-title">Filtres sauvegardés</div>
+                        <div class="feature-item-desc">
+                            Enregistrez vos configurations de filtres pour un accès rapide
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         
     </div>
+
     
     {# ===== BLOC 2 : FAVORIS (Ligne 1, Colonne 2) ===== #}
     <div class="veille-favorites">
@@ -100,8 +153,26 @@
     {# ===== BLOC 3 : ARTICLES (Ligne 2, Colonne 1) ===== #}
     <div class="veille-articles">
         <div class="articles-header">
-            <h3 id="articles-title" class="block-title">Tous les articles</h3>
-            <p class="articles-counter">Voici les premiers articles</p>
+            <h3 class="block-title">
+                <span id="articles-title">Tous les articles</span>
+                <span id="articles-count" class="articles-count"></span>
+            </h3>
+            {# Pagination compacte (Desktop) #}
+            <div id="pagination-container" class="pagination-container" style="display: none;">
+                <button id="pagination-prev" class="pagination-btn pagination-btn--small" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                
+                <span id="pagination-info" class="pagination-info">Page 1 / 1</span>
+                
+                <button id="pagination-next" class="pagination-btn pagination-btn--small" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
         </div>
     
         {# ===== TABS MOBILE UNIQUEMENT (cachés en desktop) ===== #}

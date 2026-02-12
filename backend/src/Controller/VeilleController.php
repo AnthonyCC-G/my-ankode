@@ -38,20 +38,35 @@ class VeilleController extends AbstractController
         $limit = 20;
         $offset = ($page - 1) * $limit;
 
+        // NOUVEAU : Filtre par source
+        $source = $request->query->get('source', null);
+
         $user = $this->getUser();
         $userId = (string) $user->getId();
         
         $qb = $dm->createQueryBuilder(Article::class)
-            ->field('userId')->equals(null)
-            ->sort('publishedAt', 'DESC')
+            ->field('userId')->equals(null);
+        
+        // Appliquer le filtre source si présent
+        if ($source && $source !== 'all') {
+            $qb->field('source')->equals($source);
+        }
+        
+        $qb->sort('publishedAt', 'DESC')
             ->limit($limit)
             ->skip($offset);
 
         $articles = $qb->getQuery()->execute()->toArray();
 
-        $totalArticles = $dm->createQueryBuilder(Article::class)
-            ->field('userId')->equals(null) 
-            ->count()
+        // Compter avec le filtre source
+        $countQb = $dm->createQueryBuilder(Article::class)
+            ->field('userId')->equals(null);
+        
+        if ($source && $source !== 'all') {
+            $countQb->field('source')->equals($source);
+        }
+        
+        $totalArticles = $countQb->count()
             ->getQuery()
             ->execute();
 
@@ -68,6 +83,27 @@ class VeilleController extends AbstractController
             ]
         ]);
     }
+
+    /**
+     * API REST - Liste des sources disponibles
+     */
+    #[Route('/api/articles/sources', name: 'api_articles_sources', methods: ['GET'])]
+    public function getSources(DocumentManager $dm): JsonResponse
+    {
+        $sources = $dm->createQueryBuilder(Article::class)
+            ->distinct('source')
+            ->field('userId')->equals(null)
+            ->getQuery()
+            ->execute();  // PAS de ->toArray() ici
+        
+        // Convertir en tableau indexé
+        $sources = is_array($sources) ? $sources : iterator_to_array($sources);
+
+        return $this->json([
+            'sources' => array_values($sources)
+        ]);
+    }
+
 
     /**
      * API REST - Recherche d'articles
