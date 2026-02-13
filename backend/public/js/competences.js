@@ -1,469 +1,632 @@
-// ===== 1. VARIABLES GLOBALES =====
-let competences = []; // Liste de toutes les competences de l'utilisateur
-let isEditMode = false; // Mode edition ou creation
-let editingCompetenceId = null; // ID de la competence en cours d'edition (null = mode creation)
-let currentLevel = 1; // Niveau selectionne (1-5 etoiles)
+// ========================================
+// COMPETENCES PAGE - GESTION COMPLETE
+// MY-ANKODE - Module de gestion des compétences
+// Fonctionnalités : CRUD, affichage détails, calcul auto niveau
+// ========================================
 
-// ===== 2. INITIALISATION AU CHARGEMENT DU DOM =====
-document.addEventListener('DOMContentLoaded', function() {
-    
-    // Charger les competences au demarrage
-    loadCompetences();
-    
-    // Initialiser les evenements globaux
+// =============================================
+// 1️⃣ VARIABLES GLOBALES
+// =============================================
+let competences = [];
+let allProjects = []; // Tous les projets de l'utilisateur
+let allSnippets = []; // Tous les snippets de l'utilisateur
+let selectedCompetenceId = null;
+let currentCompetenceData = null; // Données de la compétence en cours d'édition
+
+// =============================================
+// 2️⃣ ELEMENTS DOM
+// =============================================
+
+// Bloc 3 : Liste cards
+const cardsContainer = document.getElementById('cards-container');
+const emptyState = document.getElementById('empty-state');
+const listCounter = document.getElementById('list-counter');
+
+// Bloc 4 : États
+const detailEmpty = document.getElementById('detail-empty');
+const detailViewRead = document.getElementById('detail-view-read');
+const detailViewEdit = document.getElementById('detail-view-edit');
+
+// Mode LECTURE
+const detailTitleRead = document.getElementById('detail-title-read');
+const detailDescriptionRead = document.getElementById('detail-description-read');
+const detailStarsRead = document.getElementById('detail-stars-read');
+const detailProjectsRead = document.getElementById('detail-projects-read');
+const detailSnippetsRead = document.getElementById('detail-snippets-read');
+const detailExternalProjectsRead = document.getElementById('detail-external-projects-read');
+const detailExternalSnippetsRead = document.getElementById('detail-external-snippets-read');
+const btnEditDetail = document.getElementById('btn-edit-detail');
+const btnDeleteDetail = document.getElementById('btn-delete-detail');
+
+// Mode ÉDITION
+const editTitle = document.getElementById('edit-title');
+const editDescription = document.getElementById('edit-description');
+const editProjectsSelect = document.getElementById('edit-projects-select');
+const editSnippetsSelect = document.getElementById('edit-snippets-select');
+const editExternalProjectsList = document.getElementById('edit-external-projects-list');
+const editExternalSnippetsList = document.getElementById('edit-external-snippets-list');
+const btnAddExternalProject = document.getElementById('btn-add-external-project');
+const btnAddExternalSnippet = document.getElementById('btn-add-external-snippet');
+const btnSaveDetail = document.getElementById('btn-save-detail');
+const btnCancelDetail = document.getElementById('btn-cancel-detail');
+const editProjectsLinkedList = document.getElementById('edit-projects-linked-list');
+const editSnippetsLinkedList = document.getElementById('edit-snippets-linked-list');
+const btnAddProjectLinked = document.getElementById('btn-add-project-linked');
+const btnAddSnippetLinked = document.getElementById('btn-add-snippet-linked');
+
+// Formulaire création (Bloc 2)
+const competenceForm = document.getElementById('competence-form');
+const competenceName = document.getElementById('competence-name');
+const competenceDescription = document.getElementById('competence-description');
+const btnSubmitText = document.getElementById('btn-submit-text');
+
+// Messages flash
+const formFlashMessages = document.getElementById('form-flash-messages');
+const detailFlashMessages = document.getElementById('detail-flash-messages');
+
+// =============================================
+// 3️⃣ INITIALISATION AU CHARGEMENT
+// =============================================
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🚀 [Competences] Initialisation...');
+    initAutoScroll();
+    loadInitialData();
     initEventListeners();
-    
-    // Initialiser les etoiles cliquables
-    initStarsInteraction();
-    
 });
 
-// ===== 3. INITIALISATION DES EVENT LISTENERS =====
-function initEventListeners() {
-    // Formulaire de creation/edition
-    const competenceForm = document.getElementById('competence-form');
-    if (competenceForm) {
-        competenceForm.addEventListener('submit', handleSubmitCompetence);
-    }
+// =============================================
+// 4️⃣ ANIMATION AUTO-SCROLL BLOC INTRO
+// =============================================
+function initAutoScroll() {
+    const introContent = document.querySelector('.bloc-intro .scrollable');
     
-    // Bouton Annuler
-    const btnCancel = document.getElementById('btn-cancel');
-    if (btnCancel) {
-        btnCancel.addEventListener('click', handleCancelForm);
-    }
-    
-    // Bouton "Nouvelle competence" (dans le header Config)
-    const btnNewCompetence = document.getElementById('btn-new-competence');
-    if (btnNewCompetence) {
-        btnNewCompetence.addEventListener('click', () => {
-            resetForm();
-        });
-    }
-    
-}
-
-// ===== 4. INITIALISATION DES ETOILES CLIQUABLES (Niveau 1-5) =====
-function initStarsInteraction() {
-    const starsContainer = document.getElementById('stars-container');
-    
-    if (!starsContainer) {
+    if (!introContent) {
+        console.warn('⚠️ [AutoScroll] Element .bloc-intro .scrollable introuvable');
         return;
     }
     
-    const stars = starsContainer.querySelectorAll('.star');
+    let scrollDirection = 1;
+    let scrollSpeed = 0; // Désactivé par défaut
+    let isScrolling = false;
     
-    stars.forEach((star, index) => {
-        const value = index + 1;
+    function autoScroll() {
+        const maxScroll = introContent.scrollHeight - introContent.clientHeight;
         
-        // Hover : Afficher preview du niveau
-        star.addEventListener('mouseenter', () => {
-            updateStarsDisplay(value, true);
-        });
+        if (maxScroll <= 0 || !isScrolling) {
+            requestAnimationFrame(autoScroll);
+            return;
+        }
         
-        // Clic : Selectionner le niveau
-        star.addEventListener('click', () => {
-            currentLevel = value;
-            document.getElementById('competence-level').value = value;
-            updateStarsDisplay(value, false);
-            updateLevelDescription(value);
-        });
+        introContent.scrollTop += scrollDirection * scrollSpeed;
+        
+        if (introContent.scrollTop >= maxScroll) {
+            scrollDirection = -1;
+        } else if (introContent.scrollTop <= 0) {
+            scrollDirection = 1;
+        }
+        
+        requestAnimationFrame(autoScroll);
+    }
+    
+    autoScroll();
+    console.log('✅ [AutoScroll] Prêt (activé au survol uniquement)');
+    
+    // Activation AU SURVOL uniquement
+    introContent.addEventListener('mouseenter', () => {
+        scrollSpeed = 0.3; // Vitesse réduite
+        isScrolling = true;
+        console.log('▶️ [AutoScroll] Démarré');
     });
     
-    // Mouseleave : Revenir au niveau selectionne
-    starsContainer.addEventListener('mouseleave', () => {
-        updateStarsDisplay(currentLevel, false);
+    introContent.addEventListener('mouseleave', () => {
+        scrollSpeed = 0;
+        isScrolling = false;
+        console.log('⏸️ [AutoScroll] Pausé');
     });
-    
-    // Initialiser au niveau 1 par defaut
-    updateStarsDisplay(1, false);
-    updateLevelDescription(1);
-    
 }
 
-// ===== 5. CHARGEMENT DES COMPETENCES (API GET) =====
-async function loadCompetences() {
+// =============================================
+// 5️⃣ CHARGEMENT INITIAL DES DONNÉES
+// =============================================
+async function loadInitialData() {
+    console.log('📡 [API] Chargement données initiales...');
+    
     try {
+        // Charger en parallèle : compétences + projets + snippets
+        const [competencesData, projectsData, snippetsData] = await Promise.all([
+            API.get('/api/competences'),
+            API.get('/api/projects'),
+            API.get('/api/snippets')
+        ]);
         
-        // Appel API GET /api/competences
-        const data = await API.get('/api/competences');
-        competences = data;
+        competences = competencesData;
+        allProjects = projectsData;
+        allSnippets = snippetsData;
         
+        console.log(`✅ [API] ${competences.length} compétences chargées`);
+        console.log(`✅ [API] ${allProjects.length} projets disponibles`);
+        console.log(`✅ [API] ${allSnippets.length} snippets disponibles`);
         
-        // Afficher les competences dans le DOM
-        displayCompetences();
-        updateCounter();
-        toggleEmptyState();
+        renderCompetenceCards();
         
     } catch (error) {
-        showFlashMessage('Impossible de charger les competences.', 'error');
+        console.error('❌ [API] Erreur chargement:', error);
+        showFlashMessage(formFlashMessages, 'Erreur lors du chargement des données', 'error');
     }
 }
 
-// ===== 6. AFFICHAGE DES COMPETENCES (DOM MANIPULATION) =====
-function displayCompetences() {
-    const container = document.getElementById('competences-cards');
+// =============================================
+// 6️⃣ AFFICHAGE DES CARDS (BLOC 3)
+// =============================================
+function renderCompetenceCards() {
+    console.log(`🎨 [Render] Affichage de ${competences.length} cards`);
     
-    if (!container) {
+    if (competences.length === 0) {
+        emptyState.style.display = 'flex';
+        cardsContainer.innerHTML = '';
+        listCounter.textContent = '0 compétence';
         return;
     }
     
-    // Vider le container
-    container.innerHTML = '';
+    emptyState.style.display = 'none';
+    listCounter.textContent = `${competences.length} compétence${competences.length > 1 ? 's' : ''}`;
     
-    // Creer une card pour chaque competence
-    competences.forEach(competence => {
-        const card = createCompetenceCard(competence);
-        container.appendChild(card);
-    });
-}
-
-function createCompetenceCard(competence) {
-    const card = document.createElement('div');
-    card.className = 'competence-card';
-    card.dataset.id = competence.id;
-    
-    // Si c'est la competence en cours d'edition, ajouter classe "editing"
-    if (editingCompetenceId === competence.id) {
-        card.classList.add('editing');
-    }
-    
-    // Etoiles d'affichage (non cliquables)
-    const starsHtml = generateStarsDisplay(competence.level);
-    
-    // Date formatee
-    const date = new Date(competence.createdAt);
-    const formattedDate = date.toLocaleDateString('fr-FR', { 
-        day: '2-digit', 
-        month: 'short', 
-        year: 'numeric' 
-    });
-    
-    // Construire le HTML de la card
-    card.innerHTML = `
-        <div class="card-header">
-            <h3 class="card-title">${escapeHtml(competence.name)}</h3>
-            <div class="card-stars">${starsHtml}</div>
-        </div>
-        
-        <div class="card-body">
-            ${competence.notes ? `
-                <p class="card-notes">${escapeHtml(competence.notes)}</p>
-            ` : ''}
-            
-            ${competence.projectsLinks || competence.snippetsLinks ? `
-                <div class="card-links">
-                    ${competence.projectsLinks ? `
-                        <div class="card-link-item">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                            </svg>
-                            <span>Projets : ${escapeHtml(competence.projectsLinks)}</span>
-                        </div>
-                    ` : ''}
-                    ${competence.snippetsLinks ? `
-                        <div class="card-link-item">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                            </svg>
-                            <span>Snippets : ${escapeHtml(competence.snippetsLinks)}</span>
-                        </div>
-                    ` : ''}
-                </div>
-            ` : ''}
-        </div>
-        
-        <div class="card-footer">
-            <span class="card-date">Creee le ${formattedDate}</span>
-            <div class="card-actions">
-                <button class="btn-edit" data-id="${competence.id}" title="Editer">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                </button>
-                <button class="btn-delete" data-id="${competence.id}" title="Supprimer">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                </button>
+    cardsContainer.innerHTML = competences.map(comp => `
+        <div class="competence-card" data-id="${comp.id}">
+            <h3 class="card-title">${escapeHtml(comp.name)}</h3>
+            <p class="card-description">${escapeHtml(comp.description || 'Pas de description')}</p>
+            <div class="card-stars">
+                ${renderStars(comp.level)}
+                <span class="card-level">${comp.level}/5</span>
             </div>
         </div>
-    `;
+    `).join('');
     
-    // Attacher les event listeners aux boutons
-    const btnEdit = card.querySelector('.btn-edit');
-    const btnDelete = card.querySelector('.btn-delete');
-    
-    btnEdit.addEventListener('click', (e) => {
-        e.stopPropagation();
-        handleEditCompetence(competence.id);
+    // Event listeners sur les cards
+    document.querySelectorAll('.competence-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const id = parseInt(card.dataset.id);
+            selectCompetence(id);
+        });
     });
     
-    btnDelete.addEventListener('click', (e) => {
-        e.stopPropagation();
-        handleDeleteCompetence(competence.id);
-    });
-    
-    // Clic sur la card complete = edition
-    card.addEventListener('click', () => {
-        handleEditCompetence(competence.id);
-    });
-    
-    return card;
+    console.log('✅ [Render] Cards affichées');
 }
 
-// ===== 7. CREATION D'UNE COMPETENCE (API POST) =====
-async function handleSubmitCompetence(e) {
-    e.preventDefault();
-    
-    
-    // Recuperer les valeurs du formulaire
-    const data = {
-        name: document.getElementById('competence-name').value.trim(),
-        level: parseInt(document.getElementById('competence-level').value),
-        notes: document.getElementById('competence-notes').value.trim() || null,
-        projectsLinks: document.getElementById('competence-projects').value.trim() || null,
-        snippetsLinks: document.getElementById('competence-snippets').value.trim() || null
-    };
-    
-    // Validation basique cote client
-    if (!data.name) {
-        showFlashMessage('Le nom de la competence est requis', 'error');
-        return;
-    }
-    
-    if (data.level < 1 || data.level > 5) {
-        showFlashMessage('Le niveau doit etre entre 1 et 5', 'error');
-        return;
-    }
-    
-    try {
-        const btnSubmit = document.getElementById('btn-submit');
-        const btnSubmitText = document.getElementById('btn-submit-text');
-        
-        btnSubmit.disabled = true;
-        btnSubmitText.textContent = isEditMode ? 'Modification...' : 'Creation...';
-        
-        if (isEditMode && editingCompetenceId) {
-            // Mode EDITION : PUT
-            await API.put(`/api/competences/${editingCompetenceId}`, data);
-            showFlashMessage('Competence modifiee avec succes', 'success');
-        } else {
-            // Mode CREATION : POST
-            await API.post('/api/competences', data);
-            showFlashMessage('Competence creee avec succes', 'success');
-        }
-        
-        // Recharger les competences
-        await loadCompetences();
-        
-        // Reinitialiser le formulaire
-        resetForm();
-        
-    } catch (error) {
-        showFlashMessage('Erreur lors de la sauvegarde : ' + error.message, 'error');
-    } finally {
-        const btnSubmit = document.getElementById('btn-submit');
-        const btnSubmitText = document.getElementById('btn-submit-text');
-        
-        btnSubmit.disabled = false;
-        btnSubmitText.textContent = isEditMode ? 'Modifier la competence' : 'Creer la competence';
-    }
-}
-
-// ===== 8. EDITION D'UNE COMPETENCE (Remplir le formulaire) =====
-function handleEditCompetence(id) {
-    const competence = competences.find(c => c.id === id);
-    
-    if (!competence) {
-        return;
-    }
-    
-    
-    // Passer en mode edition
-    isEditMode = true;
-    editingCompetenceId = id;
-    
-    // Remplir le formulaire avec les donnees de la competence
-    document.getElementById('competence-id').value = competence.id;
-    document.getElementById('competence-name').value = competence.name;
-    document.getElementById('competence-level').value = competence.level;
-    document.getElementById('competence-notes').value = competence.notes || '';
-    document.getElementById('competence-projects').value = competence.projectsLinks || '';
-    document.getElementById('competence-snippets').value = competence.snippetsLinks || '';
-    
-    // Mettre a jour les etoiles
-    currentLevel = competence.level;
-    updateStarsDisplay(currentLevel, false);
-    updateLevelDescription(currentLevel);
-    
-    // Changer le texte du bouton submit
-    document.getElementById('btn-submit-text').textContent = 'Modifier la competence';
-    
-    // Re-render pour afficher classe "editing" sur la card
-    displayCompetences();
-    
-    // Scroll vers le formulaire
-    document.getElementById('competence-form').scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'start' 
-    });
-}
-
-// ===== 9. SUPPRESSION D'UNE COMPETENCE (API DELETE) =====
-async function handleDeleteCompetence(id) {
-    const competence = competences.find(c => c.id === id);
-    
-    if (!competence) {
-        return;
-    }
-    
-    // Confirmation utilisateur
-    const confirmed = confirm(
-        `Etes-vous sur de vouloir supprimer la competence "${competence.name}" ?\n\nCette action est irreversible.`
-    );
-    
-    if (!confirmed) {
-        return;
-    }
-    
-    try {
-        
-        // Appel API DELETE
-        await API.delete(`/api/competences/${id}`);
-        
-        showFlashMessage('Competence supprimee avec succes', 'success');
-        
-        // Si on etait en train d'editer cette competence, reinitialiser le formulaire
-        if (editingCompetenceId === id) {
-            resetForm();
-        }
-        
-        // Recharger les competences
-        await loadCompetences();
-        
-    } catch (error) {
-        showFlashMessage('Erreur lors de la suppression : ' + error.message, 'error');
-    }
-}
-
-// ===== 10. REINITIALISATION DU FORMULAIRE =====
-function resetForm() {
-    
-    // Reinitialiser les variables d'etat
-    isEditMode = false;
-    editingCompetenceId = null;
-    currentLevel = 1;
-    
-    // Vider le formulaire
-    document.getElementById('competence-form').reset();
-    document.getElementById('competence-id').value = '';
-    document.getElementById('competence-level').value = 1;
-    
-    // Reinitialiser les etoiles au niveau 1
-    updateStarsDisplay(1, false);
-    updateLevelDescription(1);
-    
-    // Changer le texte du bouton submit
-    document.getElementById('btn-submit-text').textContent = 'Creer la competence';
-    
-    // Re-render pour retirer classe "editing" des cards
-    displayCompetences();
-}
-
-function handleCancelForm() {
-    resetForm();
-}
-
-// ===== 11. HELPERS - GESTION DES ETOILES =====
-function updateStarsDisplay(level, isHover) {
-    const stars = document.querySelectorAll('#stars-container .star');
-    
-    stars.forEach((star, index) => {
-        const value = index + 1;
-        
-        // Retirer toutes les classes
-        star.classList.remove('active', 'hover');
-        
-        // Ajouter la classe appropriee
-        if (value <= level) {
-            star.classList.add(isHover ? 'hover' : 'active');
-        }
-    });
-}
-
-function updateLevelDescription(level) {
-    const descriptions = {
-        1: 'Niveau 1/5 - Debutant (notions de base)',
-        2: 'Niveau 2/5 - Intermediaire (peut realiser des taches simples)',
-        3: 'Niveau 3/5 - Competent (autonome sur les taches courantes)',
-        4: 'Niveau 4/5 - Avance (maitrise approfondie)',
-        5: 'Niveau 5/5 - Expert (reference sur le sujet)'
-    };
-    
-    const descElement = document.getElementById('level-description');
-    if (descElement) {
-        descElement.textContent = descriptions[level];
-    }
-}
-
-function generateStarsDisplay(level) {
+// =============================================
+// 7️⃣ AFFICHAGE DES ÉTOILES
+// =============================================
+function renderStars(level) {
     let stars = '';
     for (let i = 1; i <= 5; i++) {
-        stars += i <= level ? '★' : '☆';
+        if (i <= level) {
+            stars += '<svg class="star-filled" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+        } else {
+            stars += '<svg class="star-empty" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+        }
     }
     return stars;
 }
 
-// ===== 12. HELPERS - GESTION DE L'INTERFACE =====
-function updateCounter() {
-    const counter = document.getElementById('list-counter');
-    if (!counter) return;
+// =============================================
+// 8️⃣ SÉLECTION COMPÉTENCE → MODE LECTURE
+// =============================================
+function selectCompetence(id) {
+    console.log(`👆 [Selection] Compétence ID ${id}`);
     
-    const count = competences.length;
-    counter.textContent = `${count} competence${count > 1 ? 's' : ''}`;
-}
-
-function toggleEmptyState() {
-    const emptyState = document.getElementById('empty-state');
-    const cardsContainer = document.getElementById('competences-cards');
+    selectedCompetenceId = id;
+    const competence = competences.find(c => c.id === id);
     
-    if (!emptyState || !cardsContainer) return;
-    
-    if (competences.length === 0) {
-        emptyState.style.display = 'flex';
-        cardsContainer.style.display = 'none';
-    } else {
-        emptyState.style.display = 'none';
-        cardsContainer.style.display = 'flex';
-    }
-}
-
-function showFlashMessage(message, type = 'success') {
-    const container = document.getElementById('list-flash-messages');
-    
-    if (!container) {
+    if (!competence) {
+        console.error(`❌ [Selection] Compétence ${id} introuvable`);
         return;
     }
     
-    // Effacer le message precedent
-    container.innerHTML = '';
+    currentCompetenceData = { ...competence }; // Clone pour l'édition
     
-    // Creer le nouveau message (span simple)
-    const flash = document.createElement('span');
-    flash.className = `flash-${type}`; // flash-success ou flash-error
-    flash.textContent = message;
+    // Active visuellement la card
+    document.querySelectorAll('.competence-card').forEach(card => {
+        card.classList.remove('active');
+    });
+    document.querySelector(`[data-id="${id}"]`)?.classList.add('active');
     
-    container.appendChild(flash);
+    // Affiche le mode LECTURE
+    showReadMode(competence);
+}
+
+// =============================================
+// 9️⃣ AFFICHAGE MODE LECTURE
+// =============================================
+function showReadMode(competence) {
+    console.log('📖 [Mode] Passage en mode LECTURE');
     
-    // Suppression automatique apres 5 secondes
+    // Masquer autres vues
+    detailEmpty.style.display = 'none';
+    detailViewEdit.style.display = 'none';
+    detailViewRead.style.display = 'block';
+    
+    // Remplir les champs
+    detailTitleRead.textContent = competence.name;
+    detailDescriptionRead.textContent = competence.description || 'Pas de description';
+    detailStarsRead.innerHTML = `${renderStars(competence.level)} <span class="detail-level">${competence.level}/5</span>`;
+    
+    // Projets MY-ANKODE
+    if (competence.projects && competence.projects.length > 0) {
+        detailProjectsRead.innerHTML = `
+            <div class="linked-items-list">
+                ${competence.projects.map(p => `
+                    <div class="linked-item">
+                        <div class="linked-item-title">${escapeHtml(p.name)}</div>
+                        <div class="linked-item-meta">+1 étoile</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    } else {
+        detailProjectsRead.innerHTML = '<p>Aucun projet lié</p>';
+    }
+    
+    // Snippets MY-ANKODE
+    if (competence.snippets && competence.snippets.length > 0) {
+        detailSnippetsRead.innerHTML = `
+            <div class="linked-items-list">
+                ${competence.snippets.map(s => `
+                    <div class="linked-item">
+                        <div class="linked-item-title">${escapeHtml(s.title)}</div>
+                        <div class="linked-item-meta">+0.5 étoile</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    } else {
+        detailSnippetsRead.innerHTML = '<p>Aucun snippet lié</p>';
+    }
+    
+    // Projets externes
+    const externalProjects = parseExternalItems(competence.externalProjects);
+    if (externalProjects.length > 0) {
+        detailExternalProjectsRead.innerHTML = `
+            <ul class="linked-items-list">
+                ${externalProjects.map(p => `<li class="linked-item"><div class="linked-item-title">${escapeHtml(p)}</div><div class="linked-item-meta">+1 étoile</div></li>`).join('')}
+            </ul>
+        `;
+    } else {
+        detailExternalProjectsRead.innerHTML = '<p>Aucun projet externe</p>';
+    }
+    
+    // Snippets externes
+    const externalSnippets = parseExternalItems(competence.externalSnippets);
+    if (externalSnippets.length > 0) {
+        detailExternalSnippetsRead.innerHTML = `
+            <ul class="linked-items-list">
+                ${externalSnippets.map(s => `<li class="linked-item"><div class="linked-item-title">${escapeHtml(s)}</div><div class="linked-item-meta">+0.5 étoile</div></li>`).join('')}
+            </ul>
+        `;
+    } else {
+        detailExternalSnippetsRead.innerHTML = '<p>Aucun snippet externe</p>';
+    }
+    
+    console.log('✅ [Mode] Mode LECTURE affiché');
+}
+
+// =============================================
+// 🔟 PASSAGE EN MODE ÉDITION
+// =============================================
+function showEditMode() {
+    console.log('✏️ [Mode] Passage en mode ÉDITION');
+    
+    if (!currentCompetenceData) {
+        console.error('❌ [Edit] Aucune compétence sélectionnée');
+        return;
+    }
+    
+    // Masquer autres vues
+    detailViewRead.style.display = 'none';
+    detailViewEdit.style.display = 'block';
+    
+    // Remplir les champs
+    editTitle.value = currentCompetenceData.name;
+    editDescription.value = currentCompetenceData.description || '';
+    
+    // Charger les selects projets/snippets
+    populateProjectsSelect();
+    populateSnippetsSelect();
+    
+    // Charger les listes externes
+    populateExternalList(editExternalProjectsList, currentCompetenceData.externalProjects);
+    populateExternalList(editExternalSnippetsList, currentCompetenceData.externalSnippets);
+    
+    console.log('✅ [Mode] Mode ÉDITION affiché');
+}
+
+// =============================================
+// 1️⃣1️⃣ REMPLIR SELECT PROJETS
+// =============================================
+function populateProjectsSelect() {
+    const linkedProjectIds = (currentCompetenceData.projects || []).map(p => p.id);
+    
+    // Filtrer les projets NON liés
+    const availableProjects = allProjects.filter(p => !linkedProjectIds.includes(p.id));
+    
+    if (availableProjects.length === 0) {
+        editProjectsSelect.innerHTML = '<option value="">Tous les projets sont déjà liés</option>';
+        btnAddProjectLinked.disabled = true;
+    } else {
+        editProjectsSelect.innerHTML = '<option value="">Sélectionner un projet...</option>' +
+            availableProjects.map(project => 
+                `<option value="${project.id}">${escapeHtml(project.name)}</option>`
+            ).join('');
+        btnAddProjectLinked.disabled = false;
+    }
+    
+    // Remplir la liste des projets déjà liés
+    editProjectsLinkedList.innerHTML = (currentCompetenceData.projects || []).map(project => 
+        createLinkedItem(project.id, project.name, '+1 étoile', 'project')
+    ).join('');
+    
+    // Event listeners sur boutons supprimer
+    editProjectsLinkedList.querySelectorAll('.btn-remove-linked').forEach(btn => {
+        btn.addEventListener('click', () => removeLinkedItem('project', btn.dataset.id));
+    });
+    
+    console.log(`📋 [Select] ${availableProjects.length} projets disponibles`);
+}
+
+// =============================================
+// 1️⃣2️⃣ REMPLIR SELECT SNIPPETS
+// =============================================
+function populateSnippetsSelect() {
+    const linkedSnippetIds = currentCompetenceData.snippetsIds || [];
+    
+    // Filtrer les snippets NON liés
+    const availableSnippets = allSnippets.filter(s => !linkedSnippetIds.includes(s.id));
+    
+    if (availableSnippets.length === 0) {
+        editSnippetsSelect.innerHTML = '<option value="">Tous les snippets sont déjà liés</option>';
+        btnAddSnippetLinked.disabled = true;
+    } else {
+        editSnippetsSelect.innerHTML = '<option value="">Sélectionner un snippet...</option>' +
+            availableSnippets.map(snippet => 
+                `<option value="${snippet.id}">${escapeHtml(snippet.title)}</option>`
+            ).join('');
+        btnAddSnippetLinked.disabled = false;
+    }
+    
+    // Remplir la liste des snippets déjà liés
+    const linkedSnippets = allSnippets.filter(s => linkedSnippetIds.includes(s.id));
+    editSnippetsLinkedList.innerHTML = linkedSnippets.map(snippet => 
+        createLinkedItem(snippet.id, snippet.title, '+0.5 étoile', 'snippet')
+    ).join('');
+    
+    // Event listeners sur boutons supprimer
+    editSnippetsLinkedList.querySelectorAll('.btn-remove-linked').forEach(btn => {
+        btn.addEventListener('click', () => removeLinkedItem('snippet', btn.dataset.id));
+    });
+    
+    console.log(`📋 [Select] ${availableSnippets.length} snippets disponibles`);
+}
+
+// =============================================
+// 1️⃣3️⃣ CRÉER UN <LI> POUR ITEM LIÉ (projet/snippet MY-ANKODE)
+// =============================================
+function createLinkedItem(id, name, bonus, type) {
+    return `
+        <li>
+            <div class="linked-item-info">
+                <div class="linked-item-name">${escapeHtml(name)}</div>
+                <div class="linked-item-bonus">${bonus}</div>
+            </div>
+            <button type="button" class="btn-remove-linked" data-id="${id}" data-type="${type}" title="Retirer">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </li>
+    `;
+}
+
+// =============================================
+// 1️⃣4️⃣ AJOUTER UN PROJET LIÉ
+// =============================================
+function addLinkedProject() {
+    const selectedId = parseInt(editProjectsSelect.value);
+    
+    if (!selectedId) {
+        console.warn('⚠️ [Add] Aucun projet sélectionné');
+        return;
+    }
+    
+    const project = allProjects.find(p => p.id === selectedId);
+    if (!project) {
+        console.error('❌ [Add] Projet introuvable');
+        return;
+    }
+    
+    // Ajouter aux données courantes
+    if (!currentCompetenceData.projects) {
+        currentCompetenceData.projects = [];
+    }
+    currentCompetenceData.projects.push(project);
+    
+    // Rafraîchir l'affichage
+    populateProjectsSelect();
+    
+    console.log(`✅ [Add] Projet "${project.name}" ajouté`);
+}
+
+// =============================================
+// 1️⃣5️⃣ AJOUTER UN SNIPPET LIÉ
+// =============================================
+function addLinkedSnippet() {
+    const selectedId = editSnippetsSelect.value;
+    
+    if (!selectedId) {
+        console.warn('⚠️ [Add] Aucun snippet sélectionné');
+        return;
+    }
+    
+    const snippet = allSnippets.find(s => s.id === selectedId);
+    if (!snippet) {
+        console.error('❌ [Add] Snippet introuvable');
+        return;
+    }
+    
+    // Ajouter aux données courantes
+    if (!currentCompetenceData.snippetsIds) {
+        currentCompetenceData.snippetsIds = [];
+    }
+    currentCompetenceData.snippetsIds.push(snippet.id);
+    
+    // Rafraîchir l'affichage
+    populateSnippetsSelect();
+    
+    console.log(`✅ [Add] Snippet "${snippet.title}" ajouté`);
+}
+
+// =============================================
+// 1️⃣6️⃣ RETIRER UN ITEM LIÉ (projet ou snippet)
+// =============================================
+function removeLinkedItem(type, id) {
+    console.log(`🗑️ [Remove] Retrait ${type} ID ${id}`);
+    
+    if (type === 'project') {
+        const projectId = parseInt(id);
+        currentCompetenceData.projects = (currentCompetenceData.projects || []).filter(p => p.id !== projectId);
+        populateProjectsSelect();
+    } else if (type === 'snippet') {
+        currentCompetenceData.snippetsIds = (currentCompetenceData.snippetsIds || []).filter(sid => sid !== id);
+        populateSnippetsSelect();
+    }
+    
+    console.log(`✅ [Remove] ${type} retiré`);
+}
+
+// =============================================
+// 1️⃣7️⃣ REMPLIR LISTES EXTERNES
+// =============================================
+function populateExternalList(listElement, itemsString) {
+    const items = parseExternalItems(itemsString);
+    
+    listElement.innerHTML = items.map(item => createExternalListItem(item)).join('');
+    
+    // Event listeners sur boutons supprimer
+    listElement.querySelectorAll('.btn-remove-item').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.target.closest('li').remove();
+        });
+    });
+}
+
+// =============================================
+// 1️⃣8️⃣ CRÉER UN <LI> POUR LISTE EXTERNE
+// =============================================
+function createExternalListItem(value = '') {
+    const randomId = 'item-' + Math.random().toString(36).substr(2, 9);
+    return `
+        <li>
+            <input type="text" value="${escapeHtml(value)}" placeholder="Nom du projet/snippet..." maxlength="200" data-id="${randomId}">
+            <button type="button" class="btn-remove-item" title="Supprimer">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </li>
+    `;
+}
+
+// =============================================
+// 1️⃣9️⃣ CRÉER UNE NOUVELLE COMPÉTENCE (BLOC 2)
+// =============================================
+async function createCompetence(e) {
+    e.preventDefault();
+    console.log('➕ [Create] Création compétence...');
+    
+    const data = {
+        name: competenceName.value.trim(),
+        description: competenceDescription.value.trim() || null
+    };
+    
+    if (!data.name) {
+        showFlashMessage(formFlashMessages, 'Le titre est obligatoire', 'error');
+        return;
+    }
+    
+    try {
+        const result = await API.post('/api/competences', data);
+        showFlashMessage(formFlashMessages, result.message || 'Compétence créée !', 'success');
+        
+        // Reset formulaire
+        competenceForm.reset();
+        
+        // Recharger la liste
+        await loadInitialData();
+        
+        console.log('✅ [Create] Compétence créée');
+        
+    } catch (error) {
+        console.error('❌ [Create] Erreur:', error);
+        showFlashMessage(formFlashMessages, error.message || 'Erreur lors de la création', 'error');
+    }
+}
+
+// =============================================
+// 2️⃣0️⃣ EVENT LISTENERS
+// =============================================
+function initEventListeners() {
+    // Formulaire création (Bloc 2)
+    competenceForm.addEventListener('submit', createCompetence);
+    
+    // Mode LECTURE → ÉDITION
+    btnEditDetail.addEventListener('click', showEditMode);
+    
+    // Mode ÉDITION → Actions
+    btnSaveDetail.addEventListener('click', saveCompetence);
+    btnCancelDetail.addEventListener('click', cancelEdit);
+    
+    // Ajout lignes externes
+    btnAddExternalProject.addEventListener('click', () => addExternalItem(editExternalProjectsList));
+    btnAddExternalSnippet.addEventListener('click', () => addExternalItem(editExternalSnippetsList));
+    
+    // Suppression
+    btnDeleteDetail.addEventListener('click', deleteCompetence);
+    
+    console.log('✅ [Events] Listeners initialisés');
+}
+
+// =============================================
+// 2️⃣1️⃣ UTILITAIRES
+// =============================================
+
+// Parser les items externes (texte → array)
+function parseExternalItems(text) {
+    if (!text || text.trim() === '') return [];
+    return text.split('\n').map(line => line.trim()).filter(line => line !== '');
+}
+
+// Collecter les items externes (DOM → texte)
+function collectExternalItems(listElement) {
+    const items = [];
+    listElement.querySelectorAll('input[type="text"]').forEach(input => {
+        const value = input.value.trim();
+        if (value) items.push(value);
+    });
+    return items.join('\n');
+}
+
+// Messages flash
+function showFlashMessage(container, message, type) {
+    container.innerHTML = `<div class="flash-message flash-${type}">${escapeHtml(message)}</div>`;
     setTimeout(() => {
-        flash.remove();
+        container.innerHTML = '';
     }, 5000);
 }
 
+// Échapper HTML
 function escapeHtml(text) {
     if (!text) return '';
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
 }
+
+console.log('✅ [Competences] Module chargé');

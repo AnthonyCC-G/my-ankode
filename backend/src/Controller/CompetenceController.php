@@ -2,8 +2,12 @@
 
 namespace App\Controller;
 
+use App\Document\Snippet;
 use App\Entity\Competence;
+use App\Entity\Project;
 use App\Repository\CompetenceRepository;
+use App\Repository\ProjectRepository;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -22,12 +26,13 @@ class CompetenceController extends AbstractController
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private CompetenceRepository $competenceRepository
+        private CompetenceRepository $competenceRepository,
+        private ProjectRepository $projectRepository,
+        private DocumentManager $dm
     ) {}
 
     /**
-     * Route 1 : Recuperer toutes les competences de l'utilisateur
-     * GET /api/competences
+     * GET /api/competences - Liste des competences
      */
     #[Route('', name: 'api_competences_list', methods: ['GET'])]
     public function list(): JsonResponse
@@ -35,27 +40,18 @@ class CompetenceController extends AbstractController
         $owner = $this->getUser();
         $competences = $this->competenceRepository->findBy(
             ['owner' => $owner],
-            ['createdAt' => 'DESC'] // Tri par date (plus recent en premier)
-        ); 
+            ['createdAt' => 'DESC']
+        );
 
         $data = array_map(function(Competence $competence) {
-            return [
-                'id' => $competence->getId(),
-                'name' => $competence->getName(),
-                'level' => $competence->getLevel(),
-                'notes' => $competence->getNotes(),
-                'projectsLinks' => $competence->getProjectsLinks(),
-                'snippetsLinks' => $competence->getSnippetsLinks(),
-                'createdAt' => $competence->getCreatedAt()->format('Y-m-d H:i:s'),
-            ];
+            return $this->serializeCompetence($competence);
         }, $competences);
 
         return $this->json($data);
     }
 
     /**
-     * Route 2 : Recuperer une competence specifique
-     * GET /api/competences/{id}
+     * GET /api/competences/{id} - Détail d'une competence
      */
     #[Route('/{id}', name: 'api_competences_show', methods: ['GET'])]
     public function show(int $id): JsonResponse
@@ -70,40 +66,29 @@ class CompetenceController extends AbstractController
             return $this->json(['error' => 'Acces interdit'], Response::HTTP_FORBIDDEN);
         }
 
-        return $this->json([
-            'id' => $competence->getId(),
-            'name' => $competence->getName(),
-            'level' => $competence->getLevel(),
-            'notes' => $competence->getNotes(),
-            'projectsLinks' => $competence->getProjectsLinks(),
-            'snippetsLinks' => $competence->getSnippetsLinks(),
-            'createdAt' => $competence->getCreatedAt()->format('Y-m-d H:i:s'),
-        ]);
+        return $this->json($this->serializeCompetence($competence));
     }
 
     /**
-     * Route 3 : Creer une nouvelle competence
-     * POST /api/competences
-     * Protection CSRF
+     * POST /api/competences - Créer une competence
      */
     #[Route('', name: 'api_competences_create', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
-        // Validation
-        $errors = $this->validateCompetenceData($data);
-        if (!empty($errors)) {
-            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+        // Validation basique
+        if (empty($data['name'])) {
+            return $this->json(['error' => 'Le nom est requis'], Response::HTTP_BAD_REQUEST);
         }
 
         $competence = new Competence();
         $competence->setName($data['name']);
-        $competence->setLevel($data['level']);
-        $competence->setNotes($data['notes'] ?? null);
-        $competence->setProjectsLinks($data['projectsLinks'] ?? null);
-        $competence->setSnippetsLinks($data['snippetsLinks'] ?? null);
+        $competence->setDescription($data['description'] ?? null);
         $competence->setOwner($this->getUser());
+
+        // Calcul automatique du niveau (pour l'instant 0, sera mis à jour via édition)
+        $competence->calculateLevel();
 
         $this->entityManager->persist($competence);
         $this->entityManager->flush();
@@ -111,22 +96,12 @@ class CompetenceController extends AbstractController
         return $this->json([
             'success' => true,
             'message' => 'Competence creee avec succes',
-            'competence' => [
-                'id' => $competence->getId(),
-                'name' => $competence->getName(),
-                'level' => $competence->getLevel(),
-                'notes' => $competence->getNotes(),
-                'projectsLinks' => $competence->getProjectsLinks(),
-                'snippetsLinks' => $competence->getSnippetsLinks(),
-                'createdAt' => $competence->getCreatedAt()->format('Y-m-d H:i:s'),
-            ]
+            'competence' => $this->serializeCompetence($competence)
         ], Response::HTTP_CREATED);
     }
 
     /**
-     * Route 4 : Modifier une competence complete
-     * PUT /api/competences/{id}
-     * Protection CSRF
+     * PUT /api/competences/{id} - Modifier une competence
      */
     #[Route('/{id}', name: 'api_competences_update', methods: ['PUT'])]
     public function update(int $id, Request $request): JsonResponse
@@ -143,46 +118,62 @@ class CompetenceController extends AbstractController
 
         $data = json_decode($request->getContent(), true);
 
-        // Validation
-        $errors = $this->validateCompetenceData($data);
-        if (!empty($errors)) {
-            return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+        // Mise à jour des champs
+        if (isset($data['name'])) {
+            $competence->setName($data['name']);
         }
 
-        // Mise a jour des champs
-        $competence->setName($data['name']);
-        $competence->setLevel($data['level']);
-        $competence->setNotes($data['notes'] ?? null);
-        $competence->setProjectsLinks($data['projectsLinks'] ?? null);
-        $competence->setSnippetsLinks($data['snippetsLinks'] ?? null);
+        if (isset($data['description'])) {
+            $competence->setDescription($data['description']);
+        }
+
+        if (isset($data['projectIds'])) {
+            // Vider les projets actuels
+            foreach ($competence->getProjects() as $project) {
+                $competence->removeProject($project);
+            }
+            
+            // Ajouter les nouveaux projets
+            foreach ($data['projectIds'] as $projectId) {
+                $project = $this->projectRepository->find($projectId);
+                if ($project && $project->getOwner() === $this->getUser()) {
+                    $competence->addProject($project);
+                }
+            }
+        }
+
+        if (isset($data['snippetsIds'])) {
+            $competence->setSnippetsIds($data['snippetsIds']);
+        }
+
+        if (isset($data['externalProjects'])) {
+            $competence->setExternalProjects($data['externalProjects']);
+        }
+
+        if (isset($data['externalSnippets'])) {
+            $competence->setExternalSnippets($data['externalSnippets']);
+        }
+
+        // Recalculer le niveau automatiquement
+        $competence->calculateLevel();
 
         $this->entityManager->flush();
 
         return $this->json([
             'success' => true,
             'message' => 'Competence modifiee avec succes',
-            'competence' => [
-                'id' => $competence->getId(),
-                'name' => $competence->getName(),
-                'level' => $competence->getLevel(),
-                'notes' => $competence->getNotes(),
-                'projectsLinks' => $competence->getProjectsLinks(),
-                'snippetsLinks' => $competence->getSnippetsLinks(),
-            ]
+            'competence' => $this->serializeCompetence($competence)
         ]);
     }
 
     /**
-     * Route 5 : Supprimer une competence
-     * DELETE /api/competences/{id}
-     * Protection CSRF
+     * DELETE /api/competences/{id} - Supprimer une competence
      */
     #[Route('/{id}', name: 'api_competences_delete', methods: ['DELETE'])]
     public function delete(int $id): JsonResponse
     {
         $competence = $this->competenceRepository->find($id);
 
-        // Verifier AVANT d'acceder a getOwner()
         if (!$competence) {
             return $this->json(['error' => 'Competence non trouvee'], Response::HTTP_NOT_FOUND);
         }
@@ -201,41 +192,42 @@ class CompetenceController extends AbstractController
     }
 
     /**
-     * Validation des donnees de competence
+     * Sérialise une competence en tableau
      */
-    private function validateCompetenceData(array $data): array
+    private function serializeCompetence(Competence $competence): array
     {
-        $errors = [];
-
-        // Validation name
-        if (empty($data['name'])) {
-            $errors['name'] = 'Le nom est requis';
-        } elseif (strlen($data['name']) > 100) {
-            $errors['name'] = 'Le nom ne peut pas depasser 100 caracteres';
+        // Projets liés (PostgreSQL)
+        $projects = [];
+        foreach ($competence->getProjects() as $project) {
+            $projects[] = [
+                'id' => $project->getId(),
+                'name' => $project->getName()
+            ];
         }
 
-        // Validation level
-        if (!isset($data['level'])) {
-            $errors['level'] = 'Le niveau est requis';
-        } elseif (!is_numeric($data['level']) || $data['level'] < 1 || $data['level'] > 5) {
-            $errors['level'] = 'Le niveau doit etre un nombre entre 1 et 5';
+        // Snippets liés (MongoDB) - récupérer les détails
+        $snippets = [];
+        foreach ($competence->getSnippetsIds() ?? [] as $snippetId) {
+            $snippet = $this->dm->getRepository(Snippet::class)->find($snippetId);
+            if ($snippet) {
+                $snippets[] = [
+                    'id' => $snippet->getId(),
+                    'title' => $snippet->getTitle()
+                ];
+            }
         }
 
-        // Validation notes (limite de longueur)
-        if (isset($data['notes']) && $data['notes'] !== null && strlen($data['notes']) > 1000) {
-            $errors['notes'] = 'Les notes ne peuvent pas depasser 1000 caracteres';
-        }
-
-        // Validation projectsLinks (text simple)
-        if (isset($data['projectsLinks']) && $data['projectsLinks'] !== null && strlen($data['projectsLinks']) > 500) {
-            $errors['projectsLinks'] = 'Les liens projets ne peuvent pas depasser 500 caracteres';
-        }
-
-        // Validation snippetsLinks (text simple)
-        if (isset($data['snippetsLinks']) && $data['snippetsLinks'] !== null && strlen($data['snippetsLinks']) > 500) {
-            $errors['snippetsLinks'] = 'Les liens snippets ne peuvent pas depasser 500 caracteres';
-        }
-
-        return $errors;
+        return [
+            'id' => $competence->getId(),
+            'name' => $competence->getName(),
+            'description' => $competence->getDescription(),
+            'level' => $competence->getLevel(),
+            'projects' => $projects,
+            'snippetsIds' => $competence->getSnippetsIds() ?? [],
+            'snippets' => $snippets,
+            'externalProjects' => $competence->getExternalProjects(),
+            'externalSnippets' => $competence->getExternalSnippets(),
+            'createdAt' => $competence->getCreatedAt()->format('Y-m-d H:i:s'),
+        ];
     }
 }
