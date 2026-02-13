@@ -8,10 +8,10 @@
 // 1️⃣ VARIABLES GLOBALES
 // =============================================
 let competences = [];
-let allProjects = []; // Tous les projets de l'utilisateur
-let allSnippets = []; // Tous les snippets de l'utilisateur
+let allProjects = [];
+let allSnippets = [];
 let selectedCompetenceId = null;
-let currentCompetenceData = null; // Données de la compétence en cours d'édition
+let currentCompetenceData = null;
 
 // =============================================
 // 2️⃣ ELEMENTS DOM
@@ -43,16 +43,16 @@ const editTitle = document.getElementById('edit-title');
 const editDescription = document.getElementById('edit-description');
 const editProjectsSelect = document.getElementById('edit-projects-select');
 const editSnippetsSelect = document.getElementById('edit-snippets-select');
+const editProjectsLinkedList = document.getElementById('edit-projects-linked-list');
+const editSnippetsLinkedList = document.getElementById('edit-snippets-linked-list');
+const btnAddProjectLinked = document.getElementById('btn-add-project-linked');
+const btnAddSnippetLinked = document.getElementById('btn-add-snippet-linked');
 const editExternalProjectsList = document.getElementById('edit-external-projects-list');
 const editExternalSnippetsList = document.getElementById('edit-external-snippets-list');
 const btnAddExternalProject = document.getElementById('btn-add-external-project');
 const btnAddExternalSnippet = document.getElementById('btn-add-external-snippet');
 const btnSaveDetail = document.getElementById('btn-save-detail');
 const btnCancelDetail = document.getElementById('btn-cancel-detail');
-const editProjectsLinkedList = document.getElementById('edit-projects-linked-list');
-const editSnippetsLinkedList = document.getElementById('edit-snippets-linked-list');
-const btnAddProjectLinked = document.getElementById('btn-add-project-linked');
-const btnAddSnippetLinked = document.getElementById('btn-add-snippet-linked');
 
 // Formulaire création (Bloc 2)
 const competenceForm = document.getElementById('competence-form');
@@ -86,7 +86,7 @@ function initAutoScroll() {
     }
     
     let scrollDirection = 1;
-    let scrollSpeed = 0; // Désactivé par défaut
+    let scrollSpeed = 0;
     let isScrolling = false;
     
     function autoScroll() {
@@ -111,9 +111,8 @@ function initAutoScroll() {
     autoScroll();
     console.log('✅ [AutoScroll] Prêt (activé au survol uniquement)');
     
-    // Activation AU SURVOL uniquement
     introContent.addEventListener('mouseenter', () => {
-        scrollSpeed = 0.3; // Vitesse réduite
+        scrollSpeed = 0.3;
         isScrolling = true;
         console.log('▶️ [AutoScroll] Démarré');
     });
@@ -132,7 +131,6 @@ async function loadInitialData() {
     console.log('📡 [API] Chargement données initiales...');
     
     try {
-        // Charger en parallèle : compétences + projets + snippets
         const [competencesData, projectsData, snippetsData] = await Promise.all([
             API.get('/api/competences'),
             API.get('/api/projects'),
@@ -177,12 +175,11 @@ function renderCompetenceCards() {
             <p class="card-description">${escapeHtml(comp.description || 'Pas de description')}</p>
             <div class="card-stars">
                 ${renderStars(comp.level)}
-                <span class="card-level">${comp.level}/5</span>
+                <span class="card-level">${comp.level.toFixed(1)}/5</span>
             </div>
         </div>
     `).join('');
     
-    // Event listeners sur les cards
     document.querySelectorAll('.competence-card').forEach(card => {
         card.addEventListener('click', () => {
             const id = parseInt(card.dataset.id);
@@ -194,17 +191,24 @@ function renderCompetenceCards() {
 }
 
 // =============================================
-// 7️⃣ AFFICHAGE DES ÉTOILES
+// 7️⃣ AFFICHAGE DES ÉTOILES (avec demi-étoiles)
 // =============================================
 function renderStars(level) {
     let stars = '';
+    
     for (let i = 1; i <= 5; i++) {
-        if (i <= level) {
+        if (level >= i) {
+            // Étoile pleine
             stars += '<svg class="star-filled" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+        } else if (level >= i - 0.5) {
+            // Demi-étoile
+            stars += '<svg class="star-half" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><defs><linearGradient id="half-fill-' + i + '"><stop offset="50%" stop-color="var(--accent)"/><stop offset="50%" stop-color="var(--border-color)"/></linearGradient></defs><path fill="url(#half-fill-' + i + ')" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
         } else {
+            // Étoile vide
             stars += '<svg class="star-empty" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
         }
     }
+    
     return stars;
 }
 
@@ -222,15 +226,13 @@ function selectCompetence(id) {
         return;
     }
     
-    currentCompetenceData = { ...competence }; // Clone pour l'édition
+    currentCompetenceData = JSON.parse(JSON.stringify(competence));
     
-    // Active visuellement la card
     document.querySelectorAll('.competence-card').forEach(card => {
         card.classList.remove('active');
     });
     document.querySelector(`[data-id="${id}"]`)?.classList.add('active');
     
-    // Affiche le mode LECTURE
     showReadMode(competence);
 }
 
@@ -240,17 +242,14 @@ function selectCompetence(id) {
 function showReadMode(competence) {
     console.log('📖 [Mode] Passage en mode LECTURE');
     
-    // Masquer autres vues
     detailEmpty.style.display = 'none';
     detailViewEdit.style.display = 'none';
     detailViewRead.style.display = 'block';
     
-    // Remplir les champs
     detailTitleRead.textContent = competence.name;
     detailDescriptionRead.textContent = competence.description || 'Pas de description';
-    detailStarsRead.innerHTML = `${renderStars(competence.level)} <span class="detail-level">${competence.level}/5</span>`;
+    detailStarsRead.innerHTML = `${renderStars(competence.level)} <span class="detail-level">${competence.level.toFixed(1)}/5</span>`;
     
-    // Projets MY-ANKODE
     if (competence.projects && competence.projects.length > 0) {
         detailProjectsRead.innerHTML = `
             <div class="linked-items-list">
@@ -266,7 +265,6 @@ function showReadMode(competence) {
         detailProjectsRead.innerHTML = '<p>Aucun projet lié</p>';
     }
     
-    // Snippets MY-ANKODE
     if (competence.snippets && competence.snippets.length > 0) {
         detailSnippetsRead.innerHTML = `
             <div class="linked-items-list">
@@ -282,7 +280,6 @@ function showReadMode(competence) {
         detailSnippetsRead.innerHTML = '<p>Aucun snippet lié</p>';
     }
     
-    // Projets externes
     const externalProjects = parseExternalItems(competence.externalProjects);
     if (externalProjects.length > 0) {
         detailExternalProjectsRead.innerHTML = `
@@ -294,7 +291,6 @@ function showReadMode(competence) {
         detailExternalProjectsRead.innerHTML = '<p>Aucun projet externe</p>';
     }
     
-    // Snippets externes
     const externalSnippets = parseExternalItems(competence.externalSnippets);
     if (externalSnippets.length > 0) {
         detailExternalSnippetsRead.innerHTML = `
@@ -320,19 +316,14 @@ function showEditMode() {
         return;
     }
     
-    // Masquer autres vues
     detailViewRead.style.display = 'none';
     detailViewEdit.style.display = 'block';
     
-    // Remplir les champs
     editTitle.value = currentCompetenceData.name;
     editDescription.value = currentCompetenceData.description || '';
     
-    // Charger les selects projets/snippets
     populateProjectsSelect();
     populateSnippetsSelect();
-    
-    // Charger les listes externes
     populateExternalList(editExternalProjectsList, currentCompetenceData.externalProjects);
     populateExternalList(editExternalSnippetsList, currentCompetenceData.externalSnippets);
     
@@ -340,12 +331,10 @@ function showEditMode() {
 }
 
 // =============================================
-// 1️⃣1️⃣ REMPLIR SELECT PROJETS
+// 1️⃣1️⃣ REMPLIR SELECT + LISTE PROJETS
 // =============================================
 function populateProjectsSelect() {
     const linkedProjectIds = (currentCompetenceData.projects || []).map(p => p.id);
-    
-    // Filtrer les projets NON liés
     const availableProjects = allProjects.filter(p => !linkedProjectIds.includes(p.id));
     
     if (availableProjects.length === 0) {
@@ -359,12 +348,10 @@ function populateProjectsSelect() {
         btnAddProjectLinked.disabled = false;
     }
     
-    // Remplir la liste des projets déjà liés
     editProjectsLinkedList.innerHTML = (currentCompetenceData.projects || []).map(project => 
         createLinkedItem(project.id, project.name, '+1 étoile', 'project')
     ).join('');
     
-    // Event listeners sur boutons supprimer
     editProjectsLinkedList.querySelectorAll('.btn-remove-linked').forEach(btn => {
         btn.addEventListener('click', () => removeLinkedItem('project', btn.dataset.id));
     });
@@ -373,12 +360,10 @@ function populateProjectsSelect() {
 }
 
 // =============================================
-// 1️⃣2️⃣ REMPLIR SELECT SNIPPETS
+// 1️⃣2️⃣ REMPLIR SELECT + LISTE SNIPPETS
 // =============================================
 function populateSnippetsSelect() {
     const linkedSnippetIds = currentCompetenceData.snippetsIds || [];
-    
-    // Filtrer les snippets NON liés
     const availableSnippets = allSnippets.filter(s => !linkedSnippetIds.includes(s.id));
     
     if (availableSnippets.length === 0) {
@@ -392,13 +377,11 @@ function populateSnippetsSelect() {
         btnAddSnippetLinked.disabled = false;
     }
     
-    // Remplir la liste des snippets déjà liés
     const linkedSnippets = allSnippets.filter(s => linkedSnippetIds.includes(s.id));
     editSnippetsLinkedList.innerHTML = linkedSnippets.map(snippet => 
         createLinkedItem(snippet.id, snippet.title, '+0.5 étoile', 'snippet')
     ).join('');
     
-    // Event listeners sur boutons supprimer
     editSnippetsLinkedList.querySelectorAll('.btn-remove-linked').forEach(btn => {
         btn.addEventListener('click', () => removeLinkedItem('snippet', btn.dataset.id));
     });
@@ -407,7 +390,7 @@ function populateSnippetsSelect() {
 }
 
 // =============================================
-// 1️⃣3️⃣ CRÉER UN <LI> POUR ITEM LIÉ (projet/snippet MY-ANKODE)
+// 1️⃣3️⃣ CRÉER <LI> ITEM LIÉ (projet/snippet MY-ANKODE)
 // =============================================
 function createLinkedItem(id, name, bonus, type) {
     return `
@@ -426,7 +409,7 @@ function createLinkedItem(id, name, bonus, type) {
 }
 
 // =============================================
-// 1️⃣4️⃣ AJOUTER UN PROJET LIÉ
+// 1️⃣4️⃣ AJOUTER PROJET LIÉ
 // =============================================
 function addLinkedProject() {
     const selectedId = parseInt(editProjectsSelect.value);
@@ -442,20 +425,18 @@ function addLinkedProject() {
         return;
     }
     
-    // Ajouter aux données courantes
     if (!currentCompetenceData.projects) {
         currentCompetenceData.projects = [];
     }
     currentCompetenceData.projects.push(project);
     
-    // Rafraîchir l'affichage
     populateProjectsSelect();
     
     console.log(`✅ [Add] Projet "${project.name}" ajouté`);
 }
 
 // =============================================
-// 1️⃣5️⃣ AJOUTER UN SNIPPET LIÉ
+// 1️⃣5️⃣ AJOUTER SNIPPET LIÉ
 // =============================================
 function addLinkedSnippet() {
     const selectedId = editSnippetsSelect.value;
@@ -471,20 +452,18 @@ function addLinkedSnippet() {
         return;
     }
     
-    // Ajouter aux données courantes
     if (!currentCompetenceData.snippetsIds) {
         currentCompetenceData.snippetsIds = [];
     }
     currentCompetenceData.snippetsIds.push(snippet.id);
     
-    // Rafraîchir l'affichage
     populateSnippetsSelect();
     
     console.log(`✅ [Add] Snippet "${snippet.title}" ajouté`);
 }
 
 // =============================================
-// 1️⃣6️⃣ RETIRER UN ITEM LIÉ (projet ou snippet)
+// 1️⃣6️⃣ RETIRER ITEM LIÉ
 // =============================================
 function removeLinkedItem(type, id) {
     console.log(`🗑️ [Remove] Retrait ${type} ID ${id}`);
@@ -509,7 +488,6 @@ function populateExternalList(listElement, itemsString) {
     
     listElement.innerHTML = items.map(item => createExternalListItem(item)).join('');
     
-    // Event listeners sur boutons supprimer
     listElement.querySelectorAll('.btn-remove-item').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.target.closest('li').remove();
@@ -518,7 +496,7 @@ function populateExternalList(listElement, itemsString) {
 }
 
 // =============================================
-// 1️⃣8️⃣ CRÉER UN <LI> POUR LISTE EXTERNE
+// 1️⃣8️⃣ CRÉER <LI> ITEM EXTERNE
 // =============================================
 function createExternalListItem(value = '') {
     const randomId = 'item-' + Math.random().toString(36).substr(2, 9);
@@ -535,7 +513,105 @@ function createExternalListItem(value = '') {
 }
 
 // =============================================
-// 1️⃣9️⃣ CRÉER UNE NOUVELLE COMPÉTENCE (BLOC 2)
+// 1️⃣9️⃣ AJOUTER LIGNE EXTERNE
+// =============================================
+function addExternalItem(listElement) {
+    const li = document.createElement('li');
+    li.innerHTML = createExternalListItem();
+    listElement.appendChild(li);
+    
+    li.querySelector('input').focus();
+    
+    li.querySelector('.btn-remove-item').addEventListener('click', () => {
+        li.remove();
+    });
+    
+    console.log('➕ [Edit] Ligne externe ajoutée');
+}
+
+// =============================================
+// 2️⃣0️⃣ ENREGISTRER MODIFICATIONS
+// =============================================
+async function saveCompetence() {
+    console.log('💾 [Save] Enregistrement...');
+    
+    const data = {
+        name: editTitle.value.trim(),
+        description: editDescription.value.trim() || null,
+        projectIds: (currentCompetenceData.projects || []).map(p => p.id),
+        snippetsIds: currentCompetenceData.snippetsIds || [],
+        externalProjects: collectExternalItems(editExternalProjectsList),
+        externalSnippets: collectExternalItems(editExternalSnippetsList)
+    };
+    
+    if (!data.name) {
+        showFlashMessage(detailFlashMessages, 'Le titre est obligatoire', 'error');
+        return;
+    }
+    
+    try {
+        const result = await API.put(`/api/competences/${selectedCompetenceId}`, data);
+        
+        showFlashMessage(detailFlashMessages, result.message || 'Compétence mise à jour !', 'success');
+        
+        await loadInitialData();
+        
+        const updatedComp = competences.find(c => c.id === selectedCompetenceId);
+        if (updatedComp) {
+            currentCompetenceData = JSON.parse(JSON.stringify(updatedComp));
+            showReadMode(updatedComp);
+        }
+        
+        console.log('✅ [Save] Compétence mise à jour');
+        
+    } catch (error) {
+        console.error('❌ [Save] Erreur:', error);
+        showFlashMessage(detailFlashMessages, error.message || 'Erreur lors de la sauvegarde', 'error');
+    }
+}
+
+// =============================================
+// 2️⃣1️⃣ ANNULER ÉDITION
+// =============================================
+function cancelEdit() {
+    console.log('❌ [Edit] Annulation');
+    
+    if (currentCompetenceData) {
+        const original = competences.find(c => c.id === selectedCompetenceId);
+        if (original) {
+            currentCompetenceData = JSON.parse(JSON.stringify(original));
+            showReadMode(original);
+        }
+    }
+}
+
+// =============================================
+// 2️⃣2️⃣ SUPPRIMER COMPÉTENCE
+// =============================================
+async function deleteCompetence() {
+    if (!confirm('Supprimer cette compétence définitivement ?')) return;
+    
+    console.log(`🗑️ [Delete] Suppression compétence ${selectedCompetenceId}`);
+    
+    try {
+        const result = await API.delete(`/api/competences/${selectedCompetenceId}`);
+        showFlashMessage(detailFlashMessages, result.message || 'Compétence supprimée !', 'success');
+        
+        detailViewRead.style.display = 'none';
+        detailEmpty.style.display = 'flex';
+        
+        await loadInitialData();
+        
+        console.log('✅ [Delete] Compétence supprimée');
+        
+    } catch (error) {
+        console.error('❌ [Delete] Erreur:', error);
+        showFlashMessage(detailFlashMessages, error.message || 'Erreur lors de la suppression', 'error');
+    }
+}
+
+// =============================================
+// 2️⃣3️⃣ CRÉER NOUVELLE COMPÉTENCE (BLOC 2)
 // =============================================
 async function createCompetence(e) {
     e.preventDefault();
@@ -555,10 +631,8 @@ async function createCompetence(e) {
         const result = await API.post('/api/competences', data);
         showFlashMessage(formFlashMessages, result.message || 'Compétence créée !', 'success');
         
-        // Reset formulaire
         competenceForm.reset();
         
-        // Recharger la liste
         await loadInitialData();
         
         console.log('✅ [Create] Compétence créée');
@@ -570,40 +644,36 @@ async function createCompetence(e) {
 }
 
 // =============================================
-// 2️⃣0️⃣ EVENT LISTENERS
+// 2️⃣4️⃣ EVENT LISTENERS
 // =============================================
 function initEventListeners() {
-    // Formulaire création (Bloc 2)
     competenceForm.addEventListener('submit', createCompetence);
     
-    // Mode LECTURE → ÉDITION
     btnEditDetail.addEventListener('click', showEditMode);
     
-    // Mode ÉDITION → Actions
     btnSaveDetail.addEventListener('click', saveCompetence);
     btnCancelDetail.addEventListener('click', cancelEdit);
     
-    // Ajout lignes externes
+    btnAddProjectLinked.addEventListener('click', addLinkedProject);
+    btnAddSnippetLinked.addEventListener('click', addLinkedSnippet);
+    
     btnAddExternalProject.addEventListener('click', () => addExternalItem(editExternalProjectsList));
     btnAddExternalSnippet.addEventListener('click', () => addExternalItem(editExternalSnippetsList));
     
-    // Suppression
     btnDeleteDetail.addEventListener('click', deleteCompetence);
     
     console.log('✅ [Events] Listeners initialisés');
 }
 
 // =============================================
-// 2️⃣1️⃣ UTILITAIRES
+// 2️⃣5️⃣ UTILITAIRES
 // =============================================
 
-// Parser les items externes (texte → array)
 function parseExternalItems(text) {
     if (!text || text.trim() === '') return [];
     return text.split('\n').map(line => line.trim()).filter(line => line !== '');
 }
 
-// Collecter les items externes (DOM → texte)
 function collectExternalItems(listElement) {
     const items = [];
     listElement.querySelectorAll('input[type="text"]').forEach(input => {
@@ -613,7 +683,6 @@ function collectExternalItems(listElement) {
     return items.join('\n');
 }
 
-// Messages flash
 function showFlashMessage(container, message, type) {
     container.innerHTML = `<div class="flash-message flash-${type}">${escapeHtml(message)}</div>`;
     setTimeout(() => {
@@ -621,7 +690,6 @@ function showFlashMessage(container, message, type) {
     }, 5000);
 }
 
-// Échapper HTML
 function escapeHtml(text) {
     if (!text) return '';
     const div = document.createElement('div');

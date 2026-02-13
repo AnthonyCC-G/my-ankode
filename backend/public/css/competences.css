@@ -337,6 +337,16 @@
     color: var(--border-color);
 }
 
+/* Demi-étoile (gradient 50/50) */
+.card-stars .star-half {
+    color: var(--accent); /* Fallback si gradient non supporté */
+}
+
+.detail-stars .star-half {
+    color: var(--accent); /* Fallback */
+}
+
+
 .card-level {
     margin-left: 0.5rem;
     font-weight: 600;
