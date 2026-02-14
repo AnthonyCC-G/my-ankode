@@ -29,8 +29,8 @@ class Competence
     )]
     private ?string $name = null;
 
-    #[ORM\Column]
-    private int $level = 0;
+    #[ORM\Column(type: 'float')]
+    private float $level = 0.0;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Assert\Length(
@@ -100,7 +100,7 @@ class Competence
         return $this;
     }
 
-    public function getLevel(): int
+    public function getLevel(): float
     {
         return $this->level;
     }
@@ -214,20 +214,27 @@ class Competence
      */
     public function calculateLevel(): void
     {
-        $level = 0;
-
-        $level += $this->projects->count() * 1;
-
+        $level = 0.0; // ← float dès le départ
+        
+        // Projets MY-ANKODE : +1 étoile chacun
+        $level += $this->projects->count() * 1.0;
+        
+        // Snippets MY-ANKODE : +0.5 étoile chacun
         $level += count($this->snippetsIds ?? []) * 0.5;
-
+        
+        // Projets externes : +1 étoile AU TOTAL (pas par projet)
         if (!empty($this->externalProjects)) {
-            $level += 1;
+            $externalProjectsCount = count(explode("\n", trim($this->externalProjects)));
+            $level += $externalProjectsCount * 1.0;
         }
-
+        
+        // Snippets externes : +0.5 étoile AU TOTAL (pas par snippet)
         if (!empty($this->externalSnippets)) {
-            $level += 0.5;
+            $externalSnippetsCount = count(explode("\n", trim($this->externalSnippets)));
+            $level += $externalSnippetsCount * 0.5;
         }
-
-        $this->level = min(5, (int) round($level));
+        
+        // Plafond à 5 étoiles
+        $this->level = min(5.0, $level);
     }
 }

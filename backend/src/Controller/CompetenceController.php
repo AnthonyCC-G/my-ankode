@@ -221,7 +221,7 @@ class CompetenceController extends AbstractController
             'id' => $competence->getId(),
             'name' => $competence->getName(),
             'description' => $competence->getDescription(),
-            'level' => $competence->getLevel(),
+            'level' => (float) $competence->getLevel(),
             'projects' => $projects,
             'snippetsIds' => $competence->getSnippetsIds() ?? [],
             'snippets' => $snippets,
