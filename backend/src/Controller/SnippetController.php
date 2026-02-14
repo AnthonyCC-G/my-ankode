@@ -44,29 +44,13 @@ class SnippetController extends AbstractController
 
     /**
      * GET /api/snippets/{id} - Détail d'un snippet
+     * 
+     * Securite : ResourceVoter verifie l'ownership MongoDB via getUserId()
      */
     #[Route('/{id}', name: 'api_snippets_show', methods: ['GET'])]
-    public function show(string $id): JsonResponse
+    #[IsGranted('VIEW', subject: 'snippet')]
+    public function show(Snippet $snippet): JsonResponse
     {
-        $user = $this->getUser();
-        
-        if (!$user) {
-            return $this->json(['error' => 'Non authentifié'], 401);
-        }
-
-        // Récupérer le snippet par son ID
-        $snippet = $this->dm->getRepository(Snippet::class)->find($id);
-
-        // Vérifier que le snippet existe
-        if (!$snippet) {
-            return $this->json(['error' => 'Snippet non trouvé'], 404);
-        }
-
-        // Vérifier que l'utilisateur est bien le propriétaire
-        if ($snippet->getUserId() !== (string) $user->getId()) {
-            return $this->json(['error' => 'Accès refusé'], 403);
-        }
-
         return $this->json($snippet, 200);
     }
 
@@ -116,29 +100,14 @@ class SnippetController extends AbstractController
 
     /**
      * PUT /api/snippets/{id} - Modifier un snippet
-     * Protection CSRF  //
+     * Protection CSRF
+     * 
+     * Securite : ResourceVoter verifie l'ownership MongoDB via getUserId()
      */
     #[Route('/{id}', name: 'api_snippets_update', methods: ['PUT'])]
-    public function update(string $id, Request $request): JsonResponse
+    #[IsGranted('EDIT', subject: 'snippet')]
+    public function update(Snippet $snippet, Request $request): JsonResponse
     {
-        $user = $this->getUser();
-        
-        if (!$user) {
-            return $this->json(['error' => 'Non authentifié'], 401);
-        }
-
-        // Récupérer le snippet
-        $snippet = $this->dm->getRepository(Snippet::class)->find($id);
-
-        if (!$snippet) {
-            return $this->json(['error' => 'Snippet non trouvé'], 404);
-        }
-
-        // Vérifier que l'utilisateur est bien le propriétaire
-        if ($snippet->getUserId() !== (string) $user->getId()) {
-            return $this->json(['error' => 'Accès refusé'], 403);
-        }
-
         // Récupérer les données JSON
         $data = json_decode($request->getContent(), true);
 
@@ -167,29 +136,14 @@ class SnippetController extends AbstractController
 
     /**
      * DELETE /api/snippets/{id} - Supprimer un snippet
-     * Protection CSRF  //
+     * Protection CSRF
+     * 
+     * Securite : ResourceVoter verifie l'ownership MongoDB via getUserId()
      */
     #[Route('/{id}', name: 'api_snippets_delete', methods: ['DELETE'])]
-    public function delete(string $id): JsonResponse
+    #[IsGranted('DELETE', subject: 'snippet')]
+    public function delete(Snippet $snippet): JsonResponse
     {
-        $user = $this->getUser();
-        
-        if (!$user) {
-            return $this->json(['error' => 'Non authentifié'], 401);
-        }
-
-        // Récupérer le snippet
-        $snippet = $this->dm->getRepository(Snippet::class)->find($id);
-
-        if (!$snippet) {
-            return $this->json(['error' => 'Snippet non trouvé'], 404);
-        }
-
-        // Vérifier que l'utilisateur est bien le propriétaire
-        if ($snippet->getUserId() !== (string) $user->getId()) {
-            return $this->json(['error' => 'Accès refusé'], 403);
-        }
-
         // Supprimer le snippet
         $this->dm->remove($snippet);
         $this->dm->flush();

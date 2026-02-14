@@ -52,20 +52,13 @@ class CompetenceController extends AbstractController
 
     /**
      * GET /api/competences/{id} - Détail d'une competence
+     * 
+     * Securite : ResourceVoter verifie automatiquement l'ownership
      */
     #[Route('/{id}', name: 'api_competences_show', methods: ['GET'])]
-    public function show(int $id): JsonResponse
+    #[IsGranted('VIEW', subject: 'competence')]
+    public function show(Competence $competence): JsonResponse
     {
-        $competence = $this->competenceRepository->find($id);
-
-        if (!$competence) {
-            return $this->json(['error' => 'Competence non trouvee'], Response::HTTP_NOT_FOUND);
-        }
-
-        if ($competence->getOwner() !== $this->getUser()) {
-            return $this->json(['error' => 'Acces interdit'], Response::HTTP_FORBIDDEN);
-        }
-
         return $this->json($this->serializeCompetence($competence));
     }
 
@@ -102,20 +95,13 @@ class CompetenceController extends AbstractController
 
     /**
      * PUT /api/competences/{id} - Modifier une competence
+     * 
+     * Securite : ResourceVoter verifie automatiquement l'ownership
      */
     #[Route('/{id}', name: 'api_competences_update', methods: ['PUT'])]
-    public function update(int $id, Request $request): JsonResponse
+    #[IsGranted('EDIT', subject: 'competence')]
+    public function update(Competence $competence, Request $request): JsonResponse
     {
-        $competence = $this->competenceRepository->find($id);
-
-        if (!$competence) {
-            return $this->json(['error' => 'Competence non trouvee'], Response::HTTP_NOT_FOUND);
-        }
-
-        if ($competence->getOwner() !== $this->getUser()) {
-            return $this->json(['error' => 'Acces interdit'], Response::HTTP_FORBIDDEN);
-        }
-
         $data = json_decode($request->getContent(), true);
 
         // Mise à jour des champs
@@ -168,20 +154,13 @@ class CompetenceController extends AbstractController
 
     /**
      * DELETE /api/competences/{id} - Supprimer une competence
+     * 
+     * Securite : ResourceVoter verifie automatiquement l'ownership
      */
     #[Route('/{id}', name: 'api_competences_delete', methods: ['DELETE'])]
-    public function delete(int $id): JsonResponse
+    #[IsGranted('DELETE', subject: 'competence')]
+    public function delete(Competence $competence): JsonResponse
     {
-        $competence = $this->competenceRepository->find($id);
-
-        if (!$competence) {
-            return $this->json(['error' => 'Competence non trouvee'], Response::HTTP_NOT_FOUND);
-        }
-
-        if ($competence->getOwner() !== $this->getUser()) {
-            return $this->json(['error' => 'Acces interdit'], Response::HTTP_FORBIDDEN);
-        }
-
         $this->entityManager->remove($competence);
         $this->entityManager->flush();
 
