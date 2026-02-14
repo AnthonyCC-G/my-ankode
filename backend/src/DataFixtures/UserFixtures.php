@@ -5,10 +5,11 @@ namespace App\DataFixtures;
 
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;  // ← LIGNE AJOUTÉE
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class UserFixtures extends Fixture
+class UserFixtures extends Fixture implements FixtureGroupInterface  // ← MODIFIÉ
 {
     private UserPasswordHasherInterface $passwordHasher;
 
@@ -76,5 +77,11 @@ class UserFixtures extends Fixture
         $this->addReference('user_clara', $clara);
 
         $manager->flush();
+    }
+
+    // ← MÉTHODE AJOUTÉE ICI
+    public static function getGroups(): array
+    {
+        return ['user'];
     }
 }

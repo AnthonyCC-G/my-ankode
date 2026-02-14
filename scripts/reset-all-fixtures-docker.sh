@@ -1,47 +1,69 @@
 #!/bin/bash
-# ============================================
-# MY-ANKODE - Reset complet (Docker)
-# Fixtures PostgreSQL + MongoDB + Articles RSS
-# ============================================
 
-echo "======================================"
-echo "🐳 MY-ANKODE - Reset complet (Docker)"
-echo "======================================"
+# Script pour charger les fixtures une par une (environnement DOCKER)
+
+# Se placer à la RACINE du projet (où se trouve docker-compose.yaml)
+cd "$(dirname "$0")/.." || exit 1
+
+echo "=================================================="
+echo "RESET COMPLET DES FIXTURES - ENVIRONNEMENT DOCKER"
+echo "=================================================="
+
+# 1. Reset PostgreSQL complet
+echo ""
+echo "Reset schéma PostgreSQL..."
+docker-compose exec -T backend php bin/console doctrine:schema:drop --force --full-database
+docker-compose exec -T backend php bin/console doctrine:schema:create
+
+# 2. Charger Users (PostgreSQL - première fixture)
+echo ""
+echo "1/7 - Chargement Users..."
+docker-compose exec -T backend php bin/console doctrine:fixtures:load --group=user --no-interaction
+
+# 3. Charger Projects (PostgreSQL - APPEND)
+echo ""
+echo "2/7 - Chargement Projects..."
+docker-compose exec -T backend php bin/console doctrine:fixtures:load --group=project --append --no-interaction
+
+# 4. Charger Tasks (PostgreSQL - APPEND)
+echo ""
+echo "3/7 - Chargement Tasks..."
+docker-compose exec -T backend php bin/console doctrine:fixtures:load --group=task --append --no-interaction
+
+# 5. Charger Snippets (MongoDB - premier chargement)
+echo ""
+echo "4/7 - Chargement Snippets (MongoDB)..."
+docker-compose exec -T backend php bin/console doctrine:mongodb:fixtures:load --group=snippet --no-interaction
+
+# 6. Charger Articles (MongoDB - APPEND)
+echo ""
+echo "5/7 - Chargement Articles (MongoDB)..."
+docker-compose exec -T backend php bin/console doctrine:mongodb:fixtures:load --group=article --append --no-interaction
+
+# 7. Charger Competences (PostgreSQL - APPEND)
+echo ""
+echo "6/7 - Chargement Competences..."
+docker-compose exec -T backend php bin/console doctrine:fixtures:load --group=competence --append --no-interaction
+
+echo ""
+echo "=================================================="
+echo "FIXTURES CHARGEES AVEC SUCCES !"
+echo "=================================================="
+echo ""
+echo "Verification des donnees :"
 echo ""
 
-echo "🗑️  Étape 1/7 : Suppression du schéma PostgreSQL..."
-docker-compose exec -T backend php bin/console doctrine:schema:drop --force --full-database --quiet 2>/dev/null || true
-
-echo "🗑️  Étape 2/7 : Suppression de la base PostgreSQL..."
-docker-compose exec -T backend php bin/console doctrine:database:drop --force --if-exists --quiet 2>/dev/null || true
-
-echo "🏗️  Étape 3/7 : Création de la base PostgreSQL..."
-docker-compose exec -T backend php bin/console doctrine:database:create --quiet
-
-echo "📐 Étape 4/7 : Création du schéma PostgreSQL..."
-docker-compose exec -T backend php bin/console doctrine:schema:create --quiet
-
-echo "📦 Étape 5/7 : Chargement des fixtures PostgreSQL..."
-docker-compose exec -T backend php bin/console doctrine:fixtures:load --no-interaction --quiet
-
-echo "📦 Étape 6/7 : Chargement des fixtures MongoDB..."
-docker-compose exec -T backend php bin/console doctrine:mongodb:fixtures:load --no-interaction --quiet
-
-echo "📰 Étape 7/7 : Chargement des articles RSS..."
-echo "   → Récupération de Korben.info..."
-docker-compose exec -T backend php bin/console app:fetch-rss https://korben.info/feed "Korben.info" --quiet 2>/dev/null || echo "      ⚠️  Korben.info temporairement indisponible"
-
-echo "   → Récupération de Dev.to..."
-docker-compose exec -T backend php bin/console app:fetch-rss https://dev.to/feed "Dev.to" --quiet 2>/dev/null || echo "      ⚠️  Dev.to temporairement indisponible"
+# Vérification PostgreSQL
+echo "PostgreSQL :"
+docker-compose exec -T backend php bin/console doctrine:query:sql 'SELECT COUNT(*) as users FROM "user_"'
+docker-compose exec -T backend php bin/console doctrine:query:sql 'SELECT COUNT(*) as projects FROM project'
+docker-compose exec -T backend php bin/console doctrine:query:sql 'SELECT COUNT(*) as tasks FROM task'
+docker-compose exec -T backend php bin/console doctrine:query:sql 'SELECT COUNT(*) as competences FROM competence'
 
 echo ""
-echo "======================================"
-echo "✅ Reset terminé avec succès !"
-echo "======================================"
+echo "MongoDB :"
+echo "Snippets: 24 (voir message ci-dessus)"
+echo "Articles: 15 (voir message ci-dessus)"
+
 echo ""
-echo "📊 Récapitulatif :"
-echo "   - Base PostgreSQL recréée"
-echo "   - Fixtures PostgreSQL chargées"
-echo "   - Fixtures MongoDB chargées"
-echo "   - Articles RSS importés"
-echo ""
+echo "Terminé !"

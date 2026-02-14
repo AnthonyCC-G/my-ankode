@@ -6,11 +6,12 @@ namespace App\DataFixtures;
 use App\Document\Snippet;
 use App\Entity\User;
 use Doctrine\Bundle\MongoDBBundle\Fixture\Fixture;
+use Doctrine\Bundle\MongoDBBundle\Fixture\FixtureGroupInterface;  
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
 
-class SnippetFixtures extends Fixture
+class SnippetFixtures extends Fixture implements FixtureGroupInterface  
 {
     public function __construct(
         private DocumentManager $dm,
@@ -32,7 +33,7 @@ class SnippetFixtures extends Fixture
         }
 
         // ========================================
-        // 1️⃣ SNIPPETS ANTHONY - Code générique professionnel
+        // 1- SNIPPETS ANTHONY - Code générique professionnel
         // ========================================
         
         $snippet1 = new Snippet();
@@ -259,12 +260,12 @@ themeToggle.addEventListener(\'click\', () => {
         $snippet9->setUserId((string) $alice->getId());
         $snippet9->setTitle('Fix z-index qui marche pas');
         $snippet9->setLanguage('css');
-        $snippet9->setCode('/* ❌ Ne fonctionne pas */
+        $snippet9->setCode('/* Ne fonctionne pas */
 .element {
     z-index: 9999;
 }
 
-/* ✅ Solution : créer un stacking context */
+/* Solution : créer un stacking context */
 .element {
     position: relative; /* ou absolute/fixed */
     z-index: 10;
@@ -374,13 +375,13 @@ fetchData(\'/api/users\')
         $snippet14->setUserId((string) $bob->getId());
         $snippet14->setTitle('Debug requête N+1 avec Doctrine');
         $snippet14->setLanguage('php');
-        $snippet14->setCode('// ❌ Problème N+1 (1 requête + N requêtes)
+        $snippet14->setCode('// Problème N+1 (1 requête + N requêtes)
 $users = $userRepository->findAll();
 foreach ($users as $user) {
     echo count($user->getProjects()); // Requête SQL à chaque itération !
 }
 
-// ✅ Solution : JOIN avec fetch
+// Solution : JOIN avec fetch
 $users = $entityManager->createQueryBuilder()
     ->select(\'u\', \'p\')
     ->from(User::class, \'u\')
@@ -655,5 +656,10 @@ monBouton.addEventListener(\'click\', () => {
         
         echo "\n 24 snippets chargés dans MongoDB\n";
         echo " Répartition : Anthony (7 pro), Alice (6 frontend), Bob (6 backend), Clara (5 débutant)\n";
+    }
+
+    public static function getGroups(): array
+    {
+        return ['snippet'];
     }
 }

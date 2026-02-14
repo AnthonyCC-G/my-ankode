@@ -6,11 +6,12 @@ namespace App\DataFixtures;
 use App\Document\Article;
 use App\Entity\User;
 use Doctrine\Bundle\MongoDBBundle\Fixture\Fixture;
+use Doctrine\Bundle\MongoDBBundle\Fixture\FixtureGroupInterface;  
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
 
-class ArticleFixtures extends Fixture
+class ArticleFixtures extends Fixture implements FixtureGroupInterface  
 {
     public function __construct(
         private DocumentManager $dm,
@@ -294,5 +295,10 @@ class ArticleFixtures extends Fixture
         echo " Répartition sources : Grafikart (5), Dev.to (3), Korben.info (3), CSS-Tricks (2), Smashing Magazine (2)\n";
         echo " Lectures : Anthony (9), Alice (7), Bob (6), Clara (4)\n";
         echo " Favoris : Anthony (4), Alice (4), Bob (3), Clara (3)\n";
+    }
+
+    public static function getGroups(): array
+    {
+        return ['article'];
     }
 }
