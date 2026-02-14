@@ -1,14 +1,16 @@
 /* ========================================
-   COMPETENCES PAGE - GRID LAYOUT 4 BLOCS
+   COMPETENCES PAGE - GRID LAYOUT ACCORDÉON
    ======================================== */
 
 /* ===== HEADER PAGE ===== */
 .competences-header {
-    width: calc(100% - 60px); /* MODIF : Soustrait la largeur sidebar */
+    width: 100%;
     max-width: 1400px;
     margin: 0 auto;
     padding-top: 100px;
     padding-bottom: var(--spacing-md);
+    padding-left: 1rem;   /* padding gauche */
+    padding-right: 1rem;  /* padding droit */
     text-align: center;
 }
 
@@ -32,16 +34,31 @@
     margin-right: auto;
 }
 
-/* ===== GRID PRINCIPALE 3 COLONNES ===== */
+/* ===== GRID PRINCIPALE - ÉTATS DYNAMIQUES ===== */
 .competences-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr 2fr;
-    grid-template-rows: 40% 60%;
+    grid-template-rows: 1fr;
     gap: 5px;
-    /* AVANT : height: calc(100vh - 250px); */
-    /* APRÈS : ajuste en fonction de ton layout (navbar + footer + padding) */
-    height: calc(100vh - 310px); /* Augmente 350px si besoin */
-    padding: 0 12rem 1rem 1rem;
+    height: calc(100vh - 310px);
+    
+    /* Décalage pour éviter la mascotte à droite */
+    width: calc(100% - 180px);  /* 120px = espace pour mascotte + bulle */
+    margin-left: 0;             /* Coller à gauche */
+    margin-right: auto;         /* Espace automatique à droite */
+    
+    padding: 0 1rem 0.6rem 1rem;
+    transition: grid-template-columns 0.3s ease;
+}
+
+/* MODE LISTE LARGE (par défaut) - Bloc 4 réduit en sidebar */
+.competences-grid.list-mode {
+    grid-template-columns: 1fr 2fr 60px;
+}
+
+
+/* MODE DÉTAIL LARGE - Bloc 4 étendu */
+.competences-grid.detail-mode {
+    grid-template-columns: 1fr 1fr 1.5fr;
 }
 
 /* ===== BLOCS COMMUNS ===== */
@@ -56,25 +73,92 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    transition: all 0.3s ease;
+}
+
+/* ===== COLONNE 1 : WRAPPER BLOCS 1 + 2 ===== */
+.column-wrapper {
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    height: 100%;
+}
+
+/* ===== BLOCS 1 ET 2 : Gestion hauteur dynamique ===== */
+.bloc-intro,
+.bloc-form {
+    background: var(--bg-primary);
+    border: 2px solid var(--gold-700);
+    border-radius: 8px;
+    padding: 1rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+/* Bloc collapsed = hauteur minimale (header seulement) */
+.bloc-intro.collapsed,
+.bloc-form.collapsed {
+    min-height: 60px;
+    max-height: 60px;
+}
+
+/* Bloc expanded = prend l'espace disponible */
+.bloc-intro.expanded,
+.bloc-form.expanded {
+    flex: 1;
+    max-height: none;
+}
+
+/* ===== HEADERS CLIQUABLES (Blocs 1 et 2) ===== */
+.bloc-header-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    margin: -0.5rem -0.5rem 0.5rem -0.5rem;
+    border-radius: 6px;
+    transition: background 0.2s ease;
+    flex-shrink: 0;
+}
+
+.bloc-header-toggle:hover {
+    background: var(--bg-secondary);
 }
 
 .bloc-title {
     font-size: 1.3rem;
-    margin-bottom: 0.5rem;
-    color: var(--primary);
+    margin: 0;
+    color: var(--gold-500);
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
-.bloc-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
+/* Icône chevron pour accordéon */
+.chevron-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--text-secondary);
+    transition: transform 0.3s ease;
     flex-shrink: 0;
 }
 
+/* Rotation chevron quand étendu */
+.bloc-intro.expanded .chevron-icon,
+.bloc-form.expanded .chevron-icon {
+    transform: rotate(180deg);
+}
+
+/* ===== CONTENU SCROLLABLE ===== */
 .scrollable {
     overflow-y: auto;
     flex: 1;
@@ -99,10 +183,32 @@
     background: var(--accent-hover);
 }
 
-/* ===== BLOC 1 : INTRODUCTION ===== */
+/* ===== BLOC 1 : INTRODUCTION - ACCORDÉON VERTICAL ===== */
 .bloc-intro {
     grid-column: 1;
     grid-row: 1;
+}
+
+/* ===== ACCORDÉON - Pattern Veille ===== */
+.bloc-accordion {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    flex: 1;
+}
+
+.bloc-intro.expanded .bloc-accordion,
+.bloc-form.expanded .bloc-accordion {
+    max-height: none; /* Pas de limite */
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* État .open pour le formulaire (par défaut expanded) */
+.bloc-accordion.open {
+    max-height: none;
+    overflow-y: auto;
+    flex: 1;
 }
 
 .bloc-intro h3 {
@@ -140,14 +246,26 @@
     font-weight: bold;
 }
 
-/* ===== BLOC 2 : FORMULAIRE ===== */
+/* ===== BLOC 2 : FORMULAIRE - ACCORDÉON VERTICAL ===== */
 .bloc-form {
     grid-column: 1;
-    grid-row: 2;
+    grid-row: 1;
 }
 
-/* garder le scroll mais le cacher visuellement */
-.bloc-form .scrollable {
+/* Accordéon form - Pattern Veille */
+.bloc-form .bloc-accordion {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.bloc-form.expanded .bloc-accordion {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.bloc-form .bloc-accordion.open {
+    max-height: 600px;
     overflow-y: auto;
 }
 
@@ -160,6 +278,7 @@
 .form-group {
     display: flex;
     flex-direction: column;
+    width: 100%;  /* Prend toute la largeur du parent */
 }
 
 .form-group label {
@@ -198,6 +317,8 @@
     resize: vertical;
     min-height: 5rem;
     font-family: inherit;
+    width: 100%;  /* Force 100% de largeur */
+    box-sizing: border-box; /* Inclut padding et border dans le calcul */
 }
 
 .form-hint {
@@ -235,7 +356,15 @@
 /* ===== BLOC 3 : LISTE CARDS ===== */
 .bloc-list {
     grid-column: 2;
-    grid-row: 1 / 3;
+    grid-row: 1;
+}
+
+.bloc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    flex-shrink: 0;
 }
 
 .list-counter {
@@ -244,7 +373,20 @@
     font-weight: 600;
 }
 
+/* Cards container - GRID 2 colonnes quand wide */
 .cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.bloc-list.wide .cards-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.bloc-list.narrow .cards-container {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
@@ -259,6 +401,7 @@
     text-align: center;
     color: var(--text-secondary);
     padding: 3rem 1rem;
+    grid-column: 1 / -1;
 }
 
 .empty-state svg {
@@ -284,6 +427,9 @@
     padding: 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .competence-card:hover {
@@ -309,8 +455,8 @@
     color: var(--text-secondary);
     line-height: 1.4;
     margin-bottom: 0.75rem;
+    flex: 1;
     
-    /* Tronquer à 2 lignes */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -337,15 +483,9 @@
     color: var(--border-color);
 }
 
-/* Demi-étoile (gradient 50/50) */
 .card-stars .star-half {
-    color: var(--accent); /* Fallback si gradient non supporté */
+    color: var(--accent);
 }
-
-.detail-stars .star-half {
-    color: var(--accent); /* Fallback */
-}
-
 
 .card-level {
     margin-left: 0.5rem;
@@ -356,11 +496,69 @@
 /* ===== BLOC 4 : DÉTAIL COMPÉTENCE ===== */
 .bloc-detail {
     grid-column: 3;
-    grid-row: 1 / 3;
+    grid-row: 1;
+    position: relative;
+    padding: 0;
 }
 
-.detail-content {
+/* ===== SIDEBAR MODE (collapsed) ===== */
+.bloc-sidebar {
+    width: 100%;
     height: 100%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.bloc-detail.collapsed .bloc-sidebar {
+    display: flex;
+}
+
+.bloc-detail.expanded .bloc-sidebar {
+    display: none;
+}
+
+.bloc-sidebar:hover {
+    background: var(--bg-secondary);
+}
+
+.star-icon {
+    width: 32px;
+    height: 32px;
+    color: var(--accent);
+    transition: transform 0.3s ease;
+}
+
+.bloc-sidebar:hover .star-icon {
+    transform: scale(1.1);
+}
+
+/* ===== CONTENU ÉTENDU (expanded) ===== */
+.detail-content {
+    display: none;
+    height: 100%;
+    padding: 1rem;
+}
+
+.bloc-detail.expanded .detail-content {
+    display: block;
+}
+
+.bloc-detail.collapsed .detail-content {
+    display: none;
+}
+
+/* ===== ÉTOILE TITRE (en haut à gauche) ===== */
+.star-title {
+    width: 28px;
+    height: 28px;
+    color: var(--accent);
+    margin-right: 0.75rem;
+    flex-shrink: 0;
 }
 
 /* État vide détail */
@@ -375,7 +573,13 @@
     height: 100%;
 }
 
-.detail-empty svg {
+.detail-empty .star-title {
+    width: 48px;
+    height: 48px;
+    margin: 0 0 1.5rem 0;
+}
+
+.detail-empty svg:not(.star-title) {
     width: 80px;
     height: 80px;
     color: var(--border-color);
@@ -388,12 +592,16 @@
     padding-bottom: 1rem;
     margin-bottom: 1.5rem;
     position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
 .detail-title {
     font-size: 1.8rem;
     color: var(--primary);
-    margin-bottom: 1rem;
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
 }
 
 .detail-stars {
@@ -415,6 +623,10 @@
 
 .detail-stars .star-empty {
     color: var(--border-color);
+}
+
+.detail-stars .star-half {
+    color: var(--accent);
 }
 
 .detail-level {
@@ -471,6 +683,7 @@
 
 .detail-section {
     margin-bottom: 2rem;
+    width: 100%;
 }
 
 .detail-section h3 {
@@ -542,8 +755,6 @@
 }
 
 /* ===== BLOC 4 : MODE ÉDITION ===== */
-
-/* Container mode édition */
 .detail-edit {
     display: flex;
     flex-direction: column;
@@ -562,7 +773,6 @@
     overflow-y: auto;
 }
 
-/* Labels dans le mode édition */
 .detail-edit label {
     display: flex;
     align-items: center;
@@ -580,7 +790,6 @@
     flex-shrink: 0;
 }
 
-/* Select multiple pour projets/snippets MY-ANKODE */
 .form-select {
     width: 100%;
     padding: 0.5rem;
@@ -598,7 +807,6 @@
     border-color: var(--primary);
 }
 
-/* Options dans le select */
 .form-select option {
     padding: 0.5rem;
     background: var(--bg-secondary);
@@ -610,7 +818,6 @@
     color: white;
 }
 
-/* Options désactivées (projets/snippets déjà liés) */
 .form-select option:disabled {
     color: var(--text-secondary);
     background: var(--bg-primary);
@@ -622,7 +829,7 @@
     color: white;
 }
 
-/* Listes éditables pour projets/snippets externes */
+/* Listes éditables externes */
 .external-items-list {
     list-style: none;
     padding: 0;
@@ -663,7 +870,6 @@
     border-color: var(--primary);
 }
 
-/* Bouton supprimer ligne externe */
 .btn-remove-item {
     padding: 0.4rem 0.6rem;
     background: transparent;
@@ -688,7 +894,6 @@
     height: 16px;
 }
 
-/* Bouton ajouter ligne externe */
 .btn-add-item {
     display: flex;
     align-items: center;
@@ -717,7 +922,6 @@
     height: 18px;
 }
 
-/* Boutons Enregistrer / Annuler */
 .btn-save,
 .btn-cancel {
     padding: 0.6rem 1.2rem;
@@ -764,7 +968,6 @@
     height: 18px;
 }
 
-/* État vide des listes externes */
 .external-items-list:empty::before {
     content: "Aucun élément ajouté";
     color: var(--text-secondary);
@@ -778,7 +981,6 @@
     border-radius: 6px;
 }
 
-/* Espacement des sections en mode édition */
 .detail-edit .detail-section {
     margin-bottom: 1.5rem;
 }
@@ -852,7 +1054,7 @@
     height: 18px;
 }
 
-/* ===== LISTES ITEMS LIÉS (projets/snippets MY-ANKODE) ===== */
+/* ===== LISTES ITEMS LIÉS ===== */
 .linked-items-editable-list {
     list-style: none;
     padding: 0;
@@ -914,7 +1116,6 @@
     height: 16px;
 }
 
-/* État vide liste liée */
 .linked-items-editable-list:empty::before {
     content: "Aucun élément lié - Utilisez la liste déroulante ci-dessus pour en ajouter";
     color: var(--text-secondary);
@@ -930,24 +1131,12 @@
 
 /* ===== RESPONSIVE MOBILE ===== */
 @media (max-width: 768px) {
-    .competences-grid {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto;
-        height: auto;
-        gap: 1rem;
-    }
     
-    .bloc-intro,
-    .bloc-form,
-    .bloc-list,
-    .bloc-detail {
-        grid-column: 1;
-        grid-row: auto;
-        max-height: 500px;
-    }
-    
+    /* Header page */
     .competences-header {
         padding: 1.5rem 1rem;
+        width: 100%;
+        max-width: 100%;
     }
     
     .competences-title {
@@ -958,8 +1147,79 @@
         font-size: 1rem;
     }
     
+    /* Grid : Passage en colonne unique */
+    .competences-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        height: auto;
+        min-height: auto;
+        
+        /* Largeur 100% en mobile */
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        padding: 0 1rem 1rem 1rem;
+    }
+    
+    /* Tous les blocs prennent 100% de largeur */
+    .column-wrapper,
+    .bloc-intro,
+    .bloc-form,
+    .bloc-list,
+    .bloc-detail {
+        width: 100%;
+        max-width: 100%;
+        grid-column: unset;
+        grid-row: unset;
+    }
+    
+    /* Column wrapper en mode mobile */
+    .column-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    /* Blocs : hauteur auto en mobile */
+    .bloc-intro,
+    .bloc-form,
+    .bloc-list,
+    .bloc-detail {
+        max-height: 500px;
+        min-height: auto;
+    }
+    
+    /* Bloc 3 : Liste en 1 colonne en mobile */
+    .bloc-list.wide .cards-container,
+    .bloc-list.narrow .cards-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    /* Bloc 4 : Toujours en mode expanded en mobile (pas de sidebar) */
+    .bloc-detail.collapsed,
+    .bloc-detail.expanded {
+        display: flex;
+        flex-direction: column;
+        padding: 1rem;
+    }
+    
+    /* Masquer la sidebar en mobile */
+    .bloc-sidebar {
+        display: none !important;
+    }
+    
+    /* Toujours afficher le contenu détail en mobile */
+    .detail-content {
+        display: block !important;
+    }
+    
+    /* Édition : Actions en colonne */
     .detail-edit .detail-actions {
         flex-direction: column;
+        gap: 0.5rem;
     }
     
     .btn-save,
@@ -968,7 +1228,11 @@
         justify-content: center;
     }
     
-    .form-select {
-        font-size: 16px; /* Évite le zoom sur mobile */
+    /* Formulaires : Taille optimisée mobile */
+    .form-input,
+    .form-textarea,
+    .form-select,
+    .form-select-single {
+        font-size: 16px;
     }
 }

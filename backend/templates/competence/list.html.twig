@@ -20,99 +20,119 @@
     </p>
 </header>
 
-{# ========================================
-   GRID PRINCIPALE : 4 BLOCS
-   ======================================== #}
-<main class="competences-grid">
+{# ===== GRID PRINCIPALE ===== #}
+<main class="competences-grid list-mode" id="competences-grid">
     
-    {# ===== BLOC 1 : INTRODUCTION (Col 1, Row 1 - 40%) ===== #}
-    <aside class="bloc-intro">
-        <h2 class="bloc-title">À savoir</h2>
-        <div class="bloc-content scrollable">
-            <h3>Pourquoi cette page ?</h3>
-            <p>
-                Le <strong>syndrome de l'imposteur</strong> touche beaucoup de développeurs, 
-                surtout juniors. Cette page te permet de suivre objectivement ta progression.
-            </p>
-            
-            <h3>Comment ça marche ?</h3>
-            <ul>
-                <li><strong>Crée une compétence</strong> avec un titre et un objectif clair</li>
-                <li><strong>Lie des projets Kanban</strong> : +1 étoile par projet</li>
-                <li><strong>Lie des snippets de code</strong> : +0.5 étoile par snippet</li>
-                <li><strong>Ajoute des projets/snippets externes</strong> : bonus étoiles</li>
-                <li><strong>Objectif max</strong> : 5 étoiles par compétence</li>
-            </ul>
-            
-            <h3>Calcul automatique</h3>
-            <p>
-                Ton niveau d'étoiles est <strong>calculé automatiquement</strong> en fonction 
-                du nombre de projets et snippets liés. Pas de triche possible : 
-                plus tu codes et documentes, plus tes compétences augmentent !
-            </p>
-        </div>
-    </aside>
-    
-    {# ===== BLOC 2 : FORMULAIRE CRÉATION (Col 1, Row 2 - 60%) ===== #}
-    <aside class="bloc-form">
-        <div class="bloc-header">
-            <h2 class="bloc-title">Créer une compétence</h2>
-            <div id="form-flash-messages" class="flash-messages"></div>
-        </div>
+    {# ===== COLONNE 1 : WRAPPER BLOCS 1 + 2 ===== #}
+    <div class="column-wrapper">
         
-        <form id="competence-form" class="competence-form scrollable">
-            <input type="hidden" id="competence-id" name="id">
-            
-            {# Titre (obligatoire) #}
-            <div class="form-group">
-                <label for="competence-name">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                    </svg>
-                    Titre de la compétence *
-                </label>
-                <input 
-                    type="text" 
-                    id="competence-name" 
-                    name="name" 
-                    class="form-input" 
-                    placeholder="Ex: React, Docker, PostgreSQL..."
-                    maxlength="100"
-                    required
-                >
-            </div>
-            
-            {# Description/Objectif (optionnel mais recommandé) #}
-            <div class="form-group">
-                <label for="competence-description">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    Description / Objectif
-                </label>
-                <textarea 
-                    id="competence-description" 
-                    name="description" 
-                    class="form-textarea" 
-                    placeholder="Décris ce que tu maîtrises et ton objectif à atteindre..."
-                    maxlength="2000"
-                    rows="5"
-                ></textarea>
-                <span class="form-hint">Max 2000 caractères - Recommandé pour te rappeler pourquoi tu travailles cette compétence</span>
-            </div>
-            
-            {# Bouton submit #}
-            <button type="submit" class="btn-submit">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        {# ===== BLOC 1 : INTRODUCTION ===== #}
+        <aside class="bloc-intro collapsed" id="bloc-intro">
+            {# Header cliquable avec chevron #}
+            <button class="bloc-header-toggle" id="intro-toggle">
+                <h2 class="bloc-title">À savoir</h2>
+                <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
-                <span id="btn-submit-text">Créer la compétence</span>
             </button>
-        </form>
-    </aside>
+            
+            {# Contenu accordéon #}
+            <div class="bloc-accordion" id="intro-accordion">
+                <h3>Pourquoi cette page ?</h3>
+                <p>
+                    Le <strong>syndrome de l'imposteur</strong> touche beaucoup de développeurs, 
+                    surtout juniors. Cette page te permet de suivre objectivement ta progression.
+                </p>
+                
+                <h3>Comment ça marche ?</h3>
+                <ul>
+                    <li><strong>Crée une compétence</strong> avec un titre et un objectif clair</li>
+                    <li><strong>Lie des projets Kanban</strong> : +1 étoile par projet</li>
+                    <li><strong>Lie des snippets de code</strong> : +0.5 étoile par snippet</li>
+                    <li><strong>Ajoute des projets/snippets externes</strong> : bonus étoiles</li>
+                    <li><strong>Objectif max</strong> : 5 étoiles par compétence</li>
+                </ul>
+                
+                <h3>Calcul automatique</h3>
+                <p>
+                    Ton niveau d'étoiles est <strong>calculé automatiquement</strong> en fonction 
+                    du nombre de projets et snippets liés. Pas de triche possible : 
+                    plus tu codes et documentes, plus tes compétences augmentent !
+                </p>
+            </div>
+        </aside>
+        
+        {# ===== BLOC 2 : FORMULAIRE CRÉATION ===== #}
+        <aside class="bloc-form expanded" id="bloc-form">
+            {# Header cliquable avec chevron #}
+            <button class="bloc-header-toggle" id="form-toggle">
+                <h2 class="bloc-title">Créer une compétence</h2>
+                <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+            
+            {# Flash messages (toujours visible) #}
+            <div id="form-flash-messages" class="flash-messages"></div>
+            
+            {# Contenu accordéon #}
+            <div class="bloc-accordion open" id="form-accordion">
+                <form id="competence-form" class="competence-form">
+                    <input type="hidden" id="competence-id" name="id">
+                    
+                    {# Titre (obligatoire) #}
+                    <div class="form-group">
+                        <label for="competence-name">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                            </svg>
+                            Titre de la compétence *
+                        </label>
+                        <input 
+                            type="text" 
+                            id="competence-name" 
+                            name="name" 
+                            class="form-input" 
+                            placeholder="Ex: React, Docker, PostgreSQL..."
+                            maxlength="100"
+                            required
+                        >
+                    </div>
+                    
+                    {# Description/Objectif (optionnel mais recommandé) #}
+                    <div class="form-group">
+                        <label for="competence-description">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Description / Objectif
+                        </label>
+                        <textarea 
+                            id="competence-description" 
+                            name="description" 
+                            class="form-textarea" 
+                            placeholder="Décris ce que tu maîtrises et ton objectif à atteindre..."
+                            maxlength="2000"
+                            rows="5"
+                        ></textarea>
+                        <span class="form-hint">Max 2000 caractères - Recommandé pour te rappeler pourquoi tu travailles cette compétence</span>
+                    </div>
+                    
+                    {# Bouton submit #}
+                    <button type="submit" class="btn-submit">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        <span id="btn-submit-text">Créer la compétence</span>
+                    </button>
+                </form>
+            </div>
+        </aside>
+        
+    </div>
     
-    {# ===== BLOC 3 : LISTE DES CARDS (Col 2, Rows 1-2) ===== #}
-    <section class="bloc-list">
+    {# ===== BLOC 3 : LISTE DES CARDS ===== #}
+    <section class="bloc-list wide" id="bloc-list">
         <div class="bloc-header">
             <h2 class="bloc-title">Mes compétences</h2>
             <span class="list-counter" id="list-counter">0 compétence</span>
@@ -133,21 +153,36 @@
         </div>
     </section>
     
-    {# ===== BLOC 4 : DÉTAIL COMPÉTENCE (Col 3, Rows 1-2) ===== #}
-    <section class="bloc-detail">
+    {# ===== BLOC 4 : DÉTAIL COMPÉTENCE ===== #}
+    <section class="bloc-detail collapsed" id="bloc-detail">
+        
+        {# SIDEBAR MODE (collapsed) - Cliquable sur toute hauteur #}
+        <button class="bloc-sidebar" id="bloc-sidebar-toggle">
+            <svg class="star-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+        </button>
+        
+        {# CONTENU ÉTENDU (expanded) #}
         <div id="detail-content" class="detail-content scrollable">
             
             {# ========== ÉTAT VIDE (aucune compétence sélectionnée) ========== #}
             <div class="detail-empty" id="detail-empty">
+                <svg class="star-title" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <p>Sélectionne une compétence dans la liste pour voir les détails.</p>
             </div>
             
-            {# ========== MODE LECTURE (par défaut au clic sur card) ========== #}
+            {# ========== MODE LECTURE ========== #}
             <div class="detail-view" id="detail-view-read" style="display: none;">
                 <div class="detail-header">
+                    <svg class="star-title" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
                     <h2 id="detail-title-read" class="detail-title"></h2>
                     <div id="detail-flash-messages" class="flash-messages"></div>
                     <div class="detail-stars" id="detail-stars-read"></div>
@@ -195,9 +230,12 @@
                 </div>
             </div>
             
-            {# ========== MODE ÉDITION (au clic sur bouton Éditer) ========== #}
+            {# ========== MODE ÉDITION ========== #}
             <div class="detail-edit" id="detail-view-edit" style="display: none;">
                 <div class="detail-header">
+                    <svg class="star-title" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
                     <h2 class="detail-title">Édition</h2>
                     <div class="detail-actions">
                         <button class="btn-save" id="btn-save-detail" title="Enregistrer les modifications">
@@ -250,7 +288,7 @@
                         ></textarea>
                     </div>
                     
-                    {# Projets MY-ANKODE (liste avec bouton ajouter) #}
+                    {# Projets MY-ANKODE #}
                     <div class="detail-section">
                         <label>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -271,7 +309,7 @@
                         <ul id="edit-projects-linked-list" class="linked-items-editable-list"></ul>
                     </div>
                     
-                    {# Snippets MY-ANKODE (liste avec bouton ajouter) #}
+                    {# Snippets MY-ANKODE #}
                     <div class="detail-section">
                         <label>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -292,7 +330,7 @@
                         <ul id="edit-snippets-linked-list" class="linked-items-editable-list"></ul>
                     </div>
                     
-                    {# Projets externes (liste éditable) #}
+                    {# Projets externes #}
                     <div class="detail-section">
                         <label>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -309,7 +347,7 @@
                         </button>
                     </div>
                     
-                    {# Snippets externes (liste éditable) #}
+                    {# Snippets externes #}
                     <div class="detail-section">
                         <label>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
