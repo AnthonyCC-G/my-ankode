@@ -15,11 +15,11 @@ use App\Tests\ApiTestCase;
 class OwnershipTest extends ApiTestCase
 {
     private User $alice;
-    private User $marie;
+    private User $bob;
     private Project $projectAlice;
-    private Project $projectMarie;
+    private Project $projectBob;
     private Task $taskAlice;
-    private Task $taskMarie;
+    private Task $taskBob;
 
     protected function setUp(): void
     {
@@ -28,114 +28,63 @@ class OwnershipTest extends ApiTestCase
         // Récupérer les users des fixtures
         $userRepository = $this->entityManager->getRepository(User::class);
         $this->alice = $userRepository->findOneBy(['email' => 'alice@test.com']);
-        $this->marie = $userRepository->findOneBy(['email' => 'marie@test.com']);
+        $this->bob = $userRepository->findOneBy(['email' => 'bob@test.com']);
         
-        // Récupérer un projet d'Alice et un de Marie
+        // Récupérer un projet d'Alice et un de Bob
         $projectRepository = $this->entityManager->getRepository(Project::class);
         $this->projectAlice = $projectRepository->findOneBy(['owner' => $this->alice]);
-        $this->projectMarie = $projectRepository->findOneBy(['owner' => $this->marie]);
+        $this->projectBob = $projectRepository->findOneBy(['owner' => $this->bob]);
         
-        // Récupérer une task d'Alice et une de Marie
+        // Récupérer une task d'Alice et une de Bob
         $taskRepository = $this->entityManager->getRepository(Task::class);
         $this->taskAlice = $taskRepository->findOneBy(['project' => $this->projectAlice]);
-        $this->taskMarie = $taskRepository->findOneBy(['project' => $this->projectMarie]);
+        $this->taskBob = $taskRepository->findOneBy(['project' => $this->projectBob]);
     }
 
     /**
-     * Test 1 : Marie ne peut PAS voir les tasks d'Alice (GET → 403)
-     * 
-     * Scénario :
-     * - Marie se connecte
-     * - Marie essaie d'accéder à GET /api/tasks/{taskAlice}
-     * - Résultat attendu : 403 Forbidden
-     * 
-     * Note : GET ne nécessite pas de CSRF, aucun changement
+     * Test 1 : Bob ne peut PAS voir les tasks d'Alice (GET → 403)
      */
     public function testUserCannotAccessOtherUserTask(): void
     {
-        // Arrange : Marie se connecte
-        $this->loginUser($this->marie);
-        
-        // Act : Marie essaie de voir la task d'Alice
+        $this->loginUser($this->bob);
         $this->client->request('GET', '/api/tasks/' . $this->taskAlice->getId());
-        
-        // Assert : 403 Forbidden
         $this->assertResponseStatusCode(403);
     }
 
     /**
-     * Test 2 : Marie ne peut PAS modifier le project d'Alice (PUT → 403)
-     * 
-     * Scénario :
-     * - Marie se connecte
-     * - Marie essaie de modifier PUT /api/projects/{projectAlice}
-     * - Résultat attendu : 403 Forbidden
-     * 
-     * Utilise apiRequest() pour gérer le CSRF automatiquement
+     * Test 2 : Bob ne peut PAS modifier le project d'Alice (PUT → 403)
      */
     public function testUserCannotUpdateOtherUserProject(): void
     {
-        // Arrange : Marie se connecte
-        $this->loginUser($this->marie);
-        
-        // Act : Marie essaie de modifier le project d'Alice
-        // apiRequest (avec CSRF)
+        $this->loginUser($this->bob);
         $this->apiRequest('PUT', '/api/projects/' . $this->projectAlice->getId(), [
-            'name' => 'Projet piraté par Marie',
+            'name' => 'Projet piraté par Bob',
             'description' => 'Tentative de modification'
         ]);
-        
-        // Assert : 403 Forbidden
         $this->assertResponseStatusCode(403);
     }
 
     /**
-     * Test 3 : Marie ne peut PAS supprimer la task d'Alice (DELETE → 403)
-     * 
-     * Scénario :
-     * - Marie se connecte
-     * - Marie essaie de supprimer DELETE /api/tasks/{taskAlice}
-     * - Résultat attendu : 403 Forbidden
-     * 
-     * Utilise apiRequest() pour gérer le CSRF automatiquement
+     * Test 3 : Bob ne peut PAS supprimer la task d'Alice (DELETE → 403)
      */
     public function testUserCannotDeleteOtherUserTask(): void
     {
-        // Arrange : Marie se connecte
-        $this->loginUser($this->marie);
-        
-        // Act : Marie essaie de supprimer la task d'Alice
-        // client->request → apiRequest (avec CSRF)
+        $this->loginUser($this->bob);
         $this->apiRequest('DELETE', '/api/tasks/' . $this->taskAlice->getId());
-        
-        // Assert : 403 Forbidden
         $this->assertResponseStatusCode(403);
     }
 
     /**
-     * Test 4 : Marie ne peut PAS créer une task dans le project d'Alice (POST → 403)
-     * 
-     * Scénario :
-     * - Marie se connecte
-     * - Marie essaie de créer POST /api/projects/{projectAlice}/tasks
-     * - Résultat attendu : 403 Forbidden
-     * 
-     * Utilise apiRequest() pour gérer le CSRF automatiquement
+     * Test 4 : Bob ne peut PAS créer une task dans le project d'Alice (POST → 403)
      */
     public function testUserCannotCreateTaskInOtherUserProject(): void
     {
-        // Arrange : Marie se connecte
-        $this->loginUser($this->marie);
-        
-        // Act : Marie essaie de créer une task dans le project d'Alice
-        // apiRequest (avec CSRF)
+        $this->loginUser($this->bob);
         $this->apiRequest('POST', '/api/projects/' . $this->projectAlice->getId() . '/tasks', [
-            'title' => 'Task piratée par Marie',
+            'title' => 'Task piratée par Bob',
             'description' => 'Tentative de création',
             'status' => 'todo'
         ]);
-        
-        // Assert : 403 Forbidden
         $this->assertResponseStatusCode(403);
     }
 }

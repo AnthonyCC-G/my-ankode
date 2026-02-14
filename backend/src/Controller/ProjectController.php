@@ -46,20 +46,13 @@ class ProjectController extends AbstractController
     /**
      * Route 2 : Récupérer un projet spécifique
      * GET /api/projects/{id}
+     * 
+     * Sécurité : ResourceVoter vérifie automatiquement l'ownership
      */
     #[Route('/{id}', methods: ['GET'])]
-    public function getProject(int $id, ProjectRepository $projectRepo): JsonResponse
+    #[IsGranted('VIEW', subject: 'project')]
+    public function getProject(Project $project): JsonResponse
     {
-        $project = $projectRepo->find($id);
-        
-        if (!$project) {
-            return $this->json(['error' => 'Projet non trouvé'], 404);
-        }
-        
-        if ($project->getOwner() !== $this->getUser()) {
-            return $this->json(['error' => 'Accès refusé'], 403);
-        }
-        
         return $this->json([
             'id' => $project->getId(),
             'name' => $project->getName(),
@@ -119,26 +112,18 @@ class ProjectController extends AbstractController
      * Route 4 : Modifier un projet
      * PUT /api/projects/{id}
      * Protection CSRF
+     * 
+     * Sécurité : ResourceVoter vérifie automatiquement l'ownership
      */
     #[Route('/{id}', methods: ['PUT'])]
+    #[IsGranted('EDIT', subject: 'project')]
     public function updateProject(
-        int $id,
+        Project $project,
         Request $request,
-        ProjectRepository $projectRepo,
         EntityManagerInterface $em,
         ValidatorInterface $validator
     ): JsonResponse
     {
-        $project = $projectRepo->find($id);
-
-        if (!$project) {
-            return $this->json(['error' => 'Projet non trouvé'], 404);
-        }
-
-        if ($project->getOwner() !== $this->getUser()) {
-            return $this->json(['error' => 'Accès refusé'], 403);
-        }
-
         $data = json_decode($request->getContent(), true);
         
         if (isset($data['name'])) {
@@ -174,25 +159,16 @@ class ProjectController extends AbstractController
      * Route 5 : Supprimer un projet
      * DELETE /api/projects/{id}
      * Protection CSRF
+     * 
+     * Sécurité : ResourceVoter vérifie automatiquement l'ownership
      */
     #[Route('/{id}', methods: ['DELETE'])]
+    #[IsGranted('DELETE', subject: 'project')]
     public function deleteProject(
-        int $id,
-        Request $request,
-        ProjectRepository $projectRepo,
+        Project $project,
         EntityManagerInterface $em
     ): JsonResponse
     {
-        $project = $projectRepo->find($id);
-
-        if (!$project) {
-            return $this->json(['error' => 'Projet non trouvé'], 404);
-        }
-
-        if ($project->getOwner() !== $this->getUser()) {
-            return $this->json(['error' => 'Accès refusé'], 403);
-        }
-
         $em->remove($project);
         $em->flush();
         

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Task;
+use App\Entity\Project;
 use App\Repository\TaskRepository;
 use App\Repository\ProjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -10,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted; 
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -22,20 +24,13 @@ class TaskController extends AbstractController
     /**
      * Route 1 : Récupérer toutes les tâches d'un projet
      * GET /api/projects/{id}/tasks
+     * 
+     * Securite : ResourceVoter verifie l'ownership du PROJECT (pas des tasks)
      */
     #[Route('/projects/{id}/tasks', methods: ['GET'])]
-    public function getTasks(int $id, ProjectRepository $projectRepo): JsonResponse
+    #[IsGranted('VIEW', subject: 'project')]
+    public function getTasks(Project $project): JsonResponse
     {
-        $project = $projectRepo->find($id);
-        
-        if (!$project) {
-            return $this->json(['error' => 'Projet non trouvé'], 404);
-        }
-        
-        if ($project->getOwner() !== $this->getUser()) {
-            return $this->json(['error' => 'Accès refusé'], 403);
-        }
-        
         $tasks = $project->getTasks();
         
         $data = [];
@@ -58,47 +53,33 @@ class TaskController extends AbstractController
      * Route 2 : Changer le statut d'une tâche
      * PATCH /api/tasks/{id}/status
      * Protection CSRF
+     * 
+     * Securite : ResourceVoter verifie l'ownership via project.owner
      */
     #[Route('/tasks/{id}/status', methods: ['PATCH'])]
+    #[IsGranted('EDIT', subject: 'task')]
     public function updateStatus(
-        int $id, 
+        Task $task,
         Request $request, 
-        TaskRepository $taskRepo,
         EntityManagerInterface $em
     ): JsonResponse
     {
-        $task = $taskRepo->find($id);
-
-        if (!$task) {
-            return $this->json(['error' => 'Tâche non trouvée'], 404);
-        }
-
-        if ($task->getProject()->getOwner() !== $this->getUser()) {
-            return $this->json(['error' => 'Accès refusé'], 403);
-        }
-
         $data = json_decode($request->getContent(), true);
         $newStatus = $data['status'] ?? null;
-        
-        $validStatuses = ['todo', 'in_progress', 'done'];
-        if (!in_array($newStatus, $validStatuses)) {
-            return $this->json([
-                'error' => 'Statut invalide',
-                'message' => 'Le statut doit être : todo, in_progress ou done'
-            ], 400);
+
+        if (!in_array($newStatus, ['todo', 'in_progress', 'done'])) {
+            return $this->json(['error' => 'Statut invalide'], 400);
         }
-        
+
         $task->setStatus($newStatus);
         $em->flush();
         
         return $this->json([
             'success' => true,
-            'message' => 'Statut mis à jour avec succès',
+            'message' => 'Statut mis à jour',
             'task' => [
                 'id' => $task->getId(),
-                'title' => $task->getTitle(),
                 'status' => $task->getStatus(),
-                'position' => $task->getPosition()
             ]
         ]);
     }
@@ -178,20 +159,13 @@ class TaskController extends AbstractController
     /**
      * Route 4 : Récupérer une tâche spécifique
      * GET /api/tasks/{id}
+     * 
+     * Securite : ResourceVoter verifie l'ownership via project.owner
      */
     #[Route('/tasks/{id}', methods: ['GET'])]
-    public function getTask(int $id, TaskRepository $taskRepo): JsonResponse
+    #[IsGranted('VIEW', subject: 'task')]
+    public function getTask(Task $task): JsonResponse
     {
-        $task = $taskRepo->find($id);
-        
-        if (!$task) {
-            return $this->json(['error' => 'Tâche non trouvée'], 404);
-        }
-        
-        if ($task->getProject()->getOwner() !== $this->getUser()) {
-            return $this->json(['error' => 'Accès refusé'], 403);
-        }
-        
         return $this->json([
             'id' => $task->getId(),
             'title' => $task->getTitle(),
@@ -208,26 +182,18 @@ class TaskController extends AbstractController
      * Route 5 : Modifier une tâche complète
      * PUT /api/tasks/{id}
      * Protection CSRF
+     * 
+     * Securite : ResourceVoter verifie l'ownership via project.owner
      */
     #[Route('/tasks/{id}', methods: ['PUT'])]
+    #[IsGranted('EDIT', subject: 'task')]
     public function updateTask(
-        int $id,
+        Task $task,
         Request $request,
-        TaskRepository $taskRepo,
         EntityManagerInterface $em,
         ValidatorInterface $validator
     ): JsonResponse
     {
-        $task = $taskRepo->find($id);
-
-        if (!$task) {
-            return $this->json(['error' => 'Tâche non trouvée'], 404);
-        }
-
-        if ($task->getProject()->getOwner() !== $this->getUser()) {
-            return $this->json(['error' => 'Accès refusé'], 403);
-        }
-
         $data = json_decode($request->getContent(), true);
 
         if (isset($data['status'])) {
@@ -281,25 +247,16 @@ class TaskController extends AbstractController
      * Route 6 : Supprimer une tâche
      * DELETE /api/tasks/{id}
      * Protection CSRF
+     * 
+     * Securite : ResourceVoter verifie l'ownership via project.owner
      */
     #[Route('/tasks/{id}', methods: ['DELETE'])]
+    #[IsGranted('DELETE', subject: 'task')]
     public function deleteTask(
-        int $id,
-        Request $request,  
-        TaskRepository $taskRepo,
+        Task $task,
         EntityManagerInterface $em
     ): JsonResponse
     {
-        $task = $taskRepo->find($id);
-
-        if (!$task) {
-            return $this->json(['error' => 'Tâche non trouvée'], 404);
-        }
-
-        if ($task->getProject()->getOwner() !== $this->getUser()) {
-            return $this->json(['error' => 'Accès refusé'], 403);
-        }
-
         $em->remove($task);
         $em->flush();
         
