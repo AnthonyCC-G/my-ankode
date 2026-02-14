@@ -6,15 +6,21 @@ namespace App\DataFixtures;
 use App\Entity\Task;
 use App\Entity\Project;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Common\DataFixtures\DependentFixtureInterface;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;  // AJOUTÉ
 
-class TaskFixtures extends Fixture implements DependentFixtureInterface
+class TaskFixtures extends Fixture implements FixtureGroupInterface
 {
+    // CONSTRUCTEUR AJOUTÉ
+    public function __construct(
+        private EntityManagerInterface $em
+    ) {}
+
     public function load(ObjectManager $manager): void
     {
         // ========================================
-        // 1️⃣ TÂCHES ANTHONY - Roadmap MY-ANKODE
+        // 1- TÂCHES ANTHONY - Roadmap MY-ANKODE
         // ========================================
         
         // Projet 0 : Refonte Admin Dashboard
@@ -25,7 +31,7 @@ class TaskFixtures extends Fixture implements DependentFixtureInterface
             ['title' => 'Système de logs admin (qui a fait quoi)', 'status' => 'todo', 'created_offset' => '-4 months 5 days'],
             ['title' => 'Export CSV des utilisateurs', 'status' => 'todo', 'created_offset' => '-4 months'],
         ];
-        $this->createTasksForProject('project_anthony_0', $tasksAnthony0, $manager);
+        $this->createTasksForProject('MY-ANKODE - Refonte Admin Dashboard', $tasksAnthony0, $manager);
 
         // Projet 1 : Module Compétences v2
         $tasksAnthony1 = [
@@ -34,7 +40,7 @@ class TaskFixtures extends Fixture implements DependentFixtureInterface
             ['title' => 'Suggestions auto basées sur référentiel DWWM', 'status' => 'in_progress', 'created_offset' => '-3 months 10 days'],
             ['title' => 'Lier compétences aux projets/snippets', 'status' => 'todo', 'created_offset' => '-3 months 5 days'],
         ];
-        $this->createTasksForProject('project_anthony_1', $tasksAnthony1, $manager);
+        $this->createTasksForProject('MY-ANKODE - Module Compétences v2', $tasksAnthony1, $manager);
 
         // Projet 2 : Redesign Page Accueil
         $tasksAnthony2 = [
@@ -43,7 +49,7 @@ class TaskFixtures extends Fixture implements DependentFixtureInterface
             ['title' => 'Optimiser performances (Lighthouse > 90)', 'status' => 'in_progress', 'created_offset' => '-2 months 15 days'],
             ['title' => 'A/B testing nouveau design', 'status' => 'todo', 'created_offset' => '-2 months 10 days'],
         ];
-        $this->createTasksForProject('project_anthony_2', $tasksAnthony2, $manager);
+        $this->createTasksForProject('MY-ANKODE - Redesign Page Accueil', $tasksAnthony2, $manager);
 
         // Projet 3 : Easter Eggs & Animations
         $tasksAnthony3 = [
@@ -52,10 +58,10 @@ class TaskFixtures extends Fixture implements DependentFixtureInterface
             ['title' => 'Easter egg : mode "Matrix" (pluie de code)', 'status' => 'todo', 'created_offset' => '-1 month 15 days'],
             ['title' => 'Animations de chargement personnalisées', 'status' => 'todo', 'created_offset' => '-1 month 10 days'],
         ];
-        $this->createTasksForProject('project_anthony_3', $tasksAnthony3, $manager);
+        $this->createTasksForProject('MY-ANKODE - Easter Eggs & Animations', $tasksAnthony3, $manager);
 
         // ========================================
-        // 2️⃣ TÂCHES ALICE - Frontend
+        // 2- TÂCHES ALICE - Frontend
         // ========================================
 
         // Projet 0 : Intégration Maquette Figma
@@ -66,7 +72,7 @@ class TaskFixtures extends Fixture implements DependentFixtureInterface
             ['title' => 'Corriger ce bug de centrage vertical (encore...)', 'status' => 'in_progress', 'created_offset' => '-2 months 2 days'],
             ['title' => 'Tests accessibilité WCAG AA', 'status' => 'todo', 'created_offset' => '-2 months'],
         ];
-        $this->createTasksForProject('project_alice_0', $tasksAlice0, $manager);
+        $this->createTasksForProject('Intégration Maquette Figma - Agence Voyage', $tasksAlice0, $manager);
 
         // Projet 1 : Clone Netflix
         $tasksAlice1 = [
@@ -76,7 +82,7 @@ class TaskFixtures extends Fixture implements DependentFixtureInterface
             ['title' => 'Pourquoi le z-index ne fonctionne pas ?!', 'status' => 'todo', 'created_offset' => '-1 month 18 days'],
             ['title' => 'Lazy loading des images', 'status' => 'todo', 'created_offset' => '-1 month 15 days'],
         ];
-        $this->createTasksForProject('project_alice_1', $tasksAlice1, $manager);
+        $this->createTasksForProject('Clone Netflix - Interface uniquement', $tasksAlice1, $manager);
 
         // Projet 2 : Portfolio v3
         $tasksAlice2 = [
@@ -86,7 +92,7 @@ class TaskFixtures extends Fixture implements DependentFixtureInterface
             ['title' => 'Section projets interactive (filtres)', 'status' => 'todo', 'created_offset' => '-1 month 5 days'],
             ['title' => 'Formulaire de contact (EmailJS)', 'status' => 'todo', 'created_offset' => '-1 month'],
         ];
-        $this->createTasksForProject('project_alice_2', $tasksAlice2, $manager);
+        $this->createTasksForProject('Portfolio Personnel v3', $tasksAlice2, $manager);
 
         // Projet 3 : TP Cinema Responsive
         $tasksAlice3 = [
@@ -95,10 +101,10 @@ class TaskFixtures extends Fixture implements DependentFixtureInterface
             ['title' => 'Grid layout tablette (768-1024px)', 'status' => 'in_progress', 'created_offset' => '-2 weeks 5 days'],
             ['title' => 'Tests cross-browser (Safari bug...)', 'status' => 'todo', 'created_offset' => '-2 weeks'],
         ];
-        $this->createTasksForProject('project_alice_3', $tasksAlice3, $manager);
+        $this->createTasksForProject('TP Cinema - Responsive Design', $tasksAlice3, $manager);
 
         // ========================================
-        // 3️⃣ TÂCHES BOB - Backend
+        // 3- TÂCHES BOB - Backend
         // ========================================
 
         // Projet 0 : Calculatrice Console
@@ -108,7 +114,7 @@ class TaskFixtures extends Fixture implements DependentFixtureInterface
             ['title' => 'Ajouter opérations avancées (sqrt, pow)', 'status' => 'done', 'created_offset' => '-1 month 20 days'],
             ['title' => 'Refactoring : PSR-12 + PHPStan level 5', 'status' => 'in_progress', 'created_offset' => '-1 month 18 days'],
         ];
-        $this->createTasksForProject('project_bob_0', $tasksBob0, $manager);
+        $this->createTasksForProject('Calculatrice Console PHP', $tasksBob0, $manager);
 
         // Projet 1 : API Bibliothèque
         $tasksBob1 = [
@@ -118,7 +124,7 @@ class TaskFixtures extends Fixture implements DependentFixtureInterface
             ['title' => 'Débugger requête N+1 sur /api/books (Doctrine)', 'status' => 'in_progress', 'created_offset' => '-1 month 2 days'],
             ['title' => 'Tests PHPUnit (coverage > 80%)', 'status' => 'todo', 'created_offset' => '-1 month'],
         ];
-        $this->createTasksForProject('project_bob_1', $tasksBob1, $manager);
+        $this->createTasksForProject('API REST - Bibliothèque Municipale', $tasksBob1, $manager);
 
         // Projet 2 : Todo List API
         $tasksBob2 = [
@@ -128,7 +134,7 @@ class TaskFixtures extends Fixture implements DependentFixtureInterface
             ['title' => 'Documentation OpenAPI (NelmioApiDoc)', 'status' => 'todo', 'created_offset' => '-2 weeks 5 days'],
             ['title' => 'Déploiement sur Heroku/Railway', 'status' => 'todo', 'created_offset' => '-2 weeks'],
         ];
-        $this->createTasksForProject('project_bob_2', $tasksBob2, $manager);
+        $this->createTasksForProject('Todo List API (oui encore une)', $tasksBob2, $manager);
 
         // Projet 3 : Système Auth JWT
         $tasksBob3 = [
@@ -138,10 +144,10 @@ class TaskFixtures extends Fixture implements DependentFixtureInterface
             ['title' => 'Middleware validation token', 'status' => 'in_progress', 'created_offset' => '-1 week 5 days'],
             ['title' => 'Système blacklist (logout/révocation)', 'status' => 'todo', 'created_offset' => '-1 week'],
         ];
-        $this->createTasksForProject('project_bob_3', $tasksBob3, $manager);
+        $this->createTasksForProject('Système Auth JWT from scratch', $tasksBob3, $manager);
 
         // ========================================
-        // 4️⃣ TÂCHES CLARA - Reconversion
+        // 4- TÂCHES CLARA - Reconversion
         // ========================================
 
         // Projet 0 : Calculatrice Web
@@ -152,7 +158,7 @@ class TaskFixtures extends Fixture implements DependentFixtureInterface
             ['title' => 'Pourquoi mon console.log ne s\'affiche pas ?', 'status' => 'done', 'created_offset' => '-2 weeks 2 days'],
             ['title' => 'Gestion erreurs (NaN, Infinity)', 'status' => 'in_progress', 'created_offset' => '-2 weeks'],
         ];
-        $this->createTasksForProject('project_clara_0', $tasksClara0, $manager);
+        $this->createTasksForProject('Calculatrice Web (HTML/CSS/JS)', $tasksClara0, $manager);
 
         // Projet 1 : Site Vitrine Cours Maths
         $tasksClara1 = [
@@ -162,7 +168,7 @@ class TaskFixtures extends Fixture implements DependentFixtureInterface
             ['title' => 'Responsive : mon site est cassé sur mobile...', 'status' => 'todo', 'created_offset' => '-1 week 3 days'],
             ['title' => 'Déployer sur GitHub Pages', 'status' => 'todo', 'created_offset' => '-1 week'],
         ];
-        $this->createTasksForProject('project_clara_1', $tasksClara1, $manager);
+        $this->createTasksForProject('Site Vitrine - Cours de Maths', $tasksClara1, $manager);
 
         // Projet 2 : Convertisseur Unités
         $tasksClara2 = [
@@ -172,7 +178,7 @@ class TaskFixtures extends Fixture implements DependentFixtureInterface
             ['title' => 'Ajouter conversions surfaces et volumes', 'status' => 'todo', 'created_offset' => '-5 days'],
             ['title' => 'Améliorer UX (icons, animations)', 'status' => 'todo', 'created_offset' => '-3 days'],
         ];
-        $this->createTasksForProject('project_clara_2', $tasksClara2, $manager);
+        $this->createTasksForProject('Convertisseur Unités Mathématiques', $tasksClara2, $manager);
 
         $manager->flush();
     }
@@ -180,13 +186,19 @@ class TaskFixtures extends Fixture implements DependentFixtureInterface
     /**
      * Helper pour créer des tâches avec dates échelonnées
      * 
-     * @param string $projectRef Référence du projet (ex: 'project_alice_0')
+     * @param string $projectName Nom exact du projet dans la BDD
      * @param array $tasksData Tableau de tâches avec title, status, created_offset
      * @param ObjectManager $manager Doctrine ObjectManager
      */
-    private function createTasksForProject(string $projectRef, array $tasksData, ObjectManager $manager): void
+    private function createTasksForProject(string $projectName, array $tasksData, ObjectManager $manager): void
     {
-        $project = $this->getReference($projectRef, Project::class);
+        // Récupérer le projet depuis la BDD
+        $projectRepository = $this->em->getRepository(Project::class);
+        $project = $projectRepository->findOneBy(['name' => $projectName]);
+
+        if (!$project) {
+            throw new \Exception("Project '$projectName' not found! Load ProjectFixtures first.");
+        }
 
         foreach ($tasksData as $position => $taskData) {
             $task = new Task();
@@ -201,10 +213,8 @@ class TaskFixtures extends Fixture implements DependentFixtureInterface
         }
     }
 
-    public function getDependencies(): array
+    public static function getGroups(): array
     {
-        return [
-            ProjectFixtures::class,
-        ];
+        return ['task'];
     }
 }

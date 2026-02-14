@@ -6,18 +6,30 @@ namespace App\DataFixtures;
 use App\Entity\Project;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Common\DataFixtures\DependentFixtureInterface;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;  // AJOUTÉ
 
-class ProjectFixtures extends Fixture implements DependentFixtureInterface
+class ProjectFixtures extends Fixture implements FixtureGroupInterface
 {
+    // CONSTRUCTEUR AJOUTÉ
+    public function __construct(
+        private EntityManagerInterface $em
+    ) {}
+
     public function load(ObjectManager $manager): void
     {
-        // Récupérer les 4 utilisateurs
-        $anthony = $this->getReference('user_anthony', User::class);
-        $alice = $this->getReference('user_alice', User::class);
-        $bob = $this->getReference('user_bob', User::class);
-        $clara = $this->getReference('user_clara', User::class);
+        // Récupérer les users DIRECTEMENT depuis PostgreSQL
+        $userRepository = $this->em->getRepository(User::class);
+        $anthony = $userRepository->findOneBy(['username' => 'anthony_dev']);
+        $alice = $userRepository->findOneBy(['username' => 'alice_codes']);
+        $bob = $userRepository->findOneBy(['username' => 'bob_debug']);
+        $clara = $userRepository->findOneBy(['username' => 'clara_learns']);
+
+        // Vérifier que les users existent
+        if (!$anthony || !$alice || !$bob || !$clara) {
+            throw new \Exception('Users not found! Load UserFixtures first.');
+        }
 
         // ========================================
         // 1- PROJETS ANTHONY (Admin) - Roadmap MY-ANKODE
@@ -165,10 +177,8 @@ class ProjectFixtures extends Fixture implements DependentFixtureInterface
         $manager->flush();
     }
 
-    public function getDependencies(): array
+    public static function getGroups(): array
     {
-        return [
-            UserFixtures::class,
-        ];
+        return ['project'];
     }
 }
