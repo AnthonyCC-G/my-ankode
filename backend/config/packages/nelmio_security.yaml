@@ -1,0 +1,25 @@
+nelmio_security:
+    # Empêche le navigateur de deviner le type MIME
+    # Prévient l'exécution de fichiers uploadés comme du JavaScript malveillant
+    content_type:
+        nosniff: true
+    
+    # Protection contre le clickjacking (attaques par iframe)
+    # Empêche l'intégration de l'application dans une frame malveillante
+    clickjacking:
+        paths:
+            '^/.*': DENY
+    
+    # Protection XSS (Cross-Site Scripting)
+    # Note: Header obsolète (retiré de Chrome/Edge depuis 2019) mais conservé
+    # pour compatibilité navigateurs anciens et défense en profondeur
+    xss_protection:
+        enabled: true
+        mode_block: true
+    
+    # Politique de référent HTTP
+    # Envoie l'URL complète en same-origin, uniquement l'origine en cross-origin HTTPS
+    referrer_policy:
+        enabled: true
+        policies:
+            - 'strict-origin-when-cross-origin'
