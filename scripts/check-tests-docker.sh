@@ -1,9 +1,9 @@
 #!/bin/bash
 #
-# Script de vérification des tests MY-ANKODE (LOCAL)
+# Script de vérification des tests MY-ANKODE (DOCKER)
 # 
 # Prépare l'environnement et lance la suite complète de tests
-# - Vérifie que PHP est disponible
+# - Vérifie Docker actif
 # - Crée base de test si nécessaire
 # - Nettoie les caches
 # - Recharge les fixtures test
@@ -11,16 +11,13 @@
 # - Génère coverage (optionnel)
 #
 # Usage : 
-#   ./scripts/check-tests-local.sh           -> Tests standard
-#   ./scripts/check-tests-local.sh --coverage -> Tests avec coverage
+#   ./scripts/check-tests-docker.sh           -> Tests standard
+#   ./scripts/check-tests-docker.sh --coverage -> Tests avec coverage
 #
 # Auteur : Anthony (DWWM 2026)
 
-# Se placer dans le dossier backend
-cd "$(dirname "$0")/../backend" || exit 1
-
 echo "========================================="
-echo "MY-ANKODE - Verification des tests (LOCAL)"
+echo "MY-ANKODE - Verification des tests"
 echo "========================================="
 
 # Couleurs
@@ -42,26 +39,25 @@ fi
 
 echo ""
 
-# Etape 1 : Vérifier PHP
-echo -e "${CYAN}[1/5] Vérification PHP...${NC}"
-if ! command -v php &> /dev/null; then
-    echo -e "${RED}ERREUR : PHP non trouvé${NC}"
-    echo "Installez PHP ou utilisez Docker"
+# Etape 1 : Vérifier Docker
+echo -e "${CYAN}[1/5] Vérification Docker...${NC}"
+if ! docker-compose ps | grep -q "Up"; then
+    echo -e "${RED}ERREUR : Conteneurs Docker inactifs${NC}"
+    echo "Lancez : docker-compose up -d"
     exit 1
 fi
-PHP_VERSION=$(php -v | head -n 1)
-echo -e "${GREEN}[OK] $PHP_VERSION${NC}"
+echo -e "${GREEN}[OK] Conteneurs actifs${NC}"
 echo ""
 
 # Etape 2 : Vérifier base test
 echo -e "${CYAN}[2/5] Vérification base test...${NC}"
 
-DB_CHECK=$(php bin/console dbal:run-sql "SELECT 1" --env=test 2>&1)
+DB_CHECK=$(docker-compose exec -T backend php bin/console dbal:run-sql "SELECT 1" --env=test 2>&1)
 
 if echo "$DB_CHECK" | grep -q "database \"my_ankode_test\" does not exist"; then
     echo -e "${YELLOW}Base test absente, création...${NC}"
     
-    CREATE_OUTPUT=$(php bin/console doctrine:database:create --env=test 2>&1)
+    CREATE_OUTPUT=$(docker-compose exec -T backend php bin/console doctrine:database:create --env=test 2>&1)
     if [ $? -ne 0 ]; then
         echo -e "${RED}ERREUR création base${NC}"
         echo "$CREATE_OUTPUT"
@@ -69,7 +65,7 @@ if echo "$DB_CHECK" | grep -q "database \"my_ankode_test\" does not exist"; then
     fi
     echo -e "${GREEN}[OK] Base créée${NC}"
     
-    SCHEMA_OUTPUT=$(php bin/console doctrine:schema:create --env=test 2>&1)
+    SCHEMA_OUTPUT=$(docker-compose exec -T backend php bin/console doctrine:schema:create --env=test 2>&1)
     if [ $? -ne 0 ]; then
         echo -e "${RED}ERREUR création schéma${NC}"
         echo "$SCHEMA_OUTPUT"
@@ -83,9 +79,9 @@ echo ""
 
 # Etape 3 : Cache
 echo -e "${CYAN}[3/5] Nettoyage cache...${NC}"
-php bin/console cache:clear --env=dev --quiet 2>/dev/null
+docker-compose exec -T backend php bin/console cache:clear --env=dev --quiet 2>/dev/null
 echo -e "${GREEN}[OK] Cache dev${NC}"
-php bin/console cache:clear --env=test --quiet 2>/dev/null
+docker-compose exec -T backend php bin/console cache:clear --env=test --quiet 2>/dev/null
 echo -e "${GREEN}[OK] Cache test${NC}"
 echo ""
 
@@ -93,26 +89,26 @@ echo ""
 echo -e "${CYAN}[4/5] Rechargement fixtures test...${NC}"
 
 # Drop et recréer schéma PostgreSQL
-php bin/console doctrine:schema:drop --force --full-database --env=test --quiet 2>/dev/null
-php bin/console doctrine:schema:create --env=test --quiet 2>/dev/null
+docker-compose exec -T backend php bin/console doctrine:schema:drop --force --full-database --env=test --quiet 2>/dev/null
+docker-compose exec -T backend php bin/console doctrine:schema:create --env=test --quiet 2>/dev/null
 
 # Charger Users (première fixture)
-php bin/console doctrine:fixtures:load --group=user --no-interaction --env=test --quiet 2>/dev/null
+docker-compose exec -T backend php bin/console doctrine:fixtures:load --group=user --no-interaction --env=test --quiet 2>/dev/null
 
 # Charger Projects (append)
-php bin/console doctrine:fixtures:load --group=project --append --no-interaction --env=test --quiet 2>/dev/null
+docker-compose exec -T backend php bin/console doctrine:fixtures:load --group=project --append --no-interaction --env=test --quiet 2>/dev/null
 
 # Charger Tasks (append)
-php bin/console doctrine:fixtures:load --group=task --append --no-interaction --env=test --quiet 2>/dev/null
+docker-compose exec -T backend php bin/console doctrine:fixtures:load --group=task --append --no-interaction --env=test --quiet 2>/dev/null
 
 # Charger Competences (append)
-php bin/console doctrine:fixtures:load --group=competence --append --no-interaction --env=test --quiet 2>/dev/null
+docker-compose exec -T backend php bin/console doctrine:fixtures:load --group=competence --append --no-interaction --env=test --quiet 2>/dev/null
 
 # MongoDB - Snippets (première fixture MongoDB)
-php bin/console doctrine:mongodb:fixtures:load --group=snippet --no-interaction --env=test --quiet 2>/dev/null || true
+docker-compose exec -T backend php bin/console doctrine:mongodb:fixtures:load --group=snippet --no-interaction --env=test --quiet 2>/dev/null || true
 
 # MongoDB - Articles (append)
-php bin/console doctrine:mongodb:fixtures:load --group=article --append --no-interaction --env=test --quiet 2>/dev/null || true
+docker-compose exec -T backend php bin/console doctrine:mongodb:fixtures:load --group=article --append --no-interaction --env=test --quiet 2>/dev/null || true
 
 echo -e "${GREEN}[OK] Fixtures chargées${NC}"
 echo ""
@@ -127,7 +123,7 @@ else
     PHPUNIT_CMD="php bin/phpunit"
 fi
 
-OUTPUT=$($PHPUNIT_CMD 2>&1)
+OUTPUT=$(docker-compose exec -T backend $PHPUNIT_CMD 2>&1)
 EXIT_CODE=$?
 
 echo "$OUTPUT"
