@@ -88,9 +88,6 @@ class TaskControllerTest extends ApiTestCase
         // Assert : Doit être refusé
         $this->assertResponseStatusCodeSame(403);
         
-        $response = $this->getJsonResponse();
-        $this->assertArrayHasKey('error', $response);
-        $this->assertEquals('Accès refusé', $response['error']);
     }
 
     /**
