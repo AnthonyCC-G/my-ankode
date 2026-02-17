@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
  * - Competence (ownership via getOwner())
  * - Snippet MongoDB (ownership via getUserId())
  * 
- * Référentiel DWWM CP6 : Développer des composants d'accès aux données sécurisés
+ * 
  */
 class ResourceVoter extends Voter
 {

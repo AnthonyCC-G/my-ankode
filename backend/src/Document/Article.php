@@ -1,5 +1,22 @@
 <?php
 
+/**
+ * ARTICLE.PHP - Document MongoDB pour les articles RSS de veille technologique
+ * 
+ * Responsabilités :
+ * - Stocker les articles RSS agrégés (Korben.info, Dev.to, etc.)
+ * - Gérer les statuts personnalisés par utilisateur (lu, favori)
+ * - Articles publics (userId = null) partagés entre tous les utilisateurs
+ * - Stockage dans MongoDB pour ségrégation des données externes
+ * 
+ * Architecture :
+ * - Collection MongoDB 'articles'
+ * - Articles publics RSS : userId = null
+ * - Statuts personnels : tableaux readBy[] et favoritedBy[] (IDs utilisateurs)
+ * - Métadonnées : title, url, description, source, tags, publishedAt
+ * - Repository personnalisé : ArticleRepository (méthodes de comptage)
+ */
+
 namespace App\Document;
 
 use App\Repository\ArticleRepository;
@@ -9,6 +26,8 @@ use DateTimeImmutable;
 #[MongoDB\Document(collection: 'articles', repositoryClass: ArticleRepository::class)]
 class Article
 {
+    // ===== 1. PROPRIÉTÉS MONGODB - MÉTADONNÉES DE L'ARTICLE =====
+    
     #[MongoDB\Id]
     private ?string $id = null;
 
@@ -59,8 +78,11 @@ class Article
     #[MongoDB\Field(type: 'string')]
     private ?string $userId = null;
 
+    // ===== 2. CONSTRUCTEUR - INITIALISATION TIMESTAMP =====
+    
     public function __construct()
     {
+        // Timestamp automatique de création du document
         $this->createdAt = new DateTimeImmutable();
     }
 
@@ -175,6 +197,7 @@ class Article
      */
     public function isReadByUser(string $userId): bool
     {
+        // Recherche stricte (===) dans le tableau readBy[]
         return in_array($userId, $this->readBy, true);
     }
 
@@ -185,6 +208,7 @@ class Article
      */
     public function markAsReadByUser(string $userId): self
     {
+        // Ajout uniquement si pas déjà présent (évite les doublons)
         if (!$this->isReadByUser($userId)) {
             $this->readBy[] = $userId;
         }
@@ -198,6 +222,7 @@ class Article
      */
     public function markAsUnreadByUser(string $userId): self
     {
+        // Filtrage du tableau pour retirer l'userId + réindexation avec array_values
         $this->readBy = array_values(
             array_filter($this->readBy, fn($id) => $id !== $userId)
         );
@@ -211,6 +236,7 @@ class Article
      */
     public function toggleReadByUser(string $userId): self
     {
+        // Si déjà lu → marquer comme non lu, sinon → marquer comme lu
         if ($this->isReadByUser($userId)) {
             $this->markAsUnreadByUser($userId);
         } else {
@@ -239,6 +265,7 @@ class Article
      */
     public function isFavoritedByUser(string $userId): bool
     {
+        // Recherche stricte (===) dans le tableau favoritedBy[]
         return in_array($userId, $this->favoritedBy, true);
     }
 
@@ -249,6 +276,7 @@ class Article
      */
     public function addToFavorites(string $userId): self
     {
+        // Ajout uniquement si pas déjà en favori (évite les doublons)
         if (!$this->isFavoritedByUser($userId)) {
             $this->favoritedBy[] = $userId;
         }
@@ -262,6 +290,7 @@ class Article
      */
     public function removeFromFavorites(string $userId): self
     {
+        // Filtrage du tableau pour retirer l'userId + réindexation avec array_values
         $this->favoritedBy = array_values(
             array_filter($this->favoritedBy, fn($id) => $id !== $userId)
         );
@@ -275,6 +304,7 @@ class Article
      */
     public function toggleFavorite(string $userId): self
     {
+        // Si déjà en favori → retirer, sinon → ajouter
         if ($this->isFavoritedByUser($userId)) {
             $this->removeFromFavorites($userId);
         } else {

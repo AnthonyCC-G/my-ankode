@@ -11,13 +11,13 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use Doctrine\ORM\EntityManagerInterface;  // AJOUTÉ
+use Doctrine\ORM\EntityManagerInterface;  
 
 class CompetenceFixtures extends Fixture implements FixtureGroupInterface
 {
     public function __construct(
         private DocumentManager $dm,
-        private EntityManagerInterface $em  // AJOUTÉ
+        private EntityManagerInterface $em  // 
     ) {}
 
     public function load(ObjectManager $manager): void

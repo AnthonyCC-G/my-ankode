@@ -1,5 +1,26 @@
 <?php
 
+/**
+ * TASK.PHP - Entité PostgreSQL représentant une tâche Kanban
+ * 
+ * Responsabilités :
+ * - Représenter une tâche dans un projet Kanban
+ * - Gérer le statut de la tâche (todo, in_progress, done)
+ * - Gérer la position pour l'ordre d'affichage dans les colonnes
+ * - Lier la tâche à son projet parent (ManyToOne vers Project)
+ * 
+ * Architecture :
+ * - Table 'task' en PostgreSQL
+ * - Relation Doctrine : project (ManyToOne vers Project)
+ * - Suppression automatique si le projet parent est supprimé (orphanRemoval dans Project)
+ * - Contraintes de validation : title obligatoire (max 255 car), description optionnelle (max 1000 car)
+ * - Statut validé par Assert\Choice (seulement 3 valeurs possibles)
+ * 
+ * Sécurité :
+ * - Ownership vérifié via ResourceVoter (task.project.owner)
+ * - Une tâche ne peut exister sans projet (project NOT NULL)
+ */
+
 namespace App\Entity;
 
 use App\Repository\TaskRepository;
@@ -10,6 +31,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: TaskRepository::class)]
 class Task
 {
+    // ===== 1. PROPRIÉTÉS DOCTRINE - DONNÉES DE LA TÂCHE =====
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -43,6 +66,8 @@ class Task
     #[ORM\ManyToOne(inversedBy: 'tasks')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Project $project = null;
+
+    // ===== 2. GETTERS/SETTERS - PROPRIÉTÉS DE BASE =====
 
     public function getId(): ?int
     {

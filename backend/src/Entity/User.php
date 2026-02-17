@@ -1,5 +1,28 @@
 <?php
 
+/**
+ * USER.PHP - Entité PostgreSQL représentant un utilisateur de l'application
+ * 
+ * Responsabilités :
+ * - Authentification Symfony (UserInterface, PasswordAuthenticatedUserInterface)
+ * - Gestion des rôles (ROLE_USER par défaut, ROLE_ADMIN pour administrateurs)
+ * - Relations avec Projects et Competences (OneToMany avec cascade delete)
+ * - Stockage dans PostgreSQL avec contrainte d'unicité sur email
+ * 
+ * Architecture :
+ * - Table 'user_' en PostgreSQL
+ * - Identifiant unique : email
+ * - Relations Doctrine : projects (OneToMany), competences (OneToMany)
+ * - Cascade orphanRemoval : suppression auto des projets/compétences si user supprimé
+ * - Sérialisation sécurisée : hash CRC32C du password (Symfony 7.3+)
+ * 
+ * Sécurité :
+ * - Password hashé avec bcrypt via UserPasswordHasher
+ * - Email unique en base (contrainte + validation Symfony)
+ * - Username unique en base
+ * - Rôle ROLE_USER garanti pour tous les utilisateurs
+ */
+
 namespace App\Entity;
 
 use App\Repository\UserRepository;
@@ -16,6 +39,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    // ===== 1. PROPRIÉTÉS DOCTRINE - DONNÉES UTILISATEUR =====
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -56,15 +81,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Competence::class, mappedBy: 'owner', orphanRemoval: true)]
     private Collection $competences;
 
+    // ===== 2. CONSTRUCTEUR - INITIALISATION DES VALEURS PAR DÉFAUT =====
+    
     /*  */
     public function __construct()
     {
+        // Timestamp automatique de création
         $this->createdAt = new \DateTimeImmutable();
+        
+        // Rôle ROLE_USER attribué par défaut à tout nouvel utilisateur
         $this->roles = ['ROLE_USER']; // Ici le rôle de l'utilisateur par défaut
+        
+        // Initialisation des collections Doctrine (relations OneToMany)
         $this->projects = new ArrayCollection();
         $this->competences = new ArrayCollection();
     }
 
+    // ===== 3. GETTERS/SETTERS - PROPRIÉTÉS DE BASE =====
 
     public function getId(): ?int
     {
@@ -96,6 +129,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    // ===== 4. MÉTHODES USERINTERFACE - SYMFONY SECURITY =====
+    
     /**
      * A visual identifier that represents this user.
      *
@@ -103,6 +138,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
+        // L'email sert d'identifiant unique pour l'authentification
         return (string) $this->email;
     }
 
@@ -128,6 +164,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    // ===== 5. MÉTHODES PASSWORDAUTHENTICATEDUSERINTERFACE =====
+    
     /**
      * @see PasswordAuthenticatedUserInterface
      */
@@ -143,6 +181,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    // ===== 6. SÉRIALISATION SÉCURISÉE (SYMFONY 7.3+) =====
+    
     /**
      * Ensure the session doesn't contain actual password hashes by CRC32C-hashing them, as supported since Symfony 7.3.
      */
@@ -154,6 +194,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $data;
     }
 
+    // ===== 7. GETTERS/SETTERS - CREATED_AT =====
+    
     // GETTER pour created_at
     public function getCreatedAt(): ?\DateTimeImmutable
     {
@@ -167,6 +209,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    // ===== 8. MÉTHODE DÉPRÉCIÉE (SYMFONY 8) =====
 
     #[\Deprecated]
     public function eraseCredentials(): void
@@ -174,6 +217,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // @deprecated, to be removed when upgrading to Symfony 8
     }
 
+    // ===== 9. GESTION DE LA RELATION ONETOMANY - PROJECTS =====
+    
     /**
      * @return Collection<int, Project>
      */
@@ -184,6 +229,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function addProject(Project $project): static
     {
+        // Ajout uniquement si le projet n'est pas déjà dans la collection
         if (!$this->projects->contains($project)) {
             $this->projects->add($project);
             $project->setOwner($this);
@@ -204,6 +250,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    // ===== 10. GESTION DE LA RELATION ONETOMANY - COMPETENCES =====
+    
     /**
      * @return Collection<int, Competence>
      */
@@ -214,6 +262,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function addCompetence(Competence $competence): static
     {
+        // Ajout uniquement si la compétence n'est pas déjà dans la collection
         if (!$this->competences->contains($competence)) {
             $this->competences->add($competence);
             $competence->setOwner($this);

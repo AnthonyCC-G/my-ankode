@@ -1,5 +1,23 @@
 <?php
 
+/**
+ * ADMINDASHBOARDCONTROLLER.PHP - Dashboard administrateur avec statistiques globales
+ * 
+ * Responsabilités :
+ * - Afficher la page HTML du dashboard admin (réservée ROLE_ADMIN)
+ * - Fournir 7 endpoints API pour statistiques globales
+ * - Comptages PostgreSQL : Users, Projects, Tasks, Competences
+ * - Comptages MongoDB : Articles, Snippets
+ * - Documentation OpenAPI complète pour chaque endpoint
+ * - Détection mobile côté serveur (redirection vers desktop-only)
+ * 
+ * Architecture :
+ * - Accès réservé ROLE_ADMIN uniquement
+ * - Données hybrides : PostgreSQL + MongoDB
+ * - Pas de filtrage par utilisateur (stats globales)
+ * - Annotations OpenAPI pour documentation Swagger
+ */
+
 namespace App\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -21,22 +39,29 @@ use OpenApi\Attributes as OA;
     #[OA\Tag(name: 'Admin - Statistiques')]
     class AdminDashboardController extends AbstractController
     {
+    // ===== 1. AFFICHAGE DE LA PAGE HTML DASHBOARD ADMIN =====
+    
     /**
     * Page principale du dashboard admin
     */
     #[Route('', name: 'app_admin_dashboard')]
     public function index(Request $request): Response
     {
+    // 1a. Détection mobile côté serveur via User-Agent
     // Rediriger les mobiles vers la page desktop-only
     $userAgent = $request->headers->get('User-Agent');
     if (preg_match('/Mobile|Android|iPhone|iPad/i', $userAgent)) {
     return $this->redirectToRoute('app_desktop_only');
     }
+        
+        // 1b. Rendu du template Twig vide (statistiques chargées dynamiquement via API)
         return $this->render('admin_dashboard/index.html.twig', [
             'controller_name' => 'AdminDashboardController',
         ]);
     }
 
+    // ===== 2. API - STATISTIQUES USERS (PostgreSQL) =====
+    
     /**
      * API - Nombre total d'utilisateurs
      */
@@ -62,13 +87,17 @@ use OpenApi\Attributes as OA;
     )]
     public function getUsersCount(UserRepository $userRepository): JsonResponse
     {
+        // 2a. Comptage total des utilisateurs dans PostgreSQL (aucun filtre)
         $count = $userRepository->count([]);
         
+        // 2b. Réponse JSON avec le total
         return $this->json([
             'totalUsers' => $count
         ]);
     }
 
+    // ===== 3. API - STATISTIQUES PROJECTS (PostgreSQL) =====
+    
     /**
      * API - Nombre total de projets
      */
@@ -94,13 +123,17 @@ use OpenApi\Attributes as OA;
     )]
     public function getProjectsCount(ProjectRepository $projectRepository): JsonResponse
     {
+        // 3a. Comptage total des projets dans PostgreSQL (tous utilisateurs confondus)
         $count = $projectRepository->count([]);
         
+        // 3b. Réponse JSON avec le total
         return $this->json([
             'totalProjects' => $count
         ]);
     }
 
+    // ===== 4. API - STATISTIQUES TASKS (PostgreSQL) =====
+    
     /**
      * API - Nombre total de tâches
      */
@@ -126,13 +159,17 @@ use OpenApi\Attributes as OA;
     )]
     public function getTasksCount(TaskRepository $taskRepository): JsonResponse
     {
+        // 4a. Comptage total des tâches dans PostgreSQL (tous projets confondus)
         $count = $taskRepository->count([]);
         
+        // 4b. Réponse JSON avec le total
         return $this->json([
             'totalTasks' => $count
         ]);
     }
 
+    // ===== 5. API - STATISTIQUES ARTICLES (MongoDB) =====
+    
     /**
      * API - Nombre total d'articles de veille (MongoDB)
      */
@@ -158,17 +195,21 @@ use OpenApi\Attributes as OA;
     )]
     public function getArticlesCount(DocumentManager $dm): JsonResponse
     {
+        // 5a. Comptage total des articles dans MongoDB
         // Compter TOUS les articles (pas de filtre userId)
         $count = $dm->createQueryBuilder(Article::class)
             ->count()
             ->getQuery()
             ->execute();
         
+        // 5b. Réponse JSON avec le total
         return $this->json([
             'totalArticles' => $count
         ]);
     }
 
+    // ===== 6. API - STATISTIQUES SNIPPETS (MongoDB) =====
+    
     /**
      * API - Nombre total de snippets (MongoDB)
      */
@@ -194,17 +235,21 @@ use OpenApi\Attributes as OA;
     )]
     public function getSnippetsCount(DocumentManager $dm): JsonResponse
     {
+        // 6a. Comptage total des snippets dans MongoDB
         // Compter TOUS les snippets (pas de filtre userId)
         $count = $dm->createQueryBuilder(Snippet::class)
             ->count()
             ->getQuery()
             ->execute();
         
+        // 6b. Réponse JSON avec le total
         return $this->json([
             'totalSnippets' => $count
         ]);
     }
 
+    // ===== 7. API - STATISTIQUES COMPETENCES (PostgreSQL) =====
+    
     /**
      * API - Nombre total de compétences
      */
@@ -230,8 +275,10 @@ use OpenApi\Attributes as OA;
     )]
     public function getCompetencesCount(CompetenceRepository $competenceRepository): JsonResponse
     {
+        // 7a. Comptage total des compétences dans PostgreSQL (tous utilisateurs confondus)
         $count = $competenceRepository->count([]);
         
+        // 7b. Réponse JSON avec le total
         return $this->json([
             'totalCompetences' => $count
         ]);

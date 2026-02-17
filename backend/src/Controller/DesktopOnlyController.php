@@ -1,5 +1,20 @@
 <?php
 
+/**
+ * DESKTOPONLYCONTROLLER.PHP - Page d'avertissement mobile
+ * 
+ * Responsabilités :
+ * - Afficher une page explicative pour les utilisateurs mobiles
+ * - Informer sur les fonctionnalités réservées au desktop
+ * - Liste dynamique des features (Kanban, Snippets, Dashboard Admin)
+ * - Inclusion conditionnelle du Dashboard Admin selon ROLE_ADMIN
+ * 
+ * Architecture :
+ * - Redirection automatique depuis Kanban/Snippets si détection mobile
+ * - Détection mobile double : côté serveur (User-Agent) + côté client (JS window.innerWidth < 768px)
+ * - Bouton de retour vers la dernière page desktop visitée (via localStorage)
+ */
+
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -11,10 +26,13 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 class DesktopOnlyController extends AbstractController
 {
+    // ===== 1. AFFICHAGE DE LA PAGE D'AVERTISSEMENT MOBILE =====
+    
     #[Route('/desktop-only', name: 'app_desktop_only', methods: ['GET'])]
     public function index(Request $request): Response
     {
-        // Toutes les fonctionnalités possibles
+        // 1a. Construction du tableau des fonctionnalités réservées au desktop
+        // Chaque feature contient : nom, icône SVG path, raison technique
         $allFeatures = [
             [
                 'name' => 'Kanban',
@@ -28,7 +46,8 @@ class DesktopOnlyController extends AbstractController
             ],
         ];
 
-        // Ajouter Dashboard Admin UNIQUEMENT si l'utilisateur est admin
+        // 1b. Ajout conditionnel du Dashboard Admin
+        // Uniquement visible pour les utilisateurs ayant le rôle ROLE_ADMIN
         if ($this->isGranted('ROLE_ADMIN')) {
             $allFeatures[] = [
                 'name' => 'Dashboard Admin',
@@ -37,6 +56,7 @@ class DesktopOnlyController extends AbstractController
             ];
         }
 
+        // 1c. Rendu du template Twig avec la liste des fonctionnalités desktop-only
         return $this->render('desktop_only/index.html.twig', [
             'desktopFeatures' => $allFeatures
         ]);

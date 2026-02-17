@@ -1,5 +1,22 @@
 <?php
 
+/**
+ * AUTHCONTROLLER.PHP - Gestion de l'authentification (inscription + connexion)
+ * 
+ * Responsabilités :
+ * - Afficher la page d'authentification combinée (login + register dans une seule vue)
+ * - Traiter l'inscription (POST) avec validation du formulaire Symfony
+ * - Hachage sécurisé du mot de passe (bcrypt via UserPasswordHasher)
+ * - Redirection automatique vers dashboard si déjà connecté
+ * - Gestion des erreurs de connexion via AuthenticationUtils
+ * 
+ * Architecture :
+ * - Page publique (pas de #[IsGranted])
+ * - Formulaire d'inscription POST vers /auth/register
+ * - Formulaire de connexion géré par Symfony Security (app_login)
+ * - Messages flash pour feedback utilisateur
+ */
+
 namespace App\Controller;
 
 use App\Entity\User;
@@ -14,13 +31,15 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AuthController extends AbstractController
 {
+    // ===== 1. AFFICHAGE DE LA PAGE D'AUTHENTIFICATION (GET + POST) =====
+    
     /**
      * Affiche la page d'authentification (inscription + connexion)
      */
     #[Route('/auth', name: 'app_auth', methods: ['GET', 'POST'])]
     public function index(AuthenticationUtils $authenticationUtils): Response
     {
-        // Si l'utilisateur est déjà connecté, redirection vers dashboard
+        // 1a. Redirection si l'utilisateur est déjà authentifié
         if ($this->getUser()) {
             return $this->redirectToRoute('app_dashboard');
         }
@@ -42,6 +61,8 @@ class AuthController extends AbstractController
         ]);
     }
 
+    // ===== 2. TRAITEMENT DE L'INSCRIPTION (POST UNIQUEMENT) =====
+    
     /**
      * Traite l'inscription (POST uniquement)
      */
@@ -52,10 +73,12 @@ class AuthController extends AbstractController
         EntityManagerInterface $entityManager,
         AuthenticationUtils $authenticationUtils
     ): Response {
+        // 2a. Création d'une nouvelle entité User
         $user = new User();
         $registrationForm = $this->createForm(RegistrationFormType::class, $user);
         $registrationForm->handleRequest($request);
 
+        // 2b. Validation et traitement du formulaire
         if ($registrationForm->isSubmitted() && $registrationForm->isValid()) {
             /** @var string $plainPassword */
             $plainPassword = $registrationForm->get('plainPassword')->getData();
