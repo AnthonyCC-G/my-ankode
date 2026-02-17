@@ -426,7 +426,7 @@ Ces choix techniques couvrent les **8 compétences professionnelles** :
 - ✅ **CP5** : Composants d'accès aux données (Repositories, QueryBuilder)
 - ✅ **CP6** : Composants métier (Services, Voters, Sécurité)
 - ✅ **CP7** : Tests (PHPUnit, 135 tests)
-- ✅ **CP8** : Documentation technique (vous êtes en train de la lire !)
+- ✅ **CP8** : Documentation technique (vous êtes en train de la lire)
 
 ---
 
