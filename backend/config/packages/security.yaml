@@ -46,6 +46,7 @@ security:
         - { path: ^/registration, roles: PUBLIC_ACCESS }
         - { path: ^/mentions-legales, roles: PUBLIC_ACCESS }
         - { path: ^/faq, roles: PUBLIC_ACCESS }
+        - { path: ^/api/doc, roles: ROLE_ADMIN }
         - { path: ^/$, roles: PUBLIC_ACCESS }  # Page d'accueil uniquement
     
         # Route administrateur
