@@ -183,7 +183,7 @@ body:not(.dark-mode) .snippets-block--config .block-header {
 }
 
 .snippets-block--list .block-title {
-    color: var(--cyan-900); /* Texte sombre sur fond cyan */
+    color: var(--neutral-900); /* Texte sombre sur fond cyan */
 }
 
 body:not(.dark-mode) .snippets-block--list .block-header {
