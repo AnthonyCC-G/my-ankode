@@ -171,6 +171,7 @@ body:not(.dark-mode) .title-app h2 {
     background: linear-gradient(135deg, var(--orange-500) 0%, #FF8C42 100%);
     border: 2px solid var(--orange-500);
     border-radius: var(--radius-lg);
+    white-space: nowrap;
     
     /* Texte */
     font-family: var(--font-main);
@@ -345,10 +346,10 @@ body:not(.dark-mode) .title-app h2 {
     width: 30vw;        /* Était 23vw, un peu plus large */
     min-width: 370px;   /* Était 350px */
     top: 64vh;          /* Était 60vh, plus bas */
-    left: 50%;
-    transform: translateX(-50%);
+    left: 45%;
+    transform: translateX(-45%);
     border-color: var(--cyan-500);
-    padding-top: 8px;
+    padding-top: 4px;
 }
 
 .dashboard-card--features:hover {
@@ -366,7 +367,7 @@ body:not(.dark-mode) .title-app h2 {
     font-size: var(--font-size-4xl);
     font-weight: var(--font-weight-semibold);
     color: var(--text-primary);
-    margin: 0 0 var(--spacing-sm) 0;
+    margin: 0 0 var(--spacing-xs) 0;
 }
 
 .card-text {

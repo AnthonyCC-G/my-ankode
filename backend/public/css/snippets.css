@@ -3,11 +3,12 @@
 
 /* ==================== BLOC 1 : HEADER TITRE DE PAGE ==================== */
 .snippets-header {
-    width: 100%;
+    width: calc(100% - 60px); /* MODIF : Soustrait la largeur sidebar */
+    max-width: 1400px;
+    margin: 0 auto;
+    padding-top: 100px;
+    padding-bottom: var(--spacing-md);
     text-align: center;
-    padding: var(--spacing-xl) var(--spacing-lg);
-    margin-top: 80px; /* Espace pour la navbar fixe (comme kanban.css) */
-    margin-bottom: var(--spacing-xs);
 }
 
 .snippets-title {
