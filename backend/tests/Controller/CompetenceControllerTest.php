@@ -18,7 +18,7 @@ class CompetenceControllerTest extends ApiTestCase
      */
     public function testGetCompetencesSuccess(): void
     {
-        // ARRANGE
+        // ARRANGE (Prépare)
         $user = $this->createUser('john@test.com');
         
         $competence1 = new Competence();
@@ -35,11 +35,11 @@ class CompetenceControllerTest extends ApiTestCase
         
         $this->entityManager->flush();
         
-        // ACT
+        // ACT (FAIT)
         $this->loginUser($user);
         $this->client->request('GET', '/api/competences');
         
-        // ASSERT
+        // ASSERT (RESULTAT)
         $this->assertResponseIsSuccessful();
         $this->assertResponseStatusCodeSame(200);
         

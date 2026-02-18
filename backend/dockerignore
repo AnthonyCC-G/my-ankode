@@ -1,29 +1,233 @@
 # ============================================
-# .dockerignore - MY-ANKODE Backend
-# Fichiers à exclure du contexte Docker
+# .DOCKERIGNORE - Exclusion de fichiers du contexte Docker pour MY-ANKODE Backend
+# ============================================
+#
+# RÔLE DE CE FICHIER :
+# - Définir les fichiers/dossiers à EXCLURE lors de la construction de l'image Docker
+# - Réduire la taille de l'image Docker finale (performance + stockage)
+# - Éviter d'envoyer des fichiers sensibles dans l'image (sécurité)
+# - Accélérer le build Docker (moins de fichiers à copier)
+#
+# FONCTIONNEMENT :
+# - Similaire à .gitignore mais pour Docker
+# - Appliqué lors de la commande : docker build -t my-ankode .
+# - Les fichiers listés ici ne seront PAS copiés dans l'image Docker
+# - Même si un Dockerfile contient "COPY . /app", ces fichiers sont exclus
+#
+# CONTEXTE DOCKER :
+# - Le "contexte" = tous les fichiers envoyés au Docker daemon lors du build
+# - Sans .dockerignore : TOUT le dossier projet est envoyé (lent + gros)
+# - Avec .dockerignore : Seuls les fichiers nécessaires sont envoyés (rapide + léger)
+#
+# EXEMPLE CONCRET :
+# Sans .dockerignore :
+#   → Contexte = 500 Mo (vendor/ + node_modules/ + .git/ + var/cache/)
+#   → Build lent + image volumineuse
+#
+# Avec .dockerignore :
+#   → Contexte = 50 Mo (seulement src/ + config/ + public/)
+#   → Build rapide + image légère
+#
+# DIFFÉRENCE AVEC .gitignore :
+# - .gitignore : fichiers exclus de Git (versionning)
+# - .dockerignore : fichiers exclus de Docker (build d'image)
+# - Souvent similaires mais PAS identiques (vendor/ dans .dockerignore mais pas .gitignore)
+#
+#
+# STRUCTURE DE CE FICHIER :
+# 1. Dépendances (installées dans l'image via composer/npm)
+# 2. Variables d'environnement sensibles (injectées au runtime)
+# 3. Cache Symfony (régénéré dans le conteneur)
+# 4. Fichiers système (inutiles dans Docker)
+# 5. IDE (spécifiques au développeur local)
+# 6. Données de test (non nécessaires en production)
+#
 # ============================================
 
-# Dépendances
+# ============================================
+# 1. DÉPENDANCES - RÉINSTALLÉES DANS L'IMAGE
+# ============================================
+#
+# POURQUOI EXCLURE ?
+# - Ces dossiers sont ÉNORMES (100+ Mo pour vendor/, 200+ Mo pour node_modules/)
+# - Ils seront réinstallés DANS l'image Docker via :
+#   → Dockerfile : RUN composer install --no-dev --optimize-autoloader
+#   → Dockerfile : RUN npm install --production
+# - Les versions locales peuvent être incompatibles avec l'environnement Docker (OS différent)
+#
+# WORKFLOW DOCKER :
+# 1. .dockerignore exclut /vendor/ et /node_modules/ du contexte
+# 2. Dockerfile copie composer.json + composer.lock
+# 3. Dockerfile exécute : composer install (télécharge les dépendances dans l'image)
+# 4. Résultat : dépendances propres compilées pour l'environnement Docker Linux
+#
+# EXEMPLE :
+# - Local Windows : vendor/ contient des binaires Windows
+# - Image Docker Linux : vendor/ doit contenir des binaires Linux
+# → On ne copie PAS vendor/ local, on le régénère dans Docker
+#
 /vendor/
 /node_modules/
 
-# Variables d'environnement sensibles
+# ============================================
+# 2. VARIABLES D'ENVIRONNEMENT SENSIBLES - JAMAIS DANS L'IMAGE
+# ============================================
+#
+# POURQUOI EXCLURE ?
+# - Ces fichiers contiennent des MOTS DE PASSE et SECRETS (DATABASE_URL, API keys)
+# - Une image Docker peut être inspectée avec : docker history my-ankode
+# - Si .env.local est copié dans l'image → credentials visibles par tous
+# - SÉCURITÉ CRITIQUE : les secrets doivent être injectés au RUNTIME, pas au BUILD
+#
+# BONNE PRATIQUE DOCKER :
+# - BUILD TIME : construire l'image SANS secrets
+# - RUN TIME : injecter les secrets via variables d'environnement
+#
+# MÉTHODES D'INJECTION SÉCURISÉES :
+# 1. Variables d'environnement Docker :
+#    docker run -e DATABASE_URL="postgresql://..." my-ankode
+#
+# 2. Fichier .env monté en volume :
+#    docker run -v /secrets/.env.prod.local:/app/.env.local my-ankode
+#
+# 3. Docker secrets (Swarm/Kubernetes) :
+#    docker secret create db_url postgresql://...
+#
+# 4. Variables dans docker-compose.yml :
+#    environment:
+#      DATABASE_URL: ${DATABASE_URL}
+#
+# FICHIERS EXCLUS :
+# - .env.local : credentials de développement local
+# - .env.*.local : tous les fichiers .env avec .local (prod, test, etc.)
+#
+# ⚠️ ATTENTION :
+# - .env : fichier de base avec valeurs PAR DÉFAUT (peut être inclus si pas de secrets)
+# - .env.local : fichier avec VRAIS credentials (TOUJOURS exclu)
+#
 .env.local
 .env.*.local
 
-# Cache Symfony
+# ============================================
+# 3. CACHE SYMFONY - RÉGÉNÉRÉ DANS LE CONTENEUR
+# ============================================
+#
+# POURQUOI EXCLURE ?
+# - Le cache Symfony est spécifique à l'environnement local (Windows)
+# - Docker tourne sur Linux → le cache doit être régénéré pour Linux
+# - Ces dossiers peuvent être volumineux (50+ Mo)
+# - Symfony régénère automatiquement le cache au premier démarrage
+#
+# CONTENU DE CES DOSSIERS :
+# - /var/cache/* : cache compilé (routes, DI container, Twig templates)
+# - /var/log/* : logs de développement (errors.log, dev.log)
+#
+# WORKFLOW DOCKER :
+# 1. .dockerignore exclut /var/cache/ et /var/log/
+# 2. Dockerfile crée les dossiers vides :
+#    RUN mkdir -p var/cache var/log
+# 3. Dockerfile définit les permissions :
+#    RUN chown -R www-data:www-data var/
+# 4. Au premier démarrage : Symfony régénère le cache automatiquement
+#
+# OPTIMISATION PRODUCTION :
+# - Dans le Dockerfile, on peut pré-générer le cache :
+#   RUN php bin/console cache:warmup --env=prod
+# - Résultat : cache prêt, démarrage ultra-rapide
+#
 /var/cache/*
 /var/log/*
 
-# Fichiers système
+# ============================================
+# 4. FICHIERS SYSTÈME - INUTILES DANS DOCKER
+# ============================================
+#
+# POURQUOI EXCLURE ?
+# - Ces fichiers sont spécifiques au système d'exploitation local
+# - Inutiles dans un conteneur Docker Linux
+# - Peuvent causer des bugs de compatibilité
+# - Alourdissent inutilement l'image
+#
+# DÉTAILS DES FICHIERS :
+# - .DS_Store : fichier macOS (métadonnées Finder)
+# - Thumbs.db : fichier Windows (cache miniatures d'images)
+# - .git/ : historique Git (100+ Mo, inutile en production)
+# - .gitignore : règles Git (inutiles dans l'image finale)
+#
+# POURQUOI EXCLURE .git/ ?
+# - Très volumineux (tout l'historique des commits)
+# - Risque de sécurité (peut contenir d'anciens secrets dans l'historique)
+# - Inutile en production (on ne fait pas de git pull dans un conteneur)
+#
+# EXCEPTION :
+# - Si besoin de la version Git pour affichage dans l'app :
+#   → Récupérer le hash AVANT le build : git rev-parse HEAD > version.txt
+#   → Copier version.txt dans l'image
+#
 .DS_Store
 Thumbs.db
 .git/
 .gitignore
 
-# IDE
+# ============================================
+# 5. CONFIGURATION IDE - SPÉCIFIQUE AU DÉVELOPPEUR
+# ============================================
+#
+# POURQUOI EXCLURE ?
+# - Ces dossiers contiennent la configuration des éditeurs de code
+# - Spécifiques à chaque développeur (préférences personnelles)
+# - Inutiles dans un conteneur Docker
+# - Peuvent contenir des chemins absolus Windows (bugs dans Linux)
+#
+# DÉTAILS DES DOSSIERS :
+# - .vscode/ : configuration Visual Studio Code (settings.json, launch.json)
+# - .idea/ : configuration PhpStorm/IntelliJ (workspace.xml, modules.xml)
+#
+# EXEMPLE DE PROBLÈME SANS EXCLUSION :
+# - .vscode/settings.json contient : "php.executablePath": "C:\\xampp\\php\\php.exe"
+# - Dans Docker Linux : ce chemin n'existe pas → erreurs potentielles
+#
 .vscode/
 .idea/
 
-# Données de test
+# ============================================
+# 6. DONNÉES DE TEST - NON NÉCESSAIRES EN PRODUCTION
+# ============================================
+#
+# POURQUOI EXCLURE ?
+# - /public/uploads/ : dossier de tests avec images/fichiers uploadés en dev
+# - Ces fichiers peuvent être volumineux (photos de test, PDFs, etc.)
+# - En production, les uploads doivent être stockés ailleurs :
+#   → Volume Docker persistant
+#   → Stockage cloud (AWS S3, Azure Blob Storage)
+#   → Serveur de fichiers séparé
+#
+# BONNE PRATIQUE PRODUCTION :
+# - Ne JAMAIS stocker les uploads dans l'image Docker
+# - Utiliser un volume monté :
+#   docker run -v /mnt/uploads:/app/public/uploads my-ankode
+#
+# POURQUOI ?
+# - Image Docker = immuable (reconstruite à chaque déploiement)
+# - Si uploads dans l'image → perdus à chaque redéploiement
+# - Volume persistant = conserve les fichiers entre redéploiements
+#
 /public/uploads/
+
+# ============================================
+# RÉSULTAT ATTENDU
+# ============================================
+#
+# AVEC CE .dockerignore :
+# - Contexte Docker : ~50 Mo (seulement code source + configs)
+# - Image finale : ~200 Mo (Alpine Linux + PHP + vendor optimisé)
+# - Build rapide : 30-60 secondes
+# - Sécurisé : aucun credential dans l'image
+#
+# SANS .dockerignore :
+# - Contexte Docker : ~500 Mo (vendor + node_modules + .git + cache)
+# - Image finale : ~800 Mo (tout copié inutilement)
+# - Build lent : 3-5 minutes
+# - Risque : .env.local copié dans l'image (faille de sécurité)
+#
+# ============================================
