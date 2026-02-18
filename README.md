@@ -1,73 +1,194 @@
-# My-Ankode
+<div align="center">
+  <img src="docs/assets/logo-myankode.png" alt="MY-ANKODE" width="300"/>
+  
+  # MY-ANKODE
+  
+  **Plateforme de productivité pour développeurs juniors**
+  
+  Application web moderne combinant veille technologique, gestion de projets, bibliothèque de snippets et suivi de compétences.
+  
+  [![PHP Version](https://img.shields.io/badge/PHP-8.3-777BB4?style=flat&logo=php)](https://php.net)
+  [![Symfony](https://img.shields.io/badge/Symfony-7.0-000000?style=flat&logo=symfony)](https://symfony.com)
+  [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat&logo=postgresql)](https://postgresql.org)
+  [![MongoDB](https://img.shields.io/badge/MongoDB-7.0-47A248?style=flat&logo=mongodb)](https://mongodb.com)
+  
+</div>
 
-Application web pour jeunes développeurs - Projet de certification DWWM (Développeur Web et Web Mobile)
+---
 
-## 📋 Description
+## À propos
 
-My-Ankode est une application complète destinée aux jeunes développeurs, proposant :
-- 📰 **Veille technologique** : Agrégation de flux RSS
-- 📊 **Gestion de projets** : Kanban pour organiser vos tâches
-- 💾 **Bibliothèque de code** : Snippets avec annotations
-- 🎯 **Suivi de compétences** : Profil et gestion des compétences
+MY-ANKODE est une application web full-stack conçue pour accompagner les développeurs juniors dans leur montée en compétences. Elle centralise quatre modules essentiels au quotidien d'un développeur moderne.
 
-## 🛠️ Stack Technique
+### Fonctionnalités principales
+
+- **Veille Technologique** : Agrégation RSS pour suivre l'actualité tech
+- **Kanban** : Gestion de projets et tâches avec drag & drop
+- **Snippets** : Bibliothèque de code réutilisable avec description poussée possible
+- **Compétences** : Suivi personnalisé de progression technique
+
+---
+
+## Stack technique
 
 ### Backend
-- **Framework** : Symfony 7
-- **Base de données** : PostgreSQL 16
-- **Architecture** : API REST
+- **Framework** : Symfony 7.4 (PHP 8.3)
+- **ORM** : Doctrine ORM (PostgreSQL) + Doctrine ODM (MongoDB)
+- **Sécurité** : Symfony Security, CSRF Protection, Voters
+- **Tests** : PHPUnit (135 tests unitaires et fonctionnels)
 
 ### Frontend
-- **Framework** : Angular 18
-- **UI Library** : Bootstrap 5 + ng-bootstrap
-- **Styling** : SCSS
+- **Templating** : Twig
+- **Styling** : Bootstrap 5 + CSS Variables
+- **JavaScript** : Vanilla JS (approche MVP)
+- **Thème** : Dark/Light mode avec persistence
 
-### DevOps
-- **Conteneurisation** : Docker (à venir)
-- **Versioning** : Git + GitHub
+### Base de données
+- **PostgreSQL** : Données relationnelles (Users, Projects, Tasks, Competences)
+- **MongoDB** : Documents flexibles (Articles RSS, Snippets)
 
-## 🚀 Installation
+### Infrastructure
+- **Conteneurisation** : Docker & Docker Compose
+- **Services** : PHP-FPM, PostgreSQL, MongoDB
+- **Administration** : pgAdmin, Mongo Express
+
+---
+
+## Installation rapide
 
 ### Prérequis
-- PHP 8.3+
-- Composer
-- Node.js 20+
-- PostgreSQL 16
-- Angular CLI 18
 
-### Backend (Symfony)
+- Docker Desktop
+- Git
+
+### Démarrage
+
 ```bash
-cd backend
-composer install
-cp .env .env.local
-# Configurer DATABASE_URL dans .env.local
-php bin/console doctrine:database:create
-php bin/console doctrine:migrations:migrate
-symfony serve
+# Cloner le repository
+git clone https://github.com/[votre-username]/my-ankode.git
+cd my-ankode
+
+# Copier et configurer l'environnement
+cp backend/.env.example backend/.env
+
+# Lancer les conteneurs
+docker compose up -d
+
+# Installer les dépendances
+docker compose exec php composer install
+
+# Créer la base de données et charger les fixtures
+docker compose exec php php bin/console doctrine:database:create
+docker compose exec php php bin/console doctrine:migrations:migrate -n
+docker compose exec php php bin/console doctrine:mongodb:schema:create
+docker compose exec php php bin/console doctrine:fixtures:load -n
 ```
 
-### Frontend (Angular)
+### Accès à l'application
+
+- **Application** : http://localhost:8080
+- **pgAdmin** : http://localhost:5050
+- **Mongo Express** : http://localhost:8081
+
+**Compte de test** :
+- Email : `anthony@myankode.com`
+- Mot de passe : `password123`
+
+---
+
+## Documentation
+
+La documentation technique est organisée en modules spécialisés :
+
+- **[Architecture](docs/ARCHITECTURE.md)** : Architecture 3-tiers, schémas UML, structure BDD
+- **[Sécurité](docs/SECURITY.md)** : Authentification, autorisation, OWASP Top 10
+- **[Tests](docs/TESTING.md)** : Stratégie de tests, couverture, exemples
+- **[Déploiement](docs/DEPLOYMENT.md)** : Guide Docker, environnements, troubleshooting
+- **[Choix techniques](docs/TECHNICAL-CHOICES.md)** : PostgreSQL vs MongoDB, JS Vanilla, API REST
+- **[Accessibilité](docs/ACCESSIBILITY.md)** : WCAG, navigation clavier, contraste
+- **[Fonctionnalités](docs/FEATURES.md)** : Détails des 4 modules principaux
+
+---
+
+## Scripts utilitaires
+
 ```bash
-cd frontend/my-ankode-app
-npm install
-ng serve
+# Réinitialiser toutes les fixtures (Docker)
+./scripts/reset-all-fixtures-docker.sh
+
+# Charger des articles de démonstration
+./scripts/load-demo-articles-docker.sh
+
+# Lancer les tests
+docker compose exec php php bin/phpunit
 ```
 
-## 🌐 URLs de développement
+---
 
-- **Backend (API)** : http://127.0.0.1:8000
-- **Frontend** : http://localhost:4200
+## Captures d'écran
 
-## 👨‍💻 Auteur
+<div align="center">
+  <img src="docs/assets/screenshots/interface-veille.png" alt="Module Veille" width="45%"/>
+  <img src="docs/assets/screenshots/theme-switcher-desktop.png" alt="Theme Switcher" width="45%"/>
+</div>
 
-Anthony - Projet de certification DWWM 2024-2025
+---
 
-## 📅 Timeline
+## Développement
 
-- **Début** : 8 décembre 2024
-- **Fin prévue** : Mi-janvier 2025
-- **Sprints** : 5 sprints d'une semaine
+### Architecture
 
-## 📄 Licence
+MY-ANKODE suit une architecture 3-tiers classique :
 
-Projet éducatif - Certification DWWM
+- **Présentation** : Templates Twig + Vanilla JS
+- **Logique métier** : Controllers Symfony + Services
+- **Données** : Repositories Doctrine (ORM + ODM)
+
+### Conventions de code
+
+- PSR-12 pour PHP
+- Commits conventionnels (feat, fix, docs)
+- Tests obligatoires pour les fonctionnalités critiques
+- Code review avant merge
+
+### Lancer les tests
+
+```bash
+# Tous les tests
+docker compose exec php php bin/phpunit
+
+# Tests spécifiques
+docker compose exec php php bin/phpunit tests/Controller/
+docker compose exec php php bin/phpunit tests/Security/
+```
+
+---
+
+## Roadmap
+
+### MVP (Livré)
+- ✅ Authentification et autorisation
+- ✅ CRUD complet sur les 4 modules
+- ✅ Responsive design
+- ✅ Dark/Light mode
+- ✅ Tests de sécurité et fonctionnels
+
+### Post-MVP (Prévu)
+- Migration frontend vers Angular
+- API REST complète pour consommation externe
+- Authentification JWT
+
+---
+
+
+## Auteur
+
+**Anthony Catan-Cavery**  
+Développeur Web et Web Mobile fullstack
+[GitHub](https://github.com/[votre-username]) • [LinkedIn](https://linkedin.com/in/[votre-profil])
+
+---
+
+<div align="center">
+  <sub>Construit avec Symfony, PostgreSQL, MongoDB et passion pour le code propre</sub>
+</div>

@@ -1,0 +1,522 @@
+/* ==================== DASHBOARD PAGE ==================== */
+
+.dashboard-container {
+    /*width: 100%;
+    max-width: 75rem; 
+    margin: 0 auto;
+    padding: 1.5rem;
+    padding-left: 1rem;*/
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    min-height: calc(100vh - 200px);
+}
+
+/* ===== HEADER DASHBOARD ===== */
+.dashboard-header {
+    width: calc(100% - 60px); /* MODIF : Soustrait la largeur sidebar */
+    max-width: 1400px;
+    margin: 0 auto;
+    padding-top: 100px;
+    padding-bottom: var(--spacing-md);
+    text-align: center;
+}
+
+.dashboard-title {
+    font-family: var(--font-main);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin: 6% 0 0 0;
+    letter-spacing: -0.02em;
+}
+
+.dashboard-subtitle {
+    font-family: var(--font-main);
+    font-size: clamp(0.875rem, 1.5vw, 1rem); /* var(--font-size-lg) fluide */
+    font-weight: var(--font-weight-normal);
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* ===== GRID 2x2 CARDS ===== */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* INCHANGÉ */
+    gap: 0.3rem;
+    margin-bottom: var(--spacing-xs);
+}
+
+/* ===== CARDS COMMUNES ===== */
+.dashboard-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem; /* var(--spacing-lg) fluide */
+    
+    background: rgba(0, 77, 99, 0.25);
+    backdrop-filter: blur(10px);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    
+    transition: all var(--transition-base);
+    min-height: 9rem;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-0.25rem); /* -4px */
+    box-shadow: var(--shadow-lg);
+}
+
+/* Mode Light */
+body:not(.dark-mode) .dashboard-card {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: var(--neutral-300);
+}
+
+/* ===== ICONES SVG ===== */
+.card-icon {
+    width: 3rem;
+    height: clamp(3rem, 6vw, 3.5rem);
+    margin-bottom: var(--spacing-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-icon svg {
+    width: 100%;
+    height: 100%;
+    stroke-width: 1.5;
+}
+
+/* ===== TITRES CARDS ===== */
+.card-title {
+    font-family: var(--font-main);
+    font-size: clamp(1rem, 2vw, 1.25rem); 
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin: 0 0 var(--spacing-xs) 0;
+    text-align: center;
+}
+
+/* ===== CONTENU CARDS ===== */
+.card-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-bottom: var(--spacing-xs);
+    width: 100%;
+}
+
+.card-stats-group {
+    width: 100%;
+}
+
+.card-stat {
+    font-family: var(--font-main);
+    font-size: clamp(0.875rem, 1.2vw, 0.95rem); /* var(--font-size-base) fluide */
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    margin: 0 0 var(--spacing-sm) 0;
+}
+
+.card-empty {
+    font-family: var(--font-main);
+    font-size: 0.875rem; /* var(--font-size-sm) fluide */
+    font-weight: var(--font-weight-normal);
+    color: var(--text-secondary);
+    font-style: italic;
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* ===== MINI-LISTES (3 derniers items) ===== */
+.card-mini-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--spacing-xs) 0 0 0;
+    
+    /* HORIZONTAL en desktop */
+    display: flex;
+    flex-direction: row;
+    gap: var(--spacing-xs);
+    justify-content: space-between;
+}
+
+.card-mini-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs);
+    font-size: 0.75rem; /* var(--font-size-xs) fluide */
+    color: var(--text-secondary);
+    text-align: center;
+    
+    /* Largeur égale pour les 3 colonnes */
+    flex: 1;
+    
+    /* Bordure droite pour séparer */
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-mini-item:last-child {
+    border-right: none;
+}
+
+body:not(.dark-mode) .card-mini-item {
+    border-right: 1px solid var(--neutral-300);
+}
+
+body:not(.dark-mode) .card-mini-item:last-child {
+    border-right: none;
+}
+
+/* Badges de statut pour les tâches */
+.mini-item-badge {
+    width: 0.5rem; /* 8px */
+    height: 0.5rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.badge-todo {
+    background-color: var(--neutral-500);
+}
+
+.badge-in_progress {
+    background-color: var(--orange-500);
+}
+
+.badge-done {
+    background-color: var(--green-500);
+}
+
+/* ===== LIENS CARDS ===== */
+.card-link {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-xs);
+    
+    font-family: var(--font-main);
+    font-size: 0.875rem; /* var(--font-size-sm) fluide */
+    font-weight: var(--font-weight-semibold);
+    text-decoration: none;
+    text-align: center;
+    
+    border-radius: var(--radius-md);
+    transition: all var(--transition-base);
+}
+
+.card-link:hover {
+    transform: translateY(-0.125rem); /* -2px */
+}
+
+/* Liens desktop/mobile */
+.desktop-only-link {
+    display: inline-block;
+}
+
+.mobile-only-link {
+    display: none;
+}
+
+/* ===== COULEURS SPECIFIQUES PAR CARD ===== */
+
+/* VEILLE - Orange */
+.card-veille {
+    border-color: var(--orange-500);
+}
+
+.card-veille:hover {
+    box-shadow: 0 0.5rem 1.25rem rgba(253, 171, 94, 0.4); /* 0 8px 20px */
+}
+
+.card-veille .card-icon svg {
+    color: var(--orange-500);
+}
+
+.card-veille .card-link {
+    background: var(--orange-500);
+    color: var(--cyan-900);
+}
+
+.card-veille .card-link:hover {
+    background: #FDAB5E;
+    box-shadow: 0 0.25rem 0.75rem rgba(253, 171, 94, 0.5); /* 0 4px 12px */
+}
+
+body:not(.dark-mode) .card-veille .card-link {
+    color: #ffffff;
+}
+
+/* KANBAN - Green */
+.card-kanban {
+    border-color: var(--green-500);
+}
+
+.card-kanban:hover {
+    box-shadow: 0 0.5rem 1.25rem rgba(81, 207, 102, 0.4);
+}
+
+.card-kanban .card-icon svg {
+    color: var(--green-500);
+}
+
+.card-kanban .card-link {
+    background: var(--green-500);
+    color: #ffffff;
+}
+
+.card-kanban .card-link:hover {
+    background: var(--green-700);
+    box-shadow: 0 0.25rem 0.75rem rgba(81, 207, 102, 0.5);
+}
+
+/* SNIPPETS - Cyan */
+.card-snippets {
+    border-color: var(--cyan-500);
+}
+
+.card-snippets:hover {
+    box-shadow: 0 0.5rem 1.25rem rgba(0, 194, 209, 0.4);
+}
+
+.card-snippets .card-icon svg {
+    color: var(--cyan-500);
+}
+
+.card-snippets .card-link {
+    background: var(--cyan-500);
+    color: var(--cyan-900);
+}
+
+.card-snippets .card-link:hover {
+    background: var(--cyan-600);
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 194, 209, 0.5);
+}
+
+body:not(.dark-mode) .card-snippets .card-link {
+    color: #ffffff;
+}
+
+/* COMPETENCES - Gold */
+.card-competences {
+    border-color: var(--gold-500);
+}
+
+.card-competences:hover {
+    box-shadow: 0 0.5rem 1.25rem rgba(212, 165, 116, 0.4);
+}
+
+.card-competences .card-icon svg {
+    color: var(--gold-500);
+}
+
+.card-competences .card-link {
+    background: var(--gold-500);
+    color: #ffffff;
+}
+
+.card-competences .card-link:hover {
+    background: var(--gold-700);
+    box-shadow: 0 0.25rem 0.75rem rgba(212, 165, 116, 0.5);
+}
+
+/* ===== FOOTER DASHBOARD ===== */
+.dashboard-footer {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* INCHANGÉ */
+    gap: 0.5rem; /* var(--spacing-md) fluide */
+    align-items: center;
+    padding: 0.5rem 0; /* Compact */
+    margin-top: 0.5rem; /* Espace visible entre grid et footer */
+    border-top: 2px solid var(--custom-border);
+    max-width: 87.5rem; /* 1400px */
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+}
+
+/*
+.footer-action-link {
+    font-family: var(--font-main);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color var(--transition-base);
+    justify-self: start;
+    padding-left: var(--spacing-lg);
+}
+
+.footer-action-link:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+}
+*/
+
+.footer-action-warning {
+    padding: var(--spacing-sm) var(--spacing-md);
+    justify-self: start;
+    background: transparent;
+    padding-left: var(--spacing-lg);
+    color: gold;
+    border: 2px solid var(--gold-700);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem; /* var(--font-size-sm) fluide */
+    font-weight: 500;
+    font-family: var(--font-main);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.footer-action-warning:hover {
+    background: #d97706; /* Doré plus foncé au hover */
+    transform: translateY(-0.125rem); /* -2px */
+    color: white;
+}
+
+.footer-action-danger {
+    padding: var(--spacing-sm) var(--spacing-md);
+    justify-self: end;
+    padding-right: var(--spacing-lg);
+    font-family: var(--font-main);
+    font-size: 0.875rem;/* var(--font-size-sm) fluide */
+    font-weight: var(--font-weight-medium);
+    background: transparent;
+    color: var(--red-500);
+    border: 2px solid var(--red-500);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.footer-action-danger:hover {
+    background: var(--red-500);
+    color: #ffffff;
+    transform: translateY(-0.125rem); /* -2px */
+}
+
+
+
+/* ===== RESPONSIVE ===== */
+
+/* Tablette */
+@media (max-width: 62rem) { /* 991px */
+    .dashboard-container {
+        padding: clamp(2rem, 4vh, 4rem) clamp(1rem, 2vw, 2rem);
+    }
+    
+    .dashboard-title {
+        font-size: clamp(1.25rem, 3vw, 2rem); /* var(--font-size-2xl) fluide */
+    }
+    
+    .dashboard-subtitle {
+        font-size: clamp(0.875rem, 1.5vw, 1rem); /* var(--font-size-base) fluide */
+    }
+}
+
+/* Mobile */
+@media (max-width: 48rem) { /* 768px */
+    .dashboard-container {
+        padding: clamp(1rem, 2vw, 2rem);
+        padding-top: clamp(4rem, 8vh, 6.25rem); /* 100px adaptatif */
+        padding-bottom: clamp(5rem, 10vh, 7.5rem); /* 120px adaptatif */
+    }
+    
+    .dashboard-header {
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    .dashboard-title {
+        font-size: clamp(1.125rem, 2.5vw, 1.5rem); /* var(--font-size-xl) fluide */
+    }
+    
+    .dashboard-subtitle {
+        font-size: clamp(0.75rem, 1.2vw, 0.875rem); /* var(--font-size-sm) fluide */
+    }
+    
+    /* Grid devient stack vertical */
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: clamp(1rem, 3vw, 2rem); /* var(--spacing-md) fluide */
+    }
+    
+    .dashboard-card {
+        min-height: clamp(13rem, 35vh, 15rem); /* 240px adaptatif */
+        padding: clamp(1.5rem, 4vw, 2rem); /* var(--spacing-lg) fluide */
+    }
+    
+    .card-icon {
+        width: clamp(2.5rem, 5vw, 3rem); /* 48px adaptatif */
+        height: clamp(2.5rem, 5vw, 3rem);
+    }
+    
+    .card-title {
+        font-size: clamp(1rem, 2vw, 1.25rem); /* var(--font-size-lg) fluide */
+    }
+    
+    .card-empty {
+        font-size: clamp(0.75rem, 1.2vw, 0.875rem); /* var(--font-size-sm) fluide */
+    }
+    
+    /* Mini-liste redevient VERTICALE sur mobile */
+    .card-mini-list {
+        flex-direction: column;
+        gap: 0;
+    }
+    
+    .card-mini-item {
+        flex-direction: row;
+        justify-content: flex-start;
+        text-align: left;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: var(--spacing-xs) 0;
+    }
+    
+    .card-mini-item:last-child {
+        border-bottom: none;
+    }
+    
+    body:not(.dark-mode) .card-mini-item {
+        border-right: none;
+        border-bottom: 1px solid var(--neutral-300);
+    }
+    
+    body:not(.dark-mode) .card-mini-item:last-child {
+        border-bottom: none;
+    }
+    
+    /* Gestion liens desktop/mobile */
+    .desktop-only-link {
+        display: none;
+    }
+    
+    .mobile-only-link {
+        display: inline-block;
+    }
+    
+    /* Footer en colonne sur mobile */
+    .dashboard-footer {
+        flex-direction: column;
+        gap: clamp(1rem, 3vw, 2rem); /* var(--spacing-md) fluide */
+    }
+}
+
+/* Petit mobile */
+@media (max-width: 30rem) { /* 480px */
+    .dashboard-title {
+        font-size: clamp(1rem, 2vw, 1.25rem); /* var(--font-size-lg) fluide */
+    }
+    
+    .dashboard-card {
+        min-height: clamp(12rem, 30vh, 13.75rem); /* 220px adaptatif */
+    }
+}

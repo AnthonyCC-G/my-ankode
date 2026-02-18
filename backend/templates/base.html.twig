@@ -1,17 +1,177 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="csrf-token" content="{{ csrf_token('api') }}">
+        {# SEO Basics #}
+        <meta name="description" content="{% block meta_description %}My Ankode - Outil de productivité pour développeurs juniors. Veille technologique RSS, gestion de projets Kanban, snippets de code et suivi de compétences DWWM.{% endblock %}">
+        <meta name="author" content="Anthony Catan-Cavery">
+        <meta name="robots" content="{% block meta_robots %}index, follow{% endblock %}">
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
+        <title>{% block title %}My Ankode{% endblock %}</title>
+        <link rel="icon" href="{{ asset('images/Favicon.png') }}" type="image/png">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        {# SEO à revoir lors de la mise en production/hébergement #}
+        <meta name="theme-color" content="#00C2D1">
+
+        {# Open Graph / Facebook / Discord / LinkedIn #}
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="{% block og_title %}{{ block('title') }}{% endblock %}">
+        <meta property="og:description" content="{% block og_description %}{{ block('meta_description') }}{% endblock %}">
+        <meta property="og:image" content="{{ absolute_url(asset('images/opengraph.png')) }}">
+        <meta property="og:url" content="{{ app.request.uri }}">
+        <meta property="og:url" content="{{ app.request.uri }}">
+        <meta property="og:site_name" content="My Ankode">
+        <meta property="og:locale" content="fr_FR">
+
+
+        {% block stylesheets %}
+            <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
+            <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+            <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
+            <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
         {% endblock %}
     </head>
-    <body>
-        {% block body %}{% endblock %}
+    <body class="{% if app.user %}with-sidebar{% endif %}">
+        {# ===== DESKTOP : Logo top-left ===== #}
+        <div class="logo desktop-only">
+            <a href="{{ path('app_home') }}">
+                <img src="{{ asset('images/logo/logo-myankode.png') }}" alt="My Ankode Logo">
+            </a>
+        </div>
+        {# ===== DESKTOP : Aside utilisateur (sidebar gauche) ===== #}
+        {% if app.user %}
+            <aside class="user-sidebar desktop-only">
+                <p class="user-greeting">Hello {{ app.user.username }}</p>
+            </aside>
+        {% endif %}
+
+        {# ===== DESKTOP : Navbar horizontale top-right (si connecté) ===== #}
+        {% if app.user %}
+        <nav class="navbar-horizontal desktop-only">
+            <a href="{{ path('app_dashboard') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_dashboard' %}active{% endif %}">
+                Dashboard
+            </a>
+            <a href="{{ path('app_veille') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_veille' %}active{% endif %}">
+                Veille
+            </a>
+            <a href="{{ path('app_kanban') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_kanban' %}active{% endif %}">
+                Kanban
+            </a>
+            <a href="{{ path('app_snippets') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_snippets' %}active{% endif %}">
+                Snippets
+            </a>
+            <a href="{{ path('app_competences') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_competences' %}active{% endif %}">
+                Compétences
+            </a>
+            {# LIEN ADMIN - visible uniquement pour ROLE_ADMIN #}
+            {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_admin_dashboard') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_admin_dashboard' %}active{% endif %}">
+                Admin
+            </a>
+            {% endif %}
+            <a href="{{ path('app_logout') }}" class="nav-link nav-link--logout">
+                Déconnexion
+            </a>
+        </nav>
+        {% endif %}
+
+        {# ===== MOBILE : Header fixe (Logo + Ampoule + Legal) ===== #}
+        <header class="mobile-header mobile-only">
+            <a href="{{ app.user ? path('app_dashboard') : path('app_auth') }}" class="mobile-header__logo">
+                <img src="{{ asset('images/logo/logo-myankode.png') }}" alt="My Ankode">
+            </a>
+
+            <button id="theme-switcher-mobile" class="mobile-header__theme">
+                <img src="{{ asset('images/lightbulb.png') }}" alt="Changer le thème">
+            </button>
+
+            <a href="{{ path('app_legal_mentions') }}" class="mobile-header__legal" aria-label="Mentions légales">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+            </a>
+
+            {% if app.user %}
+            <a href="{{ path('app_logout') }}" class="mobile-header__logout" aria-label="Se déconnecter">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+            </a>
+            {% endif %}
+        </header>
+
+        {# ===== Contenu principal (scrollable sur mobile) ===== #}
+        <main class="main-content">
+            {% block body %}{% endblock %}
+
+            {# Footer scrollable sur mobile, sticky sur desktop #}
+            <footer class="footer-sticky">
+                <nav class="footer-nav">
+                    <a href="{{ path('app_legal_mentions') }}" class="footer-link">Mentions légales</a>
+                    <span class="footer-separator">|</span>
+                    <span class="footer-copyright">© 2026 My Ankode - Anthony Catan-Cavery</span>
+                </nav>
+            </footer>
+        </main>
+
+        {# ===== DESKTOP : Mascotte avec theme-switcher ===== #}
+        <div class="mascot-container desktop-only">
+            {# Ampoule - Theme switcher (TOUJOURS visible) #}
+            <img src="{{ asset('images/lightbulb.png') }}" id="theme-switcher" class="lightbulb" alt="Changer le thème">
+            
+            {# Personnage + Bulle #}
+            <img src="{{ asset('images/character-happy.png') }}" id="character" class="character" alt="Mascotte My Ankode">
+            <div class="bubble-container">
+                <img src="{{ asset('images/bubble.png') }}" class="bubble-image" alt="">
+                <div class="bubble-content">
+                    <p class="bubble-text-small"></p>
+                    <div class="bubble-text-expanded">
+                        <p><strong>Astuce du jour :</strong></p>
+                        <p>Le dark mode, c'est LA religion des développeurs !</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# ===== MOBILE : Bottom Navigation (4 icônes) ===== #}
+        {% if app.user %}
+        <nav class="bottom-nav mobile-only">
+            <a href="{{ path('app_dashboard') }}" class="bottom-nav-item {% if app.request.attributes.get('_route') == 'app_dashboard' %}active{% endif %}">
+                <svg class="bottom-nav-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <span class="bottom-nav-label">Dashboard</span>
+            </a>
+            <a href="{{ path('app_veille') }}" class="bottom-nav-item {% if app.request.attributes.get('_route') == 'app_veille' %}active{% endif %}">
+                <svg class="bottom-nav-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                </svg>
+                <span class="bottom-nav-label">Veille</span>
+            </a>
+            <a href="{{ path('app_competences') }}" class="bottom-nav-item {% if app.request.attributes.get('_route') == 'app_competences' %}active{% endif %}">
+                <svg class="bottom-nav-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                </svg>
+                <span class="bottom-nav-label">Compétences</span>
+            </a>
+            <a href="{{ path('app_desktop_only') }}" class="bottom-nav-item {% if app.request.attributes.get('_route') == 'app_desktop_only' %}active{% endif %}">
+                <svg class="bottom-nav-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <span class="bottom-nav-label">Desktop</span>
+            </a>
+        </nav>
+        {% endif %}
+
+        {% block javascripts %}
+            {# Bootstrap 5 JS (requis pour tabs, modals, dropdowns, etc.) #}
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            
+            {# Script API chargé en premier pour être disponible partout #}
+            <script src="{{ asset('js/api.js') }}"></script>
+            <script src="{{ asset('js/theme-switcher.js') }}"></script>
+        {% endblock %}
     </body>
 </html>

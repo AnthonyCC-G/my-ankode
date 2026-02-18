@@ -1,0 +1,437 @@
+# ============================================
+# DOCKER-COMPOSE.YML - Orchestration multi-conteneurs pour MY-ANKODE
+# Projet de certification DWWM
+# ============================================
+#
+# RÔLE DE CE FICHIER :
+# - Définir l'architecture complète de l'application (backend, bases de données, interfaces admin)
+# - Orchestrer le démarrage de 5 services Docker interconnectés
+# - Gérer les dépendances entre services (healthchecks, depends_on)
+# - Configurer la communication inter-conteneurs via réseau Docker
+# - Persister les données avec des volumes Docker
+#
+# ARCHITECTURE DES SERVICES :
+# 1. backend     → Symfony 7 + PHP 8.3 (application web)
+# 2. postgres    → PostgreSQL 16 (base relationnelle)
+# 3. mongo       → MongoDB 6 (base documentaire NoSQL)
+# 4. pgadmin     → Interface web pour PostgreSQL
+# 5. mongo-express → Interface web pour MongoDB
+#
+# WORKFLOW DE DÉMARRAGE :
+# 1. docker-compose up -d
+# 2. Création du réseau my-ankode-network (bridge)
+# 3. Démarrage parallèle : postgres + mongo (avec healthchecks)
+# 4. Attente que postgres et mongo soient "healthy"
+# 5. Démarrage backend (depends_on avec condition: service_healthy)
+# 6. Démarrage pgadmin + mongo-express (dépendent de postgres/mongo)
+# 7. Tous les services communiquent via le réseau Docker interne
+#
+# VARIABLES D'ENVIRONNEMENT :
+# - .env.docker : credentials bidons pour démo/test (versionné Git)
+# - .env.docker.local : credentials réels de développement (NON versionné)
+# - Ordre de priorité : .env.docker.local > .env.docker
+#
+# PORTS EXPOSÉS (host:container) :
+# - 8000:8000 → Backend Symfony
+# - 5433:5432 → PostgreSQL (décalé pour éviter conflit avec PostgreSQL Windows natif)
+# - 27018:27017 → MongoDB (décalé pour éviter conflit avec MongoDB Windows natif)
+# - 5050:80 → pgAdmin
+# - 8081:8081 → Mongo Express
+#
+# SÉCURITÉ :
+# - Authentification activée sur PostgreSQL (POSTGRES_USER/PASSWORD)
+# - Authentification activée sur MongoDB (MONGO_INITDB_ROOT_USERNAME/PASSWORD)
+# - pgAdmin protégé par email/password
+# - Mongo Express protégé par Basic Auth (admin/admin)
+#
+#
+# COMMANDES UTILES :
+# - docker-compose up -d : démarrer tous les services
+# - docker-compose down : arrêter et supprimer les conteneurs
+# - docker-compose logs -f backend : voir les logs en temps réel
+# - docker-compose exec backend bash : accéder au shell du conteneur
+# - docker-compose ps : lister les services et leur état
+#
+# ============================================
+# Variables chargées depuis :
+# - .env.docker (credentials bidons - versionné)
+# - .env.docker.local (credentials réels - NON versionné)
+# ============================================
+
+services:
+  # ==========================================
+  # SERVICE BACKEND - Symfony 7 + PHP 8.3
+  # ==========================================
+  #
+  # RÔLE :
+  # - Exécuter l'application Symfony (API REST + rendu Twig)
+  # - Servir les requêtes HTTP sur le port 8000
+  # - Se connecter à PostgreSQL et MongoDB
+  #
+  # FONCTIONNEMENT ACTUEL :
+  # - Build custom depuis ./backend/Dockerfile
+  # - Serveur PHP built-in (php -S) mono-thread
+  # - composer install au démarrage (relancé à chaque up)
+  # - Volume bind direct (./backend:/var/www/html)
+  #
+  # ⚠️ PROBLÈMES DE PERFORMANCE :
+  # - php -S = 1 seule requête à la fois (très lent)
+  # - composer install à chaque démarrage (30-60s de délai)
+  # - Bind Windows→Linux sans optimisation (accès fichiers lent)
+  #
+  backend:
+    # Construction de l'image depuis un Dockerfile personnalisé
+    build:
+      context: ./backend           # Dossier contenant le code source
+      dockerfile: Dockerfile       # Nom du Dockerfile à utiliser
+    
+    # Nom du conteneur (facilite les commandes docker exec)
+    container_name: my-ankode-backend
+    
+    # Exposition du port (host:container)
+    # Port 8000 sur l'hôte Windows → port 8000 dans le conteneur
+    ports:
+      - "8000:8000"
+    
+    # Montage du code source (bind mount)
+    # Permet de modifier le code en temps réel sans rebuild
+    # ⚠️ Performance : Windows NTFS ↔ Linux ext4 = lent
+    volumes:
+      - ./backend:/var/www/html
+    
+    # Variables d'environnement injectées dans le conteneur
+    # Surchargent les valeurs du fichier .env de Symfony
+    environment:
+      APP_ENV: dev                 # Environnement Symfony (dev = debug activé)
+      APP_SECRET: changeme_in_production  # Secret pour tokens CSRF (à changer en prod)
+      # Connexion PostgreSQL via hostname Docker "postgres" (réseau interne)
+      # ${POSTGRES_USER} : variable chargée depuis .env.docker ou .env.docker.local
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?serverVersion=16&charset=utf8
+      # Connexion MongoDB via hostname Docker "mongo" (réseau interne)
+      MONGODB_URL: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017
+      MONGODB_DB: ${POSTGRES_DB}   # Nom de la base MongoDB (même nom que PostgreSQL)
+    
+    # Dépendances : backend démarre SEULEMENT si postgres et mongo sont "healthy"
+    # condition: service_healthy → attend que le healthcheck réussisse
+    depends_on:
+      postgres:
+        condition: service_healthy  # Attend pg_isready = 0
+      mongo:
+        condition: service_healthy  # Attend mongosh ping = OK
+    
+    # Réseau Docker pour communication inter-conteneurs
+    networks:
+      - my-ankode-network
+    
+    # Commande exécutée au démarrage du conteneur
+    # sh -c : exécuter plusieurs commandes dans un shell
+    # composer install --no-scripts : installer les dépendances PHP
+    # php -S 0.0.0.0:8000 -t public : lancer le serveur built-in PHP
+    #
+    # ⚠️ PROBLÈME : composer install relancé à CHAQUE démarrage (lent)
+    # ⚠️ PROBLÈME : php -S = mono-thread (1 requête à la fois, très lent)
+    command: >
+      sh -c "
+        composer install --no-scripts;
+        php -S 0.0.0.0:8000 -t public
+      "
+      
+  # ==========================================
+  # SERVICE BASE DE DONNÉES - PostgreSQL 16
+  # ==========================================
+  #
+  # RÔLE :
+  # - Stocker les données relationnelles (users, projects, tasks, competences)
+  # - Assurer l'intégrité référentielle (clés étrangères, CASCADE)
+  # - Fournir les transactions ACID
+  #
+  # DONNÉES STOCKÉES :
+  # - user_ : utilisateurs (email, password hashé bcrypt, roles)
+  # - project : projets Kanban (name, description, owner_id FK, createdAt)
+  # - task : tâches (title, status, position, project_id FK, createdAt)
+  # - competence : compétences DWWM (name, level, description, owner_id FK)
+  # - competence_project : table de jointure ManyToMany
+  #
+  postgres:
+    # Image officielle PostgreSQL 16 basée sur Alpine Linux (légère)
+    image: postgres:16-alpine
+    
+    # Nom du conteneur
+    container_name: my-ankode-postgres
+    
+    # Exposition du port (host:container)
+    # ${POSTGRES_PORT:-5433} : variable .env.docker ou défaut 5433 si absente
+    # Port 5433 sur Windows → port 5432 dans le conteneur
+    # ⚠️ Décalé à 5433 pour éviter conflit avec PostgreSQL Windows natif (port 5432)
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    
+    # Variables d'environnement pour initialisation PostgreSQL
+    # Utilisées UNIQUEMENT lors de la première création de la base
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}           # Nom de la base (my_ankode)
+      POSTGRES_USER: ${POSTGRES_USER}       # Utilisateur (ankode_user)
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}  # Mot de passe
+    
+    # Volume nommé pour persistance des données
+    # /var/lib/postgresql/data : dossier des données PostgreSQL dans le conteneur
+    # postgres-data : volume Docker (survit au docker-compose down)
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    
+    # Réseau Docker
+    networks:
+      - my-ankode-network
+    
+    # Healthcheck : vérifier que PostgreSQL est prêt à accepter des connexions
+    # pg_isready : utilitaire PostgreSQL pour tester la connexion
+    # -U ${POSTGRES_USER} : utilisateur à tester
+    # -d ${POSTGRES_DB} : base de données à tester
+    # interval: 5s → teste toutes les 5 secondes
+    # timeout: 5s → attend max 5s par test
+    # retries: 5 → maximum 5 tentatives avant de marquer "unhealthy"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ==========================================
+  # SERVICE BASE DE DONNÉES - MongoDB 6
+  # ==========================================
+  #
+  # RÔLE :
+  # - Stocker les données semi-structurées (articles RSS, snippets de code)
+  # - Fournir un schéma flexible (pas de migrations nécessaires)
+  # - Isoler les données externes potentiellement dangereuses (code, HTML)
+  #
+  # DONNÉES STOCKÉES :
+  # - articles : articles RSS (title, url, description, source, readBy[], favoritedBy[])
+  # - snippets : snippets de code (title, language, code, description, tags[], userId)
+  #
+  mongo:
+    # Image officielle MongoDB 6
+    image: mongo:6
+    
+    # Nom du conteneur
+    container_name: my-ankode-mongo
+    
+    # Exposition du port (host:container)
+    # ${MONGO_PORT:-27018} : variable .env.docker ou défaut 27018 si absente
+    # Port 27018 sur Windows → port 27017 dans le conteneur
+    # ⚠️ Décalé à 27018 pour éviter conflit avec MongoDB Windows natif (port 27017)
+    ports:
+      - "${MONGO_PORT:-27018}:27017"
+    
+    # Variables d'environnement pour initialisation MongoDB
+    # Activation de l'authentification MongoDB (sécurité)
+    # ⚠️ IMPORTANT : en production, TOUJOURS activer l'authentification
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}  # Utilisateur root MongoDB
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}  # Mot de passe root MongoDB
+    
+    # Volume nommé pour persistance des données
+    # /data/db : dossier des données MongoDB dans le conteneur
+    # mongo-data : volume Docker (survit au docker-compose down)
+    volumes:
+      - mongo-data:/data/db
+    
+    # Réseau Docker
+    networks:
+      - my-ankode-network
+    
+    # Healthcheck : vérifier que MongoDB est prêt à accepter des connexions
+    # mongosh : client MongoDB shell
+    # --eval "db.adminCommand('ping')" : exécuter la commande ping
+    # interval: 5s → teste toutes les 5 secondes
+    # timeout: 5s → attend max 5s par test
+    # retries: 5 → maximum 5 tentatives
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ==========================================
+  # SERVICE INTERFACE POSTGRESQL - pgAdmin 4
+  # ==========================================
+  #
+  # RÔLE :
+  # - Interface web pour administrer PostgreSQL
+  # - Visualiser les tables, exécuter des requêtes SQL
+  # - Gérer les utilisateurs, sauvegardes, etc.
+  #
+  # ACCÈS :
+  # - URL : http://localhost:5050
+  # - Email : défini dans PGADMIN_DEFAULT_EMAIL
+  # - Password : défini dans PGADMIN_DEFAULT_PASSWORD
+  #
+  pgadmin:
+    # Image officielle pgAdmin 4 (dernière version)
+    image: dpage/pgadmin4:latest
+    
+    # Nom du conteneur
+    container_name: my-ankode-pgadmin
+    
+    # Exposition du port (host:container)
+    # ${PGADMIN_PORT:-5050} : variable .env.docker ou défaut 5050
+    # Port 5050 sur Windows → port 80 dans le conteneur (pgAdmin écoute sur 80)
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    
+    # Variables d'environnement pour initialisation pgAdmin
+    # Créent le compte admin par défaut
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}        # Email de connexion
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}  # Mot de passe de connexion
+    
+    # Volume nommé pour persistance de la configuration pgAdmin
+    # /var/lib/pgadmin : dossier de config pgAdmin (connexions enregistrées, etc.)
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    
+    # Réseau Docker
+    networks:
+      - my-ankode-network
+    
+    # Dépendance : pgAdmin démarre après postgres
+    # Pas de healthcheck ici (pgAdmin peut démarrer même si postgres pas prêt)
+    depends_on:
+      - postgres
+
+  # ==========================================
+  # SERVICE INTERFACE MONGODB - Mongo Express
+  # ==========================================
+  #
+  # RÔLE :
+  # - Interface web pour administrer MongoDB
+  # - Visualiser les collections, documents JSON
+  # - Exécuter des requêtes MongoDB
+  #
+  # ACCÈS :
+  # - URL : http://localhost:8081
+  # - Authentification Basic Auth : admin / admin
+  #
+  mongo-express:
+    # Image officielle Mongo Express (dernière version)
+    image: mongo-express:latest
+    
+    # Nom du conteneur
+    container_name: my-ankode-mongo-express
+    
+    # Exposition du port (host:container)
+    # ${ME_CONFIG_PORT:-8081} : variable .env.docker ou défaut 8081
+    # Port 8081 sur Windows → port 8081 dans le conteneur
+    ports:
+      - "${ME_CONFIG_PORT:-8081}:8081"
+    
+    # Variables d'environnement pour connexion MongoDB
+    environment:
+      # Credentials pour se connecter à MongoDB (utilisateur root)
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${ME_CONFIG_MONGODB_ADMINUSERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${ME_CONFIG_MONGODB_ADMINPASSWORD}
+      # URL complète de connexion MongoDB via hostname Docker "mongo"
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017/
+      # Authentification Basic Auth pour accéder à l'interface web
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin
+    
+    # Réseau Docker
+    networks:
+      - my-ankode-network
+    
+    # Dépendance : Mongo Express démarre après mongo
+    depends_on:
+      - mongo
+
+  # ==========================================
+  # SERVICE FRONTEND - Angular 18 (OPTIONNEL)
+  # ==========================================
+  #
+  # RÔLE :
+  # - Application Angular pour interface utilisateur moderne
+  # - SPA (Single Page Application) avec API REST Symfony
+  #
+  # STATUT ACTUEL :
+  # - Commenté : non utilisé pour l'instant (MVP en Twig + Bootstrap)
+  # - À décommenter après certification pour migration Angular
+  #
+  # Décommenter quand tu voudras développer le frontend
+  # frontend:
+  #   build:
+  #     context: ./frontend/my-ankode-app
+  #     dockerfile: Dockerfile
+  #   container_name: my-ankode-frontend
+  #   ports:
+  #     - "4200:4200"
+  #   volumes:
+  #     - ./frontend/my-ankode-app:/app
+  #     - /app/node_modules
+  #   networks:
+  #     - my-ankode-network
+  #   command: npm start
+
+# ==========================================
+# VOLUMES (Persistance des données)
+# ==========================================
+#
+# RÔLE DES VOLUMES DOCKER :
+# - Persister les données entre redémarrages (docker-compose down/up)
+# - Stocker les données HORS du conteneur (survit à la suppression du conteneur)
+# - Améliorer les performances (stockage natif Docker vs bind mount)
+#
+# TYPES DE VOLUMES :
+# - Volumes nommés (postgres-data, mongo-data) : gérés par Docker
+# - Bind mounts (./backend:/var/www/html) : dossiers de l'hôte
+#
+# LOCALISATION :
+# - Windows : C:\ProgramData\docker\volumes\
+# - Linux : /var/lib/docker/volumes/
+#
+# COMMANDES UTILES :
+# - docker volume ls : lister les volumes
+# - docker volume inspect postgres-data : voir détails d'un volume
+# - docker volume rm postgres-data : supprimer un volume (⚠️ perte de données)
+# - docker-compose down -v : arrêter et supprimer les volumes (⚠️ danger)
+#
+volumes:
+  # Volume pour PostgreSQL : base de données relationnelle
+  postgres-data:
+    driver: local  # Driver par défaut (stockage local)
+  
+  # Volume pour MongoDB : base de données documentaire
+  mongo-data:
+    driver: local
+  
+  # Volume pour pgAdmin : configuration et connexions enregistrées
+  pgadmin-data:
+    driver: local
+
+# ==========================================
+# RÉSEAU (Communication entre conteneurs)
+# ==========================================
+#
+# RÔLE DU RÉSEAU DOCKER :
+# - Isoler les conteneurs dans un réseau privé
+# - Permettre la communication inter-conteneurs par hostname
+# - Empêcher l'accès depuis l'extérieur (sauf ports exposés)
+#
+# FONCTIONNEMENT :
+# - Driver bridge : réseau virtuel isolé (par défaut)
+# - DNS interne : résolution automatique des noms de services
+# - Exemple : backend peut contacter "postgres:5432" et "mongo:27017"
+#
+# ISOLATION :
+# - Services dans my-ankode-network : peuvent communiquer entre eux
+# - Services hors du réseau : ne peuvent PAS communiquer avec eux
+# - Host (Windows) : accède via ports exposés uniquement (8000, 5433, etc.)
+#
+# COMMUNICATION :
+# - backend → postgres : postgresql://user:pass@postgres:5432/db
+# - backend → mongo : mongodb://user:pass@mongo:27017
+# - pgadmin → postgres : hostname "postgres", port 5432
+# - mongo-express → mongo : hostname "mongo", port 27017
+#
+networks:
+  my-ankode-network:
+    driver: bridge  # Driver par défaut (réseau pont isolé)

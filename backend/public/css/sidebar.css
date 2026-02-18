@@ -1,0 +1,65 @@
+/* ==================== USER SIDEBAR (ASIDE GAUCHE) ==================== */
+
+/* Aside fixe à gauche, visible uniquement desktop */
+.user-sidebar {
+    position: fixed;
+    left: 1.625rem;
+    top: 140px; /* 110px logo + 30px gap */
+    bottom: 90px; /* s'arrête avant les mentions légales qui sont sur toutes les pages en desktop */
+    z-index: calc(var(--z-header) - 1); /* Sous la navbar */
+    width: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    background: rgba(0, 77, 99, 0.85);
+    backdrop-filter: blur(15px);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    
+    box-shadow: var(--shadow-lg);
+}
+
+/* Mode Light */
+body:not(.dark-mode) .user-sidebar {
+    background: rgba(245, 249, 252, 0.85);
+    border-color: var(--neutral-300);
+}
+
+/* ===== Texte "Hello Username" vertical ===== */
+.user-greeting {
+    font-family: var(--font-main);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    
+    /* Rotation 90° sens horaire */
+    transform: rotate(-90deg);
+    white-space: nowrap;
+    
+    margin: 0;
+    padding: 0;
+}
+
+/* Mode Light - Texte */
+body:not(.dark-mode) .user-greeting {
+    color: var(--neutral-900);
+}
+
+/* ===== Padding pour le contenu principal ===== */
+/* Appliqué uniquement quand l'utilisateur est connecté */
+body.with-sidebar {
+    padding-left: 100px; /* 80px aside + 20px marge */
+}
+
+/* ===== Responsive - Masquer sur mobile/tablette ===== */
+@media (max-width: 991px) {
+    .user-sidebar {
+        display: none;
+    }
+    
+    /* Retirer le padding sur mobile */
+    body.with-sidebar {
+        padding-left: 0;
+    }
+}

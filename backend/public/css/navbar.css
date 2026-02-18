@@ -1,0 +1,91 @@
+/* ==================== NAVBAR HORIZONTALE DESKTOP ==================== */
+
+.navbar-horizontal {
+    position: fixed;
+    top: var(--spacing-md);
+    
+    /* Centrage absolu au milieu de la page */
+    left: 60%;
+    transform: translateX(-70%);
+    
+    z-index: var(--z-header);
+    
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    background: rgba(0, 77, 99, 0.85);
+    backdrop-filter: blur(15px);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xs) var(--spacing-xs);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Mode Light */
+body:not(.dark-mode) .navbar-horizontal {
+    background: rgba(245, 249, 252, 0.85);
+    border-color: var(--neutral-300);
+}
+
+/* ===== Liens de navigation ===== */
+.nav-link {
+    font-family: var(--font-main);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
+    text-decoration: none;
+    
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    
+    transition: all var(--transition-base);
+    white-space: nowrap; /* Empêche le retour à la ligne */
+}
+
+/* Hover */
+.nav-link:hover {
+    color: var(--text-primary);
+    background: rgba(0, 194, 209, 0.1);
+    transform: translateY(-2px);
+}
+
+/* État ACTIVE - Page actuelle */
+.nav-link.active {
+    font-size: var(--font-size-lg); /* Police plus grande */
+    font-weight: var(--font-weight-bold); /* Plus gras */
+    color: var(--color-primary); /* Cyan */
+    background: rgba(0, 194, 209, 0.15);
+}
+
+/* Lien Déconnexion - Style spécial */
+.nav-link--logout {
+    color: var(--color-accent); /* Orange */
+    border: 2px solid var(--color-accent);
+}
+
+.nav-link--logout:hover {
+    background: var(--color-accent);
+    color: var(--cyan-900);
+    transform: translateY(-2px);
+}
+
+/* Mode Light - Ajustements */
+body:not(.dark-mode) .nav-link {
+    color: var(--neutral-500);
+}
+
+body:not(.dark-mode) .nav-link:hover {
+    color: var(--neutral-900);
+    background: rgba(0, 102, 204, 0.1);
+}
+
+body:not(.dark-mode) .nav-link.active {
+    color: #0066cc; /* Bleu pour le light mode */
+}
+
+/* ===== Responsive - Masquer sur mobile ===== */
+@media (max-width: 768px) {
+    .navbar-horizontal {
+        display: none;
+    }
+}

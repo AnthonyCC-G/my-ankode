@@ -1,0 +1,932 @@
+/**
+ * KANBAN.CSS - Styles de la page Kanban (Desktop uniquement)
+ * Description : Interface Kanban avec 2 blocs focus alterné (Projets + Tâches)
+ */
+
+/* ==================== IMPORTS ET VARIABLES ==================== */
+/* Variables héritées de Variables.css (palette Cyan/Orange) */
+
+/* ==================== HEADER KANBAN ==================== */
+.kanban-header {
+    width: calc(100% - 60px); /* MODIF : Soustrait la largeur sidebar */
+    max-width: 1400px;
+    margin: 0 auto;
+    padding-top: 100px;
+    padding-bottom: var(--spacing-md);
+    text-align: center;
+}
+
+.kanban-title {
+    font-family: var(--font-code);
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.kanban-intro {
+    font-family: var(--font-main);
+    font-size: var(--font-size-base);
+    color: var(--text-secondary);
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* ==================== MAIN KANBAN : 2 BLOCS ==================== */
+.kanban-main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    height: calc(100vh - 260px); /* ajustement valeur contrairement à snippets */
+    padding: 0 var(--spacing-lg);
+    padding-right: clamp(80px, 12.5vw, 180px);
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: 80px; /* Même valeur que snippets */
+}
+
+/* ===== BLOC GÉNÉRIQUE (Projets + Tâches) ===== */
+.kanban-block {
+    background: var(--bg-secondary);
+    border: 2px solid var(--green-700);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: all var(--transition-base);
+}
+
+/* ===== ÉTATS : FOCUS vs REDUCED ===== */
+/* Par défaut, le bloc Projets est FOCUS et le bloc Tâches est REDUCED */
+.kanban-block--projects {
+    flex: 1; /* Occupe l'espace disponible */
+}
+
+.kanban-block--tasks {
+    flex: 0 0 60px; /* Réduit (juste le titre) */
+}
+
+/* Quand Projets est REDUCED et Tâches est FOCUS (géré par JS) */
+.kanban-block--projects.reduced {
+    flex: 0 0 60px;
+}
+
+.kanban-block--tasks.focus {
+    flex: 1;
+}
+
+/* ===== CONTENUS DES BLOCS ===== */
+.block-content--focus {
+    display: block;
+    padding: var(--spacing-md);
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.block-content--reduced {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    border-radius: var(--radius-sm);
+    min-height: 60px;
+}
+
+/* Hover : Effet visuel pour montrer que c'est cliquable */
+.block-content--reduced:hover {
+    background: rgba(0, 194, 209, 0.1);
+    transform: translateX(2px); /* Léger décalage pour effet "push" */
+    border-left: 3px solid var(--color-primary); /* Bordure cyan à gauche */
+}
+
+/* Effet actif au clic */
+.block-content--reduced:active {
+    transform: translateX(0);
+    background: rgba(0, 194, 209, 0.15);
+}
+
+/* ===== HEADER DE BLOC ===== */
+.block-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--green-700);
+}
+
+.block-title {
+    font-family: var(--font-code);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-primary);
+    margin: 0;
+}
+
+/* ===== ÉTAT REDUCED : Info + Bouton ===== */
+.block-reduced-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+/* Supprimer toutes les marges par défaut dans les zones réduites */
+.block-content--reduced * {
+    margin: 0;
+    line-height: 1.2; /* ← Réduit la hauteur de ligne pour compacter */
+}
+
+.reduced-label {
+    font-family: var(--font-main);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.reduced-value {
+    font-family: var(--font-code);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}
+
+.btn-change-project {
+    padding: 6px var(--spacing-md); /* ← Padding vertical fixe réduit */
+    background: transparent;
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    border-radius: var(--radius-md);
+    font-family: var(--font-main);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    flex-shrink: 0; /* ← Empêche le bouton de rétrécir */
+    line-height: 1; /* ← Réduit la hauteur de ligne */
+}
+
+.btn-change-project:hover {
+    background: var(--color-primary);
+    color: var(--cyan-900);
+}
+
+/* ==================== BLOC PROJETS ==================== */
+
+/* ===== BOUTON NOUVEAU PROJET ===== */
+.btn-new-project {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-md);
+    background: var(--color-primary);
+    color: var(--cyan-900);
+    border: none;
+    border-radius: var(--radius-md);
+    font-family: var(--font-main);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.btn-new-project:hover {
+    background: var(--cyan-400);
+    transform: translateY(-2px);
+}
+
+.btn-new-project svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* ===== FORMULAIRE PROJET ===== */
+.project-form-container {
+    margin-bottom: var(--spacing-sm);
+    padding: var(--spacing-md);
+    background: rgba(0, 194, 209, 0.05);
+    border: 1px solid var(--green-500);
+    border-radius: var(--radius-md);
+}
+
+.project-form .form-group {
+    margin-bottom: var(--spacing-xs);
+}
+
+.project-form label {
+    display: block;
+    font-family: var(--font-main);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.project-form .form-input,
+.project-form .form-textarea {
+    width: 100%;
+    padding: var(--spacing-sm);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-main);
+    font-size: var(--font-size-base);
+    transition: border-color var(--transition-base);
+}
+
+.project-form .form-input:focus,
+.project-form .form-textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.project-form .form-textarea {
+    resize: vertical;
+    min-height: 50px;
+    max-height: 80px;  /* ← AJOUT : hauteur max = 4-5 lignes */
+    overflow-y: auto;
+}
+
+.form-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
+}
+
+.btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    border-radius: var(--radius-md);
+    font-family: var(--font-main);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.btn-primary {
+    background: var(--color-primary);
+    color: var(--cyan-900);
+}
+
+.btn-primary:hover {
+    background: var(--cyan-400);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background: var(--bg-tertiary);
+}
+
+/* ===== LISTE DES PROJETS (avec scroll) ===== */
+.projects-list {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: var(--spacing-xs);
+}
+
+/* Scrollbar personnalisée */
+.projects-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.projects-list::-webkit-scrollbar-track {
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
+}
+
+.projects-list::-webkit-scrollbar-thumb {
+    background: var(--color-primary);
+    border-radius: var(--radius-sm);
+}
+
+.projects-list::-webkit-scrollbar-thumb:hover {
+    background: var(--cyan-400);
+}
+
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--text-secondary);
+    font-family: var(--font-main);
+    font-size: var(--font-size-base);
+}
+
+/* ===== CARD PROJET ===== */
+.project-card {
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+    background: var(--bg-primary);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.project-card:hover {
+    border-color: var(--color-primary);
+    transform: translateX(4px);
+}
+
+.project-card.selected {
+    border-color: var(--color-primary);
+    background: rgba(0, 194, 209, 0.1);
+}
+
+.project-card-title {
+    font-family: var(--font-code);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.project-card-description {
+    font-family: var(--font-main);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    
+    /* Tronquer avec ellipsis */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.project-card-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--border-color);
+}
+
+.btn-icon {
+    padding: var(--spacing-xs);
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--text-secondary);
+}
+
+.btn-icon:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--color-primary);
+}
+
+.btn-icon:hover svg {
+    stroke: var(--color-primary);
+}
+
+.btn-icon--delete {
+    border-color: var(--red-500);
+}
+
+.btn-icon--delete svg {
+    stroke: var(--red-500);
+}
+
+.btn-icon--delete:hover {
+    background: var(--red-500);
+    border-color: var(--red-500);
+}
+
+.btn-icon--delete:hover svg {
+    stroke: #ffffff;
+}
+
+/* ===== BOUTON MODIFIER (crayon) ===== */
+.btn-icon--edit svg {
+    stroke: var(--color-primary);
+}
+
+.btn-icon--edit:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.btn-icon--edit:hover svg {
+    stroke: var(--cyan-900);
+}
+
+/* ===== BOUTON MODIFIER (crayon) ===== */
+.btn-icon--edit svg {
+    stroke: var(--color-primary);
+}
+
+.btn-icon--edit:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.btn-icon--edit:hover svg {
+    stroke: var(--cyan-900);
+}
+
+/* ===== MODE ÉDITION : CARD PROJET ===== */
+.project-card--editing {
+    border-color: var(--orange-500); /* Juste la border orange, rien de plus */
+    background: rgba(253, 171, 94, 0.05); /* Fond très léger */
+}
+
+/* Formulaire d'édition dans la card */
+.project-edit-form .form-group {
+    margin-bottom: var(--spacing-sm);
+}
+
+.project-edit-form label {
+    display: block;
+    font-family: var(--font-main);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.project-edit-form .form-input--edit,
+.project-edit-form .form-textarea--edit {
+    width: 100%;
+    padding: var(--spacing-sm);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--orange-500); /* Border orange fine */
+    border-radius: var(--radius-sm);
+    font-family: var(--font-main);
+    font-size: var(--font-size-base);
+    transition: border-color var(--transition-base);
+}
+
+.project-edit-form .form-input--edit:focus,
+.project-edit-form .form-textarea--edit:focus {
+    outline: none;
+    border-color: var(--orange-500);
+}
+
+.project-edit-form .form-textarea--edit {
+    resize: vertical;
+    min-height: 60px;
+}
+
+/* ==================== BLOC TÂCHES (KANBAN) ==================== */
+
+/* ===== MESSAGE SI AUCUN PROJET ===== */
+.tasks-empty-state {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--text-secondary);
+    font-family: var(--font-main);
+    font-size: var(--font-size-base);
+}
+
+/* ===== KANBAN BOARD : 3 COLONNES ===== */
+.kanban-board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-md);
+    flex: 1;
+    overflow: hidden;
+}
+
+/* ===== COLONNE KANBAN ===== */
+.kanban-column {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-primary);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.kanban-column--todo {
+    border-top: 4px solid var(--orange-500);
+}
+
+.kanban-column--in-progress {
+    border-top: 4px solid var(--color-primary);
+}
+
+.kanban-column--done {
+    border-top: 4px solid var(--green-500);
+}
+
+/* ===== HEADER DE COLONNE ===== */
+.column-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.column-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-family: var(--font-code);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.column-badge {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.badge-todo {
+    background: var(--neutral-400);
+}
+
+.badge-in-progress {
+    background: var(--color-primary);
+}
+
+.badge-done {
+    background: var(--green-500);
+}
+
+/* ===== BOUTON NOUVELLE TÂCHE (uniquement colonne TODO) ===== */
+.btn-new-task {
+    padding: var(--spacing-xs);
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-new-task svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--text-secondary);
+}
+
+.btn-new-task:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.btn-new-task:hover svg {
+    stroke: var(--cyan-900);
+}
+
+/* ===== FORMULAIRE TÂCHE (inline dans la colonne) ===== */
+.task-form-container {
+    padding: var(--spacing-sm);
+    background: rgba(0, 194, 209, 0.05);
+    border-bottom: 1px solid var(--color-primary);
+}
+
+.task-form .form-input--small,
+.task-form .form-textarea--small {
+    width: 100%;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--green-700);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-main);
+    font-size: var(--font-size-sm);
+    transition: border-color var(--transition-base);
+    margin-bottom: var(--spacing-xs);
+}
+
+.task-form .form-input--small:focus,
+.task-form .form-textarea--small:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.task-form .form-textarea--small {
+    resize: none;
+    min-height: 50px;
+}
+
+.form-actions--inline {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+.btn-sm {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
+}
+
+/* ===== CONTAINER TÂCHES (avec scroll) ===== */
+.tasks-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-sm);
+}
+
+/* Scrollbar personnalisée pour les colonnes */
+.tasks-container::-webkit-scrollbar {
+    width: 4px;
+}
+
+.tasks-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.tasks-container::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: var(--radius-sm);
+}
+
+.tasks-container::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+/* ===== CARD TÂCHE ===== */
+.task-card {
+    padding: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-base);
+    cursor: pointer;
+}
+
+.task-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(0, 194, 209, 0.2);
+}
+
+.task-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-xs);
+}
+
+.task-card-title {
+    font-family: var(--font-code);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    flex: 1;
+}
+
+.task-card-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.task-card-description {
+    font-family: var(--font-main);
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+    line-height: 1.4;
+    
+    /* Tronquer avec ellipsis (2 lignes) */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: var(--spacing-xs);
+}
+
+/* Accordéon pour description complète (géré en JS) */
+.task-card-description.expanded {
+    -webkit-line-clamp: unset;
+}
+
+/* ===== BOUTONS D'ACTION TÂCHE ===== */
+.task-btn {
+    padding: 4px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xs);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.task-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* Bouton Modifier (crayon) */
+.task-btn--edit svg {
+    stroke: var(--color-primary);
+}
+
+.task-btn--edit:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.task-btn--edit:hover svg {
+    stroke: var(--cyan-900);
+}
+
+/* Bouton Terminer (check) */
+.task-btn--complete svg {
+    stroke: var(--green-500);
+}
+
+.task-btn--complete:hover {
+    background: var(--green-500);
+    border-color: var(--green-500);
+}
+
+.task-btn--complete:hover svg {
+    stroke: #ffffff;
+}
+
+/* Bouton Supprimer (poubelle) */
+.task-btn--delete svg {
+    stroke: var(--red-500);
+}
+
+.task-btn--delete:hover {
+    background: var(--red-500);
+    border-color: var(--red-500);
+}
+
+.task-btn--delete:hover svg {
+    stroke: #ffffff;
+}
+
+/* Bouton Démarrer (play) */
+.task-btn--start svg {
+    stroke: var(--color-primary);
+}
+
+.task-btn--start:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.task-btn--start:hover svg {
+    stroke: var(--cyan-900);
+}
+
+/* ===== MODE ÉDITION : TASK CARD ===== */
+.task-card--editing {
+    border-color: var(--orange-500); /* Border orange comme les projets */
+    background: rgba(253, 171, 94, 0.05);
+}
+
+/* Formulaire d'édition dans la task-card */
+.task-edit-form {
+    padding: var(--spacing-xs);
+}
+
+.task-edit-form .form-group {
+    margin-bottom: var(--spacing-xs);
+}
+
+.task-edit-form label {
+    display: block;
+    font-family: var(--font-main);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.task-edit-form .form-input--edit-task,
+.task-edit-form .form-textarea--edit-task {
+    width: 100%;
+    padding: var(--spacing-xs);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--orange-500); /* Border orange fine */
+    border-radius: var(--radius-sm);
+    font-family: var(--font-main);
+    font-size: var(--font-size-sm);
+    transition: border-color var(--transition-base);
+}
+
+.task-edit-form .form-input--edit-task:focus,
+.task-edit-form .form-textarea--edit-task:focus {
+    outline: none;
+    border-color: var(--orange-500);
+}
+
+.task-edit-form .form-textarea--edit-task {
+    resize: vertical;
+    min-height: 50px;
+}
+
+.task-edit-form .form-actions--inline {
+    display: flex;
+    gap: 4px;
+    margin-top: var(--spacing-xs);
+}
+
+.task-edit-form .btn-sm {
+    padding: 4px var(--spacing-xs);
+    font-size: var(--font-size-xs);
+}
+
+/* ===== DRAG & DROP ===== */
+
+/* ===== POIGNÉE DE DRAG & DROP ===== */
+.task-drag-handle {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 24px;
+    cursor: grab;
+    color: #64748b;;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.task-drag-handle:hover {
+    opacity: 1;
+    color: var(--color-primary);
+}
+
+.task-drag-handle:active {
+    cursor: grabbing;
+}
+
+.task-drag-handle svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Ajuster le padding de la card pour faire de la place à la poignée */
+.task-card {
+    position: relative;
+    padding-left: 32px; /* Faire de la place pour la poignée */
+}
+
+/* Colonne survolée pendant le drag */
+.tasks-container.drag-over {
+    background-color: var(--color-primary-light);
+    border: 2px dashed var(--color-primary);
+    border-radius: 8px;
+}
+
+/* Carte en cours de déplacement */
+.task-card[draggable="true"] {
+    cursor: grab;
+}
+
+.task-card[draggable="true"]:active {
+    cursor: grabbing;
+}
+
+/* Colonne survolée pendant le drag */
+.tasks-container.drag-over {
+    background-color: var(--color-primary-light);
+    border: 2px dashed var(--color-primary);
+    border-radius: 8px;
+}
+
+
+/* ==================== MODE DARK/LIGHT ==================== */
+/* Les variables CSS s'ajustent automatiquement via Variables.css */
+
+/* ==================== RESPONSIVE (Sécurité) ==================== */
+/* La page redirige les mobiles, mais on garde une sécurité CSS */
+@media (max-width: 768px) {
+    .kanban-main {
+        display: none;
+    }
+    
+    .kanban-header::after {
+        content: "Cette page est optimisée pour desktop. Veuillez utiliser un ordinateur.";
+        display: block;
+        margin-top: var(--spacing-md);
+        padding: var(--spacing-md);
+        background: var(--color-accent);
+        color: var(--cyan-900);
+        border-radius: var(--radius-md);
+        font-weight: var(--font-weight-semibold);
+    }
+}

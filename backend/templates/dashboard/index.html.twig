@@ -1,0 +1,202 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard - My Ankode{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/delete-modal.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="dashboard-container">
+        
+        {# ===== HEADER DASHBOARD ===== #}
+        <header class="dashboard-header">
+            <h1 class="dashboard-title">Bienvenue {{ app.user.username }}</h1>
+            <p class="dashboard-subtitle">Connecté depuis le {{ app.user.createdAt|date('d/m/Y') }}</p>
+        </header>
+
+        {# ===== GRID 2x2 CARDS FONCTIONNALITES ===== #}
+        <section class="dashboard-grid">
+            
+            {# CARD 1 - VEILLE #}
+            <article class="dashboard-card card-veille">
+                <div class="card-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                    </svg>
+                </div>
+                <h2 class="card-title">Veille Technologique</h2>
+                <div class="card-content">
+                    {% if favoritesCount > 0 or readCount > 0 %}
+                        <p class="card-stat">{{ favoritesCount }} favoris | {{ readCount }} lus</p>
+                    {% else %}
+                        <p class="card-empty">Aucune veille configurée actuellement, prêt pour tes premières lectures ?</p>
+                    {% endif %}
+                </div>
+                <a href="{{ path('app_veille') }}" class="card-link">Accéder à la veille</a>
+            </article>
+
+            {# CARD 2 - KANBAN #}
+            <article class="dashboard-card card-kanban">
+                <div class="card-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    </svg>
+                </div>
+                <h2 class="card-title">Kanban</h2>
+                <div class="card-content">
+                    {% if projectCount > 0 %}
+                        <div class="card-stats-group">
+                            <p class="card-stat">{{ projectCount }} projet{{ projectCount > 1 ? 's' : '' }} | {{ taskCount }} tâche{{ taskCount > 1 ? 's' : '' }}</p>
+                            
+                            {% if latestTasks|length > 0 %}
+                                <ul class="card-mini-list">
+                                    {% for task in latestTasks %}
+                                        <li class="card-mini-item">
+                                            <span class="mini-item-badge badge-{{ task.status }}"></span>
+                                            {{ task.title }}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <p class="card-empty">Aucun projet pour le moment, allons-y pour le premier ?</p>
+                    {% endif %}
+                </div>
+                <a href="{{ path('app_kanban') }}" class="card-link desktop-only-link">Accéder au Kanban</a>
+                <a href="{{ path('app_desktop_only') }}" class="card-link mobile-only-link">Fonctionnalité Desktop</a>
+            </article>
+
+            {# CARD 3 - SNIPPETS #}
+            <article class="dashboard-card card-snippets">
+                <div class="card-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                    </svg>
+                </div>
+                <h2 class="card-title">Snippets</h2>
+                <div class="card-content">
+                    {% if snippetCount > 0 %}
+                        <p class="card-stat">{{ snippetCount }} snippet{{ snippetCount > 1 ? 's' : '' }} enregistré{{ snippetCount > 1 ? 's' : '' }}</p>
+                    {% else %}
+                        <p class="card-empty">Aucun snippet pour le moment, un code à save pour célébrer ta victoire sur un bug ?</p>
+                    {% endif %}
+                </div>
+                <a href="{{ path('app_snippets') }}" class="card-link desktop-only-link">Accéder aux Snippets</a>
+                <a href="{{ path('app_desktop_only') }}" class="card-link mobile-only-link">Fonctionnalité Desktop</a>
+            </article>
+
+            {# CARD 4 - COMPETENCES #}
+            <article class="dashboard-card card-competences">
+                <div class="card-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                    </svg>
+                </div>
+                <h2 class="card-title">Compétences</h2>
+                <div class="card-content">
+                    {% if competenceCount > 0 %}
+                        <p class="card-stat">{{ competenceCount }} compétence{{ competenceCount > 1 ? 's' : '' }} suivie{{ competenceCount > 1 ? 's' : '' }}</p>
+                    {% else %}
+                        <p class="card-empty">Aucune compétence configurée pour le moment, sur quelles skills travailles-tu ?</p>
+                    {% endif %}
+                </div>
+                <a href="{{ path('app_competences') }}" class="card-link">Gérer mes compétences</a>
+            </article>
+
+        </section>
+
+        {# ===== FOOTER DASHBOARD - FAQ + SUPPRESSION ===== #}
+        <footer class="dashboard-footer">
+            <a href="{{ path('app_legal_mentions') }}" class="footer-action-warning">Aide et FAQ</a>  
+            <button type="button" class="footer-action-danger" id="btn-delete-account">Supprimer mon compte</button>
+        </footer>
+
+        {# ===== MODAL ASIDE : Suppression de compte ===== #}
+        <aside id="delete-account-modal" class="delete-modal">
+            <div class="delete-modal__overlay"></div>
+            
+            <div class="delete-modal__content">
+                {# Header avec croix de fermeture #}
+                <div class="delete-modal__header">
+                    <h2 class="delete-modal__title"> Supprimer mon compte</h2>
+                    <button type="button" class="delete-modal__close" aria-label="Fermer">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                {# Corps du modal avec formulaire #}
+                <div class="delete-modal__body">
+                    <p class="delete-modal__warning">
+                        Cette action est <strong>IRRÉVERSIBLE</strong>. Toutes vos données seront définitivement supprimées :
+                    </p>
+                    <ul class="delete-modal__list">
+                        <li>Vos projets et tâches Kanban</li>
+                        <li>Vos snippets de code</li>
+                        <li>Vos compétences suivies</li>
+                        <li>Vos articles de veille</li>
+                    </ul>
+
+                    {# Message d'erreur (caché par défaut) #}
+                    <div id="delete-error-message" class="delete-modal__error" style="display: none;"></div>
+
+                    {# Formulaire de confirmation #}
+                    <form id="delete-account-form" class="delete-modal__form">
+                        {# Input mot de passe #}
+                        <div class="form-group">
+                            <label for="delete-password" class="form-label">
+                                Confirmez votre mot de passe :
+                            </label>
+                            <input 
+                                type="password" 
+                                id="delete-password" 
+                                name="password" 
+                                class="form-input" 
+                                placeholder="Votre mot de passe actuel"
+                                required
+                                autocomplete="current-password"
+                            >
+                        </div>
+
+                        {# Checkbox de confirmation #}
+                        <div class="form-group form-group--checkbox">
+                            <input 
+                                type="checkbox" 
+                                id="delete-confirm-checkbox" 
+                                name="confirm" 
+                                class="form-checkbox"
+                                required
+                            >
+                            <label for="delete-confirm-checkbox" class="form-label-checkbox">
+                                Je comprends que cette action est irréversible
+                            </label>
+                        </div>
+
+                        {# Boutons d'action #}
+                        <div class="delete-modal__actions">
+                            <button type="button" class="btn btn--secondary delete-modal__cancel">
+                                Annuler
+                            </button>
+                            <button type="submit" class="btn btn--danger" id="delete-submit-btn">
+                                Confirmer la suppression
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </aside>
+
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {# TEMPORAIRE : Desactive pour implementer la vraie suppression de compte #}
+    {# Script de suppression de compte #}
+    <script src="{{ asset('js/delete-account.js') }}"></script>
+{% endblock %}

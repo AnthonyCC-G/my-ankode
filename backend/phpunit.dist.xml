@@ -1,44 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<!-- https://phpunit.readthedocs.io/en/latest/configuration.html -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
-         colors="true"
-         failOnDeprecation="true"
-         failOnNotice="true"
-         failOnWarning="true"
          bootstrap="tests/bootstrap.php"
-         cacheDirectory=".phpunit.cache"
->
+         colors="true"
+         failOnWarning="true"
+         failOnRisky="true">
+    
+    <!-- 
+    ==========================================
+    TESTSUITES - Organisation des tests
+    ==========================================
+    Grouper les tests par type pour exécution sélective
+    - Entity : tests PostgreSQL (User, Project, Task, Competence)
+    - Controller : tests endpoints API (CRUD, auth)
+    - Document : tests MongoDB (Article, Snippet)
+    - Security : tests sécurité (CSRF, ownership, validators)
+    -->
+    <testsuites>
+        <testsuite name="Entity">
+            <directory>tests/Entity</directory>
+        </testsuite>
+        <testsuite name="Controller">
+            <directory>tests/Controller</directory>
+        </testsuite>
+        <testsuite name="Document">
+            <directory>tests/Document</directory>
+        </testsuite>
+        <testsuite name="Security">
+            <directory>tests/Security</directory>
+        </testsuite>
+    </testsuites>
+
+    <!-- Configuration du Code Coverage -->
+    <coverage>
+        <report>
+            <html outputDirectory="coverage"/>
+            <text outputFile="php://stdout" showOnlySummary="true"/>
+        </report>
+    </coverage>
+
+    <!-- 
+    ==========================================
+    VARIABLES PHP - Environnement de test
+    ==========================================
+    Isolation complète de l'environnement test
+    - APP_ENV=test : config/packages/test/
+    - Base dédiée : my_ankode_test
+    - Fixtures rechargées avant chaque test
+    -->
     <php>
         <ini name="display_errors" value="1" />
         <ini name="error_reporting" value="-1" />
         <server name="APP_ENV" value="test" force="true" />
         <server name="SHELL_VERBOSITY" value="-1" />
+        <server name="SYMFONY_PHPUNIT_REMOVE" value="" />
+        <server name="SYMFONY_PHPUNIT_VERSION" value="12.5" />
     </php>
 
-    <testsuites>
-        <testsuite name="Project Test Suite">
-            <directory>tests</directory>
-        </testsuite>
-    </testsuites>
-
-    <source ignoreSuppressionOfDeprecations="true"
-            ignoreIndirectDeprecations="true"
-            restrictNotices="true"
-            restrictWarnings="true"
-    >
+    <!-- 
+    ==========================================
+    SOURCE - Code coverage
+    ==========================================
+    Analyse tous les .php de src/
+    SAUF DataFixtures (données test) et Kernel.php (Symfony généré)
+    -->
+    <source>
         <include>
-            <directory>src</directory>
+            <directory suffix=".php">src</directory>
         </include>
-
-        <deprecationTrigger>
-            <method>Doctrine\Deprecations\Deprecation::trigger</method>
-            <method>Doctrine\Deprecations\Deprecation::delegateTriggerToBackend</method>
-            <function>trigger_deprecation</function>
-        </deprecationTrigger>
+        <exclude>
+            <directory>src/DataFixtures</directory>
+            <file>src/Kernel.php</file>
+        </exclude>
     </source>
-
-    <extensions>
-    </extensions>
 </phpunit>

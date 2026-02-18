@@ -1104,6 +1104,11 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *             filter?: scalar|null, // Default: "({uid_key}={user_identifier})"
  *             password_attribute?: scalar|null, // Default: null
  *         },
+ *         mongodb?: array{
+ *             class: scalar|null, // The full entity class name of your user class.
+ *             property?: scalar|null, // Default: null
+ *             manager_name?: scalar|null, // Default: null
+ *         },
  *     }>,
  *     firewalls: array<string, array{ // Default: []
  *         pattern?: scalar|null,
@@ -1509,6 +1514,398 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *     generate_final_classes?: bool, // Default: true
  *     generate_final_entities?: bool, // Default: false
  * }
+ * @psalm-type DoctrineMongodbConfig = array{
+ *     document_managers?: array<string, array{ // Default: []
+ *         connection?: scalar|null,
+ *         database?: scalar|null,
+ *         logging?: bool, // Default: "%kernel.debug%"
+ *         profiler?: array{
+ *             enabled?: bool, // Default: "%kernel.debug%"
+ *             pretty?: bool, // Default: "%kernel.debug%"
+ *         },
+ *         default_document_repository_class?: scalar|null, // Default: "Doctrine\\ODM\\MongoDB\\Repository\\DocumentRepository"
+ *         default_gridfs_repository_class?: scalar|null, // Default: "Doctrine\\ODM\\MongoDB\\Repository\\DefaultGridFSRepository"
+ *         repository_factory?: scalar|null, // Default: "doctrine_mongodb.odm.container_repository_factory"
+ *         persistent_collection_factory?: scalar|null, // Default: null
+ *         auto_mapping?: bool, // Default: false
+ *         filters?: array<string, string|array{ // Default: []
+ *             class: scalar|null,
+ *             enabled?: bool, // Default: false
+ *             parameters?: array<string, mixed>,
+ *         }>,
+ *         metadata_cache_driver?: string|array{
+ *             type?: scalar|null, // Default: "array"
+ *             class?: scalar|null,
+ *             host?: scalar|null,
+ *             port?: int,
+ *             instance_class?: scalar|null,
+ *             id?: scalar|null,
+ *             namespace?: scalar|null,
+ *         },
+ *         use_transactional_flush?: bool, // Default: false
+ *         mappings?: array<string, bool|string|array{ // Default: []
+ *             mapping?: scalar|null, // Default: true
+ *             type?: scalar|null,
+ *             dir?: scalar|null,
+ *             prefix?: scalar|null,
+ *             alias?: scalar|null,
+ *             is_bundle?: bool,
+ *         }>,
+ *     }>,
+ *     connections?: array<string, array{ // Default: []
+ *         server?: scalar|null,
+ *         options?: array{
+ *             authMechanism?: "SCRAM-SHA-1"|"SCRAM-SHA-256"|"MONGODB-CR"|"MONGODB-X509"|"PLAIN"|"GSSAPI",
+ *             connectTimeoutMS?: int,
+ *             db?: scalar|null,
+ *             authSource?: scalar|null,
+ *             journal?: bool,
+ *             password?: scalar|null,
+ *             readPreference?: "primary"|"primaryPreferred"|"secondary"|"secondaryPreferred"|"nearest",
+ *             readPreferenceTags?: list<array<string, scalar|null>>,
+ *             replicaSet?: scalar|null,
+ *             socketTimeoutMS?: int,
+ *             ssl?: bool,
+ *             tls?: bool,
+ *             tlsAllowInvalidCertificates?: bool,
+ *             tlsAllowInvalidHostnames?: bool,
+ *             tlsCAFile?: scalar|null,
+ *             tlsCertificateKeyFile?: scalar|null,
+ *             tlsCertificateKeyFilePassword?: scalar|null,
+ *             tlsDisableCertificateRevocationCheck?: bool,
+ *             tlsDisableOCSPEndpointCheck?: bool,
+ *             tlsInsecure?: bool,
+ *             username?: scalar|null,
+ *             retryReads?: bool,
+ *             retryWrites?: bool,
+ *             w?: scalar|null,
+ *             wTimeoutMS?: int,
+ *         },
+ *         driver_options?: array{
+ *             context?: scalar|null, // Deprecated: The "context" driver option is deprecated and will be removed in 3.0. This option is ignored by the MongoDB driver version 2. // Default: null
+ *         },
+ *         autoEncryption?: array{
+ *             bypassAutoEncryption?: bool,
+ *             keyVaultClient?: scalar|null,
+ *             keyVaultNamespace?: scalar|null,
+ *             masterKey?: list<mixed>,
+ *             kmsProvider: array{
+ *                 type: scalar|null,
+ *                 accessKeyId?: scalar|null,
+ *                 secretAccessKey?: scalar|null,
+ *                 sessionToken?: scalar|null,
+ *                 tenantId?: scalar|null,
+ *                 clientId?: scalar|null,
+ *                 clientSecret?: scalar|null,
+ *                 keyVaultEndpoint?: scalar|null,
+ *                 identityPlatformEndpoint?: scalar|null,
+ *                 keyName?: scalar|null,
+ *                 keyVersion?: scalar|null,
+ *                 email?: scalar|null,
+ *                 privateKey?: scalar|null,
+ *                 endpoint?: scalar|null,
+ *                 projectId?: scalar|null,
+ *                 location?: scalar|null,
+ *                 keyRing?: scalar|null,
+ *                 key?: scalar|null,
+ *             },
+ *             schemaMap?: list<mixed>,
+ *             encryptedFieldsMap?: array<string, array{ // Default: []
+ *                 fields?: list<array{ // Default: []
+ *                     path: scalar|null,
+ *                     bsonType: scalar|null,
+ *                     keyId: mixed,
+ *                     queries?: array{
+ *                         queryType: scalar|null,
+ *                         min?: mixed,
+ *                         max?: mixed,
+ *                         sparsity?: int,
+ *                         precision?: int,
+ *                         trimFactor?: int,
+ *                         contention?: int,
+ *                     },
+ *                 }>,
+ *             }>,
+ *             extraOptions?: array{
+ *                 mongocryptdURI?: scalar|null,
+ *                 mongocryptdBypassSpawn?: bool,
+ *                 mongocryptdSpawnPath?: scalar|null,
+ *                 mongocryptdSpawnArgs?: list<scalar|null>,
+ *                 cryptSharedLibPath?: scalar|null,
+ *                 cryptSharedLibRequired?: bool,
+ *             },
+ *             bypassQueryAnalysis?: bool,
+ *             tlsOptions?: array{
+ *                 tlsCAFile?: scalar|null,
+ *                 tlsCertificateKeyFile?: scalar|null,
+ *                 tlsCertificateKeyFilePassword?: scalar|null,
+ *                 tlsDisableOCSPEndpointCheck?: bool,
+ *             },
+ *         },
+ *     }>,
+ *     resolve_target_documents?: array<string, scalar|null>,
+ *     types?: array<string, string|array{ // Default: []
+ *         class: scalar|null,
+ *     }>,
+ *     proxy_namespace?: scalar|null, // Default: "MongoDBODMProxies"
+ *     proxy_dir?: scalar|null, // Default: "%kernel.cache_dir%/doctrine/odm/mongodb/Proxies"
+ *     enable_native_lazy_objects?: bool, // Deprecated: The "enable_native_lazy_objects" option is deprecated and will be removed in 6.0. Native Lazy Objects are enable by default when using PHP 8.4+ and doctrine/mongodb-odm 2.14+. // Requires PHP 8.4+ and doctrine/mongodb-odm 2.14+ // Default: false
+ *     enable_lazy_ghost_objects?: bool, // Deprecated: The "enable_lazy_ghost_objects" option is deprecated and will be removed in 6.0. Native Lazy Objects are enable by default when using PHP 8.4+ and doctrine/mongodb-odm 2.14+. // Requires doctrine/mongodb-odm 2.12+ // Default: true
+ *     auto_generate_proxy_classes?: scalar|null, // Default: 3
+ *     hydrator_namespace?: scalar|null, // Default: "Hydrators"
+ *     hydrator_dir?: scalar|null, // Default: "%kernel.cache_dir%/doctrine/odm/mongodb/Hydrators"
+ *     auto_generate_hydrator_classes?: scalar|null, // Default: 0
+ *     persistent_collection_namespace?: scalar|null, // Default: "PersistentCollections"
+ *     persistent_collection_dir?: scalar|null, // Default: "%kernel.cache_dir%/doctrine/odm/mongodb/PersistentCollections"
+ *     auto_generate_persistent_collection_classes?: scalar|null, // Default: 0
+ *     default_document_manager?: scalar|null,
+ *     default_connection?: scalar|null,
+ *     default_database?: scalar|null, // Default: "default"
+ *     default_commit_options?: array{
+ *         j?: bool,
+ *         timeout?: int,
+ *         w?: scalar|null,
+ *         wtimeout?: int,
+ *     },
+ *     controller_resolver?: bool|array{
+ *         enabled?: bool, // Default: true
+ *         auto_mapping?: bool, // Set to false to disable using route placeholders as lookup criteria when the object id doesn't match the argument name // Default: true
+ *     },
+ * }
+ * @psalm-type NelmioApiDocConfig = array{
+ *     type_info?: bool, // Use the symfony/type-info component for determining types. // Default: false
+ *     use_validation_groups?: bool, // If true, `groups` passed to #[Model] attributes will be used to limit validation constraints // Default: false
+ *     operation_id_generation?: \Nelmio\ApiDocBundle\Describer\OperationIdGeneration::ALWAYS_PREPEND|\Nelmio\ApiDocBundle\Describer\OperationIdGeneration::CONDITIONALLY_PREPEND|\Nelmio\ApiDocBundle\Describer\OperationIdGeneration::NO_PREPEND|"always_prepend"|"conditionally_prepend"|"no_prepend", // How to generate operation ids // Default: "always_prepend"
+ *     cache?: array{
+ *         pool?: scalar|null, // define cache pool to use // Default: null
+ *         item_id?: scalar|null, // define cache item id // Default: null
+ *     },
+ *     documentation?: array<string, mixed>,
+ *     media_types?: list<scalar|null>,
+ *     html_config?: array{ // UI configuration options
+ *         assets_mode?: scalar|null, // Default: "cdn"
+ *         swagger_ui_config?: array<mixed>,
+ *         redocly_config?: array<mixed>,
+ *         stoplight_config?: array<mixed>,
+ *     },
+ *     areas?: array<string, array{ // Default: {"default":{"path_patterns":[],"host_patterns":[],"with_attribute":false,"documentation":[],"name_patterns":[],"disable_default_routes":false,"cache":[],"security":[]}}
+ *         path_patterns?: list<scalar|null>,
+ *         host_patterns?: list<scalar|null>,
+ *         name_patterns?: list<scalar|null>,
+ *         security?: array<string, array{ // Default: []
+ *             type?: scalar|null,
+ *             scheme?: scalar|null,
+ *             in?: scalar|null,
+ *             name?: scalar|null,
+ *             description?: scalar|null,
+ *             openIdConnectUrl?: scalar|null,
+ *             ...<mixed>
+ *         }>,
+ *         with_attribute?: bool, // whether to filter by attributes // Default: false
+ *         disable_default_routes?: bool, // if set disables default routes without attributes // Default: false
+ *         documentation?: array<string, mixed>,
+ *         cache?: array{
+ *             pool?: scalar|null, // define cache pool to use // Default: null
+ *             item_id?: scalar|null, // define cache item id // Default: null
+ *         },
+ *     }>,
+ *     models?: array{
+ *         use_jms?: bool, // Default: false
+ *         names?: list<array{ // Default: []
+ *             alias: scalar|null,
+ *             type: scalar|null,
+ *             groups?: mixed, // Default: null
+ *             options?: mixed, // Default: null
+ *             serializationContext?: list<mixed>,
+ *             areas?: list<scalar|null>,
+ *         }>,
+ *     },
+ * }
+ * @psalm-type NelmioSecurityConfig = array{
+ *     signed_cookie?: array{
+ *         names?: list<scalar|null>,
+ *         secret?: scalar|null, // Default: "%kernel.secret%"
+ *         hash_algo?: scalar|null,
+ *         legacy_hash_algo?: scalar|null, // Fallback algorithm to allow for frictionless hash algorithm upgrades. Use with caution and as a temporary measure as it allows for downgrade attacks. // Default: null
+ *         separator?: scalar|null, // Default: "."
+ *     },
+ *     clickjacking?: array{
+ *         hosts?: list<scalar|null>,
+ *         paths?: array<string, array{ // Default: {"^/.*":{"header":"DENY"}}
+ *             header?: scalar|null, // Default: "DENY"
+ *         }>,
+ *         content_types?: list<scalar|null>,
+ *     },
+ *     external_redirects?: array{
+ *         abort?: bool, // Default: false
+ *         override?: scalar|null, // Default: null
+ *         forward_as?: scalar|null, // Default: null
+ *         log?: bool, // Default: false
+ *         allow_list?: list<scalar|null>,
+ *     },
+ *     flexible_ssl?: bool|array{
+ *         enabled?: bool, // Default: false
+ *         cookie_name?: scalar|null, // Default: "auth"
+ *         unsecured_logout?: bool, // Default: false
+ *     },
+ *     forced_ssl?: bool|array{
+ *         enabled?: bool, // Default: false
+ *         hsts_max_age?: scalar|null, // Default: null
+ *         hsts_subdomains?: bool, // Default: false
+ *         hsts_preload?: bool, // Default: false
+ *         allow_list?: list<scalar|null>,
+ *         hosts?: list<scalar|null>,
+ *         redirect_status_code?: scalar|null, // Default: 302
+ *     },
+ *     content_type?: array{
+ *         nosniff?: bool, // Default: false
+ *     },
+ *     xss_protection?: array{ // Deprecated: The "xss_protection" option is deprecated, use Content Security Policy without allowing "unsafe-inline" scripts instead.
+ *         enabled?: bool, // Default: false
+ *         mode_block?: bool, // Default: false
+ *         report_uri?: scalar|null, // Default: null
+ *     },
+ *     csp?: bool|array{
+ *         enabled?: bool, // Default: true
+ *         request_matcher?: scalar|null, // Default: null
+ *         hosts?: list<scalar|null>,
+ *         content_types?: list<scalar|null>,
+ *         report_endpoint?: array{
+ *             log_channel?: scalar|null, // Default: null
+ *             log_formatter?: scalar|null, // Default: "nelmio_security.csp_report.log_formatter"
+ *             log_level?: "alert"|"critical"|"debug"|"emergency"|"error"|"info"|"notice"|"warning", // Default: "notice"
+ *             filters?: array{
+ *                 domains?: bool, // Default: true
+ *                 schemes?: bool, // Default: true
+ *                 browser_bugs?: bool, // Default: true
+ *                 injected_scripts?: bool, // Default: true
+ *             },
+ *             dismiss?: list<list<"default-src"|"base-uri"|"block-all-mixed-content"|"child-src"|"connect-src"|"font-src"|"form-action"|"frame-ancestors"|"frame-src"|"img-src"|"manifest-src"|"media-src"|"object-src"|"plugin-types"|"script-src"|"style-src"|"upgrade-insecure-requests"|"report-uri"|"worker-src"|"prefetch-src"|"report-to"|"*">>,
+ *         },
+ *         compat_headers?: bool, // Default: true
+ *         report_logger_service?: scalar|null, // Default: "logger"
+ *         hash?: array{
+ *             algorithm?: "sha256"|"sha384"|"sha512", // The algorithm to use for hashes // Default: "sha256"
+ *         },
+ *         report?: array{
+ *             level1_fallback?: bool, // Provides CSP Level 1 fallback when using hash or nonce (CSP level 2) by adding 'unsafe-inline' source. See https://www.w3.org/TR/CSP2/#directive-script-src and https://www.w3.org/TR/CSP2/#directive-style-src // Default: true
+ *             browser_adaptive?: bool|array{ // Do not send directives that browser do not support
+ *                 enabled?: bool, // Default: false
+ *                 parser?: scalar|null, // Default: "nelmio_security.ua_parser.ua_php"
+ *             },
+ *             default-src?: list<scalar|null>,
+ *             base-uri?: list<scalar|null>,
+ *             block-all-mixed-content?: bool, // Default: false
+ *             child-src?: list<scalar|null>,
+ *             connect-src?: list<scalar|null>,
+ *             font-src?: list<scalar|null>,
+ *             form-action?: list<scalar|null>,
+ *             frame-ancestors?: list<scalar|null>,
+ *             frame-src?: list<scalar|null>,
+ *             img-src?: list<scalar|null>,
+ *             manifest-src?: list<scalar|null>,
+ *             media-src?: list<scalar|null>,
+ *             object-src?: list<scalar|null>,
+ *             plugin-types?: list<scalar|null>,
+ *             script-src?: list<scalar|null>,
+ *             style-src?: list<scalar|null>,
+ *             upgrade-insecure-requests?: bool, // Default: false
+ *             report-uri?: list<scalar|null>,
+ *             worker-src?: list<scalar|null>,
+ *             prefetch-src?: list<scalar|null>,
+ *             report-to?: scalar|null,
+ *         },
+ *         enforce?: array{
+ *             level1_fallback?: bool, // Provides CSP Level 1 fallback when using hash or nonce (CSP level 2) by adding 'unsafe-inline' source. See https://www.w3.org/TR/CSP2/#directive-script-src and https://www.w3.org/TR/CSP2/#directive-style-src // Default: true
+ *             browser_adaptive?: bool|array{ // Do not send directives that browser do not support
+ *                 enabled?: bool, // Default: false
+ *                 parser?: scalar|null, // Default: "nelmio_security.ua_parser.ua_php"
+ *             },
+ *             default-src?: list<scalar|null>,
+ *             base-uri?: list<scalar|null>,
+ *             block-all-mixed-content?: bool, // Default: false
+ *             child-src?: list<scalar|null>,
+ *             connect-src?: list<scalar|null>,
+ *             font-src?: list<scalar|null>,
+ *             form-action?: list<scalar|null>,
+ *             frame-ancestors?: list<scalar|null>,
+ *             frame-src?: list<scalar|null>,
+ *             img-src?: list<scalar|null>,
+ *             manifest-src?: list<scalar|null>,
+ *             media-src?: list<scalar|null>,
+ *             object-src?: list<scalar|null>,
+ *             plugin-types?: list<scalar|null>,
+ *             script-src?: list<scalar|null>,
+ *             style-src?: list<scalar|null>,
+ *             upgrade-insecure-requests?: bool, // Default: false
+ *             report-uri?: list<scalar|null>,
+ *             worker-src?: list<scalar|null>,
+ *             prefetch-src?: list<scalar|null>,
+ *             report-to?: scalar|null,
+ *         },
+ *     },
+ *     referrer_policy?: bool|array{
+ *         enabled?: bool, // Default: false
+ *         policies?: list<scalar|null>,
+ *     },
+ *     permissions_policy?: bool|array{
+ *         enabled?: bool, // Default: false
+ *         policies?: array{
+ *             accelerometer?: mixed, // Default: null
+ *             ambient_light_sensor?: mixed, // Default: null
+ *             attribution_reporting?: mixed, // Default: null
+ *             autoplay?: mixed, // Default: null
+ *             bluetooth?: mixed, // Default: null
+ *             browsing_topics?: mixed, // Default: null
+ *             camera?: mixed, // Default: null
+ *             captured_surface_control?: mixed, // Default: null
+ *             compute_pressure?: mixed, // Default: null
+ *             cross_origin_isolated?: mixed, // Default: null
+ *             deferred_fetch?: mixed, // Default: null
+ *             deferred_fetch_minimal?: mixed, // Default: null
+ *             display_capture?: mixed, // Default: null
+ *             encrypted_media?: mixed, // Default: null
+ *             fullscreen?: mixed, // Default: null
+ *             gamepad?: mixed, // Default: null
+ *             geolocation?: mixed, // Default: null
+ *             gyroscope?: mixed, // Default: null
+ *             hid?: mixed, // Default: null
+ *             identity_credentials_get?: mixed, // Default: null
+ *             idle_detection?: mixed, // Default: null
+ *             interest_cohort?: mixed, // Default: null
+ *             language_detector?: mixed, // Default: null
+ *             local_fonts?: mixed, // Default: null
+ *             magnetometer?: mixed, // Default: null
+ *             microphone?: mixed, // Default: null
+ *             midi?: mixed, // Default: null
+ *             otp_credentials?: mixed, // Default: null
+ *             payment?: mixed, // Default: null
+ *             picture_in_picture?: mixed, // Default: null
+ *             publickey_credentials_create?: mixed, // Default: null
+ *             publickey_credentials_get?: mixed, // Default: null
+ *             screen_wake_lock?: mixed, // Default: null
+ *             serial?: mixed, // Default: null
+ *             speaker_selection?: mixed, // Default: null
+ *             storage_access?: mixed, // Default: null
+ *             summarizer?: mixed, // Default: null
+ *             translator?: mixed, // Default: null
+ *             usb?: mixed, // Default: null
+ *             web_share?: mixed, // Default: null
+ *             window_management?: mixed, // Default: null
+ *             xr_spatial_tracking?: mixed, // Default: null
+ *         },
+ *     },
+ *     cross_origin_isolation?: bool|array{
+ *         enabled?: bool, // Default: false
+ *         paths?: array<string, array{ // Default: []
+ *             coep?: "unsafe-none"|"require-corp"|"credentialless", // Cross-Origin-Embedder-Policy (COEP) header value
+ *             coop?: "unsafe-none"|"same-origin-allow-popups"|"same-origin"|"noopener-allow-popups", // Cross-Origin-Opener-Policy (COOP) header value
+ *             corp?: "same-site"|"same-origin"|"cross-origin", // Cross-Origin-Resource-Policy (CORP) header value
+ *             report_only?: bool, // Use Report-Only headers instead of enforcing (applies to COEP and COOP only) // Default: false
+ *             report_to?: scalar|null, // Reporting endpoint name for violations (requires Reporting API configuration, applies to COEP and COOP only) // Default: null
+ *         }>,
+ *     },
+ * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -1522,6 +1919,9 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *     twig_extra?: TwigExtraConfig,
  *     security?: SecurityConfig,
  *     monolog?: MonologConfig,
+ *     doctrine_mongodb?: DoctrineMongodbConfig,
+ *     nelmio_api_doc?: NelmioApiDocConfig,
+ *     nelmio_security?: NelmioSecurityConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -1538,6 +1938,9 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         security?: SecurityConfig,
  *         monolog?: MonologConfig,
  *         maker?: MakerConfig,
+ *         doctrine_mongodb?: DoctrineMongodbConfig,
+ *         nelmio_api_doc?: NelmioApiDocConfig,
+ *         nelmio_security?: NelmioSecurityConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -1552,6 +1955,9 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         twig_extra?: TwigExtraConfig,
  *         security?: SecurityConfig,
  *         monolog?: MonologConfig,
+ *         doctrine_mongodb?: DoctrineMongodbConfig,
+ *         nelmio_api_doc?: NelmioApiDocConfig,
+ *         nelmio_security?: NelmioSecurityConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -1567,6 +1973,9 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         twig_extra?: TwigExtraConfig,
  *         security?: SecurityConfig,
  *         monolog?: MonologConfig,
+ *         doctrine_mongodb?: DoctrineMongodbConfig,
+ *         nelmio_api_doc?: NelmioApiDocConfig,
+ *         nelmio_security?: NelmioSecurityConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,

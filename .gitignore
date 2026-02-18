@@ -1,4 +1,8 @@
 cat > .gitignore << 'EOF'
+# Docker credentials (JAMAIS versionner)
+.env
+.env.local
+
 # Backend (Symfony)
 backend/vendor/
 backend/.env.local
@@ -21,3 +25,4 @@ frontend/my-ankode-app/.angular/
 .DS_Store
 Thumbs.db
 EOF
+
