@@ -59,7 +59,7 @@ security:
         - { path: ^/snippets, roles: ROLE_USER }
         - { path: ^/competences, roles: ROLE_USER }
         
-        # Par défaut, bloquer tout le reste (sécurité)
+        # Securite par defaut : tout acces non defini ci-dessus requiert ROLE_USER
         - { path: ^/, roles: ROLE_USER }
 
 when@test:
