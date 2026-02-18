@@ -260,16 +260,15 @@ body:not(.dark-mode) .lightbulb:hover {
 
 /* ==================== MOBILE HEADER ==================== */
 .mobile-header {
-    position: fixed;
+    position: fixed;  /* <- indispensable ! */
     top: 0;
     left: 0;
     right: 0;
     height: 70px;
+    justify-content: space-around;
     
     display: none;
     align-items: center;
-    justify-content: space-between;
-    padding: 0 var(--spacing-md);
     
     background: rgba(10, 22, 40, 0.85);
     backdrop-filter: blur(15px);
@@ -278,94 +277,51 @@ body:not(.dark-mode) .lightbulb:hover {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
-body:not(.dark-mode) .mobile-header {
-    background: rgba(245, 249, 252, 0.85);
-}
-
 .mobile-header__logo img {
     width: 50px;
     height: auto;
 }
 
-/* Username au centre du header mobile */
-.mobile-header__user {
-    flex: 1;
-    text-align: center;
-    
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    color: var(--text-primary);
-    
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Mode Light */
-body:not(.dark-mode) .mobile-header__user {
-    color: var(--neutral-900);
-}
-
-/* Container pour les actions (Legal + Theme) */
-.mobile-header__actions {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-}
-
-/* Bouton Legal/Info */
-.mobile-header__legal {
+.mobile-header__theme,
+.mobile-header__legal,
+.mobile-header__logout {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 40px;
     height: 40px;
     background: transparent;
-    border: 2px solid var(--border-color);
-    border-radius: var(--radius-sm);
+    border: none;
     cursor: pointer;
     transition: all var(--transition-base);
     text-decoration: none;
-}
-
-.mobile-header__legal svg {
-    width: 24px;
-    height: 24px;
-    color: var(--cyan-500);
-    stroke-width: 2;
-}
-
-.mobile-header__legal:hover,
-.mobile-header__legal:active {
-    transform: scale(1.1);
-    border-color: var(--cyan-500);
-    background: rgba(0, 194, 209, 0.1);
-}
-
-body:not(.dark-mode) .mobile-header__legal svg {
-    color: #0066cc;
-}
-
-body:not(.dark-mode) .mobile-header__legal:hover {
-    border-color: #0066cc;
-    background: rgba(0, 102, 204, 0.1);
-}
-
-.mobile-header__theme {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: var(--spacing-xs);
-    transition: transform var(--transition-base);
-}
-
-.mobile-header__theme:hover {
-    transform: scale(1.1);
+    padding: 0;
 }
 
 .mobile-header__theme img {
     width: 35px;
     height: 35px;
+}
+
+.mobile-header__legal svg,
+.mobile-header__logout svg {
+    width: 30px;
+    height: 30px;
+    stroke-width: 2;
+}
+
+.mobile-header__legal svg {
+    color: var(--cyan-500);
+}
+
+.mobile-header__logout svg {
+    color: var(--color-accent); /* Orange */
+}
+
+.mobile-header__theme:hover,
+.mobile-header__legal:hover,
+.mobile-header__logout:hover {
+    transform: scale(1.1);
 }
 
 /* ==================== BOTTOM NAVIGATION BAR (MOBILE) ==================== */
