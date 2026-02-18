@@ -1,5 +1,25 @@
 <?php
 
+/**
+ * PROJECT.PHP - Entité PostgreSQL représentant un projet Kanban
+ * 
+ * Responsabilités :
+ * - Représenter un projet Kanban avec nom et description
+ * - Gérer la relation avec les tâches (OneToMany avec cascade delete)
+ * - Lier le projet à son propriétaire (ManyToOne vers User)
+ * - Validation des données (nom obligatoire, limites de caractères)
+ * 
+ * Architecture :
+ * - Table 'project' en PostgreSQL
+ * - Relations Doctrine : owner (ManyToOne vers User), tasks (OneToMany vers Task)
+ * - Cascade orphanRemoval : suppression auto des tâches si projet supprimé
+ * - Contraintes de validation : nom obligatoire (max 255 car), description optionnelle (max 1000 car)
+ * 
+ * Sécurité :
+ * - Ownership vérifié via ResourceVoter (project.owner)
+ * - Un projet ne peut avoir qu'un seul propriétaire (owner NOT NULL)
+ */
+
 namespace App\Entity;
 
 use App\Repository\ProjectRepository;
@@ -12,6 +32,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 class Project
 {
+    // ===== 1. PROPRIÉTÉS DOCTRINE - DONNÉES DU PROJET =====
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -45,10 +67,15 @@ class Project
     #[ORM\OneToMany(targetEntity: Task::class, mappedBy: 'project', orphanRemoval: true)]
     private Collection $tasks;
 
+    // ===== 2. CONSTRUCTEUR - INITIALISATION DE LA COLLECTION TASKS =====
+    
     public function __construct()
     {
+        // Initialisation de la collection Doctrine (relation OneToMany)
         $this->tasks = new ArrayCollection();
     }
+
+    // ===== 3. GETTERS/SETTERS - PROPRIÉTÉS DE BASE =====
 
     public function getId(): ?int
     {
@@ -103,6 +130,8 @@ class Project
         return $this;
     }
 
+    // ===== 4. GESTION DE LA RELATION ONETOMANY - TASKS =====
+    
     /**
      * @return Collection<int, Task>
      */
@@ -113,6 +142,7 @@ class Project
 
     public function addTask(Task $task): static
     {
+        // Ajout uniquement si la tâche n'est pas déjà dans la collection
         if (!$this->tasks->contains($task)) {
             $this->tasks->add($task);
             $task->setProject($this);

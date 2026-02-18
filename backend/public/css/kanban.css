@@ -8,11 +8,12 @@
 
 /* ==================== HEADER KANBAN ==================== */
 .kanban-header {
+    width: calc(100% - 60px); /* MODIF : Soustrait la largeur sidebar */
+    max-width: 1400px;
+    margin: 0 auto;
+    padding-top: 100px;
+    padding-bottom: var(--spacing-md);
     text-align: center;
-    padding: var(--spacing-xl) var(--spacing-lg);
-    margin-top: 80px; /* Espace pour la navbar fixe */
-    margin-bottom: var(--spacing-lg);
-    border-radius: var(--radius-lg);
 }
 
 .kanban-title {
@@ -37,10 +38,11 @@
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);
-    height: calc(100vh - 300px); 
+    height: calc(100vh - 260px); /* ajustement valeur contrairement à snippets */
     padding: 0 var(--spacing-lg);
+    padding-right: clamp(80px, 12.5vw, 180px);
     margin-bottom: var(--spacing-xl);
-    padding-bottom: 180px; 
+    padding-bottom: 80px; /* Même valeur que snippets */
 }
 
 /* ===== BLOC GÉNÉRIQUE (Projets + Tâches) ===== */
@@ -904,64 +906,6 @@
     background-color: var(--color-primary-light);
     border: 2px dashed var(--color-primary);
     border-radius: 8px;
-}
-
-
-
-/* ==================== AJUSTEMENTS MASCOTTE POUR KANBAN ==================== */
-
-/**
- * Sur la page Kanban UNIQUEMENT :
- * - Personnage masqué (géré dans base.html.twig avec condition Twig)
- * - Bulle masquée (géré dans base.html.twig avec condition Twig)  
- * - Ampoule repositionnée en bas à droite au-dessus du footer
- */
-
-/* Repositionner le conteneur entier */
-.mascot-container {
-    bottom: 90px;  /* Au-dessus du footer (ajuste selon hauteur de ton footer) */
-    right: 25px;    
-}
-
-/* Ampoule seule : retirer les transformations par défaut */
-.mascot-container .lightbulb {
-    position: static;  /* Retire le positionnement absolu (était relative au personnage) */
-    transform: none;   /* Retire translateX(-50%) ou autre */
-    top: auto;
-    left: auto;
-    width: 50px;       /* Taille visible et cliquable */
-    height: 50px;
-    cursor: pointer;
-    
-    /* Animation pulse douce pour attirer l'œil */
-    animation: gentle-glow 3s ease-in-out infinite;
-}
-
-/* Animation de glow subtil */
-@keyframes gentle-glow {
-    0%, 100% {
-        filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
-    }
-    50% {
-        filter: drop-shadow(0 0 18px rgba(255, 215, 0, 0.9));
-    }
-}
-
-/* Hover renforcé */
-.mascot-container .lightbulb:hover {
-    filter: drop-shadow(0 0 25px rgba(255, 215, 0, 1));
-    transform: scale(1.15);
-}
-
-/* Mode Light : ampoule éteinte (grise) - pas d'animation */
-body:not(.dark-mode) .mascot-container .lightbulb {
-    filter: grayscale(100%) brightness(0.5);
-    animation: none;
-}
-
-body:not(.dark-mode) .mascot-container .lightbulb:hover {
-    filter: grayscale(100%) brightness(0.7);
-    transform: scale(1.1);
 }
 
 

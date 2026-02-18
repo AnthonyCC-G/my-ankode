@@ -1,0 +1,12 @@
+nelmio_security:
+    forced_ssl:
+        enabled: false
+    
+    # Désactive COMPLÈTEMENT clickjacking en dev
+    clickjacking:
+        paths:
+            '^/.*': ALLOW  # Permet TOUTES les iframes en dev
+    
+    # CSP désactivé en dev
+    csp:
+        enabled: false

@@ -130,6 +130,22 @@
     border-radius: 2px;
 }
 
+.title-app--connected h2 {
+    animation: glow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+    0%, 100% {
+        text-shadow: 0 0 10px rgba(0, 194, 209, 0.4);
+    }
+    50% {
+        text-shadow: 
+            0 0 20px rgba(0, 194, 209, 0.8),
+            0 0 40px rgba(0, 194, 209, 0.5);
+    }
+}
+
+
 /* Mode light - Titres */
 body:not(.dark-mode) .title-welcome h1,
 body:not(.dark-mode) .title-app h2 {
@@ -155,6 +171,7 @@ body:not(.dark-mode) .title-app h2 {
     background: linear-gradient(135deg, var(--orange-500) 0%, #FF8C42 100%);
     border: 2px solid var(--orange-500);
     border-radius: var(--radius-lg);
+    white-space: nowrap;
     
     /* Texte */
     font-family: var(--font-main);
@@ -298,29 +315,41 @@ body:not(.dark-mode) .title-app h2 {
         0 0 50px rgba(0, 194, 209, 0.4);
 }
 
-/* ===== CARD TÉMOIGNAGE - Cyan (remplace le logo) ===== */
-.dashboard-card--testimonial {
-    width: 25vw;
-    top: 4px; /* Même position que le logo en temps normal */
-    left: 4px; /* Même position que le logo normal */
-    border-color: var(--cyan-500);
+
+.dashboard-logo {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 13vw;
 }
 
-.dashboard-card--testimonial:hover {
-    border-color: var(--cyan-400);
-    box-shadow: 
-        0 0 25px rgba(0, 194, 209, 0.6),
-        0 0 50px rgba(0, 194, 209, 0.4);
+.dashboard-logo img {
+    width: 100%;
+    height: auto;
+    animation: logo-pulse 8s ease-in-out infinite;
 }
+
+@keyframes logo-pulse {
+    0%, 100% { 
+        transform: scale(1);
+        opacity: 0.6;
+    }
+    50% { 
+        transform: scale(1.08);
+        opacity: 0.9;
+    }
+}
+
 
 /* ===== CARD FONCTIONNALITÉS - Cyan ===== */
 .dashboard-card--features {
-    width: 23vw;
-    min-width: 350px;
-    top: 60vh;
-    left: 50%;
-    transform: translateX(-50%);
+    width: 30vw;        /* Était 23vw, un peu plus large */
+    min-width: 370px;   /* Était 350px */
+    top: 64vh;          /* Était 60vh, plus bas */
+    left: 45%;
+    transform: translateX(-45%);
     border-color: var(--cyan-500);
+    padding-top: 4px;
 }
 
 .dashboard-card--features:hover {
@@ -333,15 +362,17 @@ body:not(.dark-mode) .title-app h2 {
 
 /* ===== CONTENU DES CARDS ===== */
 .card-title {
+    text-align: center;
     font-family: var(--font-main);
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-4xl);
     font-weight: var(--font-weight-semibold);
     color: var(--text-primary);
-    margin: 0 0 var(--spacing-sm) 0;
+    margin: 0 0 var(--spacing-xs) 0;
 }
 
 .card-text {
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
     line-height: 1.6;
     color: var(--text-secondary);
     margin: 0 0 var(--spacing-sm) 0;
@@ -364,10 +395,33 @@ body:not(.dark-mode) .title-app h2 {
 }
 
 .card-list li {
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
     color: var(--text-secondary);
     padding-left: var(--spacing-sm);
     position: relative;
+    animation: scan-line 5s ease-in-out infinite;
+    display: inline-block;
+}
+
+.card-list li:nth-child(1) { animation-delay: 0s; }
+.card-list li:nth-child(2) { animation-delay: 0.8s; }
+.card-list li:nth-child(3) { animation-delay: 1.6s; }
+.card-list li:nth-child(4) { animation-delay: 2.4s; }
+
+@keyframes scan-line {
+    0%, 100% { 
+        transform: scale(1);
+    }
+    50% { 
+        transform: scale(1.05); /* Grossissement subtil */
+    }
+}
+
+/* Light mode : on surcharge juste les couleurs, pas l'animation */
+body:not(.dark-mode) .card-list li:nth-child(50%) {
+    color: #1A6FD4;
+    text-shadow: 0 0 12px rgba(26, 111, 212, 0.5);
 }
 
 .card-list li::before {
@@ -392,7 +446,7 @@ body:not(.dark-mode) .card-title {
 
 body:not(.dark-mode) .card-text,
 body:not(.dark-mode) .card-list li {
-    color: var(--neutral-700);
+    color: var(--neutral-900);
 }
 
 /* ==================== MASQUAGE DU LOGO SUR PAGE HOME ==================== */
@@ -438,7 +492,7 @@ body:not(.dark-mode) .card-list li {
 /* Image de la loupe (en haut à droite) */
 .decorative-image--loupe {
     top: 5vh;
-    right: 28vw;
+    right: 24vw;
     width: 5vw;
     max-width: 180px;
     z-index: 5;
@@ -449,8 +503,8 @@ body:not(.dark-mode) .card-list li {
 /* Image du diagramme KPI (en bas à droite) */
 .decorative-image--kpi {
     bottom: 8vh;
-    right: 20vw;
-    width: 8vw;
+    right: 23vw;
+    width: 5vw;
     max-width: 200px;
     opacity: 0.5;
     z-index: 5;

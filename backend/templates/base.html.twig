@@ -36,7 +36,7 @@
     <body class="{% if app.user %}with-sidebar{% endif %}">
         {# ===== DESKTOP : Logo top-left ===== #}
         <div class="logo desktop-only">
-            <a href="{{ app.user ? path('app_dashboard') : path('app_auth') }}">
+            <a href="{{ path('app_home') }}">
                 <img src="{{ asset('images/logo/logo-myankode.png') }}" alt="My Ankode Logo">
             </a>
         </div>
@@ -82,24 +82,24 @@
             <a href="{{ app.user ? path('app_dashboard') : path('app_auth') }}" class="mobile-header__logo">
                 <img src="{{ asset('images/logo/logo-myankode.png') }}" alt="My Ankode">
             </a>
-            
-            {% if app.user %}
-                <div class="mobile-header__user">
-                    Hello {{ app.user.username }}
-                </div>
-            {% endif %}
 
-            <div class="mobile-header__actions">
-                <a href="{{ path('app_legal_mentions') }}" class="mobile-header__legal" aria-label="Mentions légales">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                </a>
-                
-                <button id="theme-switcher-mobile" class="mobile-header__theme">
-                    <img src="{{ asset('images/lightbulb.png') }}" alt="Changer le thème">
-                </button>
-            </div>
+            <button id="theme-switcher-mobile" class="mobile-header__theme">
+                <img src="{{ asset('images/lightbulb.png') }}" alt="Changer le thème">
+            </button>
+
+            <a href="{{ path('app_legal_mentions') }}" class="mobile-header__legal" aria-label="Mentions légales">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+            </a>
+
+            {% if app.user %}
+            <a href="{{ path('app_logout') }}" class="mobile-header__logout" aria-label="Se déconnecter">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+            </a>
+            {% endif %}
         </header>
 
         {# ===== Contenu principal (scrollable sur mobile) ===== #}
@@ -121,20 +121,18 @@
             {# Ampoule - Theme switcher (TOUJOURS visible) #}
             <img src="{{ asset('images/lightbulb.png') }}" id="theme-switcher" class="lightbulb" alt="Changer le thème">
             
-            {# Personnage + Bulle - Masqués sur la page Kanban uniquement #}
-            {% if app.request.attributes.get('_route') != 'app_kanban' %}
-                <img src="{{ asset('images/character-happy.png') }}" id="character" class="character" alt="Mascotte My Ankode">
-                <div class="bubble-container">
-                    <img src="{{ asset('images/bubble.png') }}" class="bubble-image" alt="">
-                    <div class="bubble-content">
-                        <p class="bubble-text-small"></p>
-                        <div class="bubble-text-expanded">
-                            <p><strong>Astuce du jour :</strong></p>
-                            <p>Le dark mode, c'est LA religion des développeurs !</p>
-                        </div>
+            {# Personnage + Bulle #}
+            <img src="{{ asset('images/character-happy.png') }}" id="character" class="character" alt="Mascotte My Ankode">
+            <div class="bubble-container">
+                <img src="{{ asset('images/bubble.png') }}" class="bubble-image" alt="">
+                <div class="bubble-content">
+                    <p class="bubble-text-small"></p>
+                    <div class="bubble-text-expanded">
+                        <p><strong>Astuce du jour :</strong></p>
+                        <p>Le dark mode, c'est LA religion des développeurs !</p>
                     </div>
                 </div>
-            {% endif %}
+            </div>
         </div>
 
         {# ===== MOBILE : Bottom Navigation (4 icônes) ===== #}

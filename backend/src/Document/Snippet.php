@@ -1,5 +1,22 @@
 <?php
 
+/**
+ * SNIPPET.PHP - Document MongoDB pour les snippets de code
+ * 
+ * Responsabilités :
+ * - Stocker les extraits de code (snippets) des utilisateurs
+ * - Organiser le code par langage (javascript, php, python, etc.)
+ * - Gérer les tags pour classification
+ * - Stockage dans MongoDB pour ségrégation des données (code potentiellement dangereux)
+ * 
+ * Architecture :
+ * - Collection MongoDB 'snippets'
+ * - Ownership : userId obligatoire (snippets personnels uniquement)
+ * - Champs : title, language, code, description, tags
+ * - Repository personnalisé : SnippetRepository (méthode countByUser)
+ * - Pas de statuts partagés (contrairement à Article)
+ */
+
 namespace App\Document;
 
 use App\Repository\SnippetRepository;
@@ -9,6 +26,8 @@ use DateTimeImmutable;
 #[MongoDB\Document(collection: 'snippets', repositoryClass: SnippetRepository::class)]
 class Snippet
 {
+    // ===== 1. PROPRIÉTÉS MONGODB - DONNÉES DU SNIPPET =====
+    
     #[MongoDB\Id]
     private ?string $id = null;
 
@@ -33,8 +52,11 @@ class Snippet
     #[MongoDB\Field(type: 'string')]
     private ?string $userId = null;
 
+    // ===== 2. CONSTRUCTEUR - INITIALISATION TIMESTAMP =====
+    
     public function __construct()
     {
+        // Timestamp automatique de création du document
         $this->createdAt = new DateTimeImmutable();
     }
 

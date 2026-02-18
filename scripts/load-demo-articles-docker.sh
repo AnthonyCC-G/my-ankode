@@ -1,13 +1,18 @@
 #!/bin/bash
 # ============================================
 # Script pour charger des articles RSS réels dans MongoDB Docker
-# Usage: bash scripts/load-demo-articles.sh
+# Les sources sont définies dans scripts/rss-sources.conf
+# Usage: bash scripts/load-demo-articles-docker.sh
 # ============================================
 
 echo "=========================================="
-echo "  CHARGEMENT ARTICLES RSS RÉELS"
+echo "  CHARGEMENT ARTICLES RSS RÉELS (DOCKER)"
 echo "=========================================="
 echo ""
+
+# ============================================
+# VÉRIFICATIONS PRÉALABLES
+# ============================================
 
 # Vérification que Docker est lancé
 if ! docker ps | grep -q "my-ankode-backend"; then
@@ -16,35 +21,50 @@ if ! docker ps | grep -q "my-ankode-backend"; then
     exit 1
 fi
 
-echo " Import des flux RSS..."
+# Vérification que le fichier de configuration existe
+CONFIG_FILE="scripts/rss-sources.conf"
+
+if [ ! -f "$CONFIG_FILE" ]; then
+    echo " Erreur : Fichier $CONFIG_FILE introuvable"
+    echo "   Crée-le d'abord avec les sources RSS"
+    exit 1
+fi
+
+# ============================================
+# IMPORT DES SOURCES RSS
+# ============================================
+
+echo "Import des flux RSS (configuration: $CONFIG_FILE)"
 echo ""
 
-# Flux francophones tech
-echo "1/6 - Korben (actualités tech FR)..."
-docker exec my-ankode-backend php bin/console app:fetch-rss https://korben.info/feed "Korben"
+# Compter le nombre de sources (en ignorant commentaires et lignes vides)
+total=$(grep -v "^#" "$CONFIG_FILE" | grep -v "^$" | wc -l)
+current=0
 
-echo ""
-echo "2/6 - Numerama..."
-docker exec my-ankode-backend php bin/console app:fetch-rss https://www.numerama.com/feed/ "Numerama"
+# Lire chaque ligne du fichier de config
+while IFS='|' read -r source url; do
+    # Ignorer les commentaires
+    [[ "$source" =~ ^#.*$ ]] && continue
+    
+    # Ignorer les lignes vides
+    [[ -z "$source" ]] && continue
+    
+    # Incrémenter le compteur
+    ((current++))
+    
+    # Afficher la progression
+    echo "[$current/$total] Import de $source..."
+    
+    # Exécuter la commande d'import DOCKER
+    docker exec my-ankode-backend php bin/console app:fetch-rss "$url" "$source"
+    
+    echo ""
+done < "$CONFIG_FILE"
 
-echo ""
-echo "3/6 - Frandroid (tech grand public)..."
-docker exec my-ankode-backend php bin/console app:fetch-rss https://www.frandroid.com/feed "Frandroid"
+# ============================================
+# VÉRIFICATION DES RÉSULTATS
+# ============================================
 
-# Flux anglophones dev
-echo ""
-echo "4/6 - Dev.to (articles dev communautaires)..."
-docker exec my-ankode-backend php bin/console app:fetch-rss https://dev.to/feed "Dev.to"
-
-echo ""
-echo "5/6 - FreeCodeCamp (tutoriels dev)..."
-docker exec my-ankode-backend php bin/console app:fetch-rss https://www.freecodecamp.org/news/rss "FreeCodeCamp"
-
-echo ""
-echo "6/6 - CSS-Tricks (astuces CSS/Frontend)..."
-docker exec my-ankode-backend php bin/console app:fetch-rss https://css-tricks.com/feed "CSS-Tricks"
-
-echo ""
 echo "=========================================="
 echo "  VÉRIFICATION"
 echo "=========================================="
@@ -64,10 +84,27 @@ docker exec my-ankode-mongo mongosh \
   --quiet \
   --eval "db.articles.countDocuments()"
 
+# Compter les articles par source
 echo ""
-echo " Chargement terminé !"
+echo "Répartition par source :"
+docker exec my-ankode-mongo mongosh \
+  --username "$MONGO_USER" \
+  --password "$MONGO_PASS" \
+  --authenticationDatabase admin \
+  my_ankode_docker \
+  --quiet \
+  --eval "db.articles.aggregate([
+    { \$group: { _id: '\$source', count: { \$sum: 1 } } },
+    { \$sort: { count: -1 } }
+  ]).forEach(doc => print(doc._id + ': ' + doc.count + ' articles'))"
+
 echo ""
-echo " Tu peux maintenant :"
-echo "   - Accéder à http://localhost:8000/veille pour voir les articles"
+echo "=========================================="
+echo " CHARGEMENT TERMINÉ !"
+echo "=========================================="
+echo ""
+echo "Tu peux maintenant :"
+echo "   - Accéder à http://localhost:8000/veille"
 echo "   - Tester l'API : curl http://localhost:8000/api/articles"
+echo "   - Filtrer par source : curl http://localhost:8000/api/articles?source=Korben"
 echo ""

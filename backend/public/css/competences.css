@@ -4,13 +4,11 @@
 
 /* ===== HEADER PAGE ===== */
 .competences-header {
-    width: 100%;
+    width: calc(100% - 60px); /* MODIF : Soustrait la largeur sidebar */
     max-width: 1400px;
     margin: 0 auto;
     padding-top: 100px;
     padding-bottom: var(--spacing-md);
-    padding-left: 1rem;   /* padding gauche */
-    padding-right: 1rem;  /* padding droit */
     text-align: center;
 }
 

@@ -5,11 +5,12 @@
 
 /* ==================== HEADER TITRE DE PAGE ==================== */
 .admin-header {
-    width: 100%;
+    width: calc(100% - 60px); /* MODIF : Soustrait la largeur sidebar */
+    max-width: 1400px;
+    margin: 0 auto;
+    padding-top: 100px;
+    padding-bottom: var(--spacing-md);
     text-align: center;
-    padding: var(--spacing-lg) var(--spacing-md);
-    margin-top: 70px; /* Réduit de 80px à 70px */
-    margin-bottom: var(--spacing-sm); /* Réduit */
 }
 
 .admin-title {
@@ -252,48 +253,11 @@ body:not(.dark-mode) .stat-number {
     flex-direction: column;
 }
 
-.api-doc-intro {
-    background-color: var(--bg-secondary);
-    border: 2px solid var(--border-color);
-    border-radius: var(--radius-md);
-    padding: var(--spacing-md);
-    margin-bottom: var(--spacing-md);
-    text-align: center;
-}
-
-.api-doc-intro h2 {
-    color: var(--color-primary);
-    font-size: var(--font-size-xl);
-    font-weight: var(--font-weight-bold);
-    margin: 0 0 var(--spacing-xs) 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--spacing-xs);
-}
-
-.api-doc-intro p {
-    color: var(--text-primary); /* Changé de text-secondary à text-primary pour meilleur contraste */
-    margin: 0;
-    font-size: var(--font-size-sm);
-}
-
-body:not(.dark-mode) .api-doc-intro {
-    background-color: var(--bg-tertiary);
-}
-
-body:not(.dark-mode) .api-doc-intro h2 {
-    color: var(--cyan-700);
-}
-
-body:not(.dark-mode) .api-doc-intro p {
-    color: var(--text-secondary); /* En light mode on garde secondary */
-}
 
 /* Iframe Swagger UI */
 .api-doc-iframe {
     width: 100%;
-    height: calc(100vh - 500px); /* Ajusté pour remplir jusqu'au footer */
+    height: calc(100vh - 350px); /* Ajusté pour remplir jusqu'au footer */
     min-height: 500px;
     border: 2px solid var(--border-color);
     border-radius: var(--radius-md);
