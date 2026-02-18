@@ -20,7 +20,7 @@
                 <h1>{ Bienvenue sur }</h1>
             </div>
             
-            <div class="title-app">
+            <div class="title-app {% if app.user %}title-app--connected{% endif %}">
                 <h2>{ My Ankode }</h2>
             </div>
             
@@ -29,10 +29,11 @@
                 <img src="{{ asset('images/background/Loupe.png') }}" alt="">
             </div>
             {# ===== FIN AJOUT ===== #}
-
-            <div class="cta-button">
-                <a href="{{ path('app_auth') }}">{ S'inscrire / Se Connecter }</a>
-            </div>
+            {% if not app.user %}
+                <div class="cta-button">
+                    <a href="{{ path('app_auth') }}">{ S'inscrire / Se Connecter }</a>
+                </div>
+            {% endif %}
 
             {# Cards Dashboard - Asymétriques #}
             <div class="dashboard-cards">

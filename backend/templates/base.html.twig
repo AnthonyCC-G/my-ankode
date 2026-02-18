@@ -36,7 +36,7 @@
     <body class="{% if app.user %}with-sidebar{% endif %}">
         {# ===== DESKTOP : Logo top-left ===== #}
         <div class="logo desktop-only">
-            <a href="{{ app.user ? path('app_dashboard') : path('app_auth') }}">
+            <a href="{{ app.user ? path('app_home') : path('app_auth') }}">
                 <img src="{{ asset('images/logo/logo-myankode.png') }}" alt="My Ankode Logo">
             </a>
         </div>
