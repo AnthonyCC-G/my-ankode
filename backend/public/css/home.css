@@ -298,28 +298,39 @@ body:not(.dark-mode) .title-app h2 {
         0 0 50px rgba(0, 194, 209, 0.4);
 }
 
-/* ===== CARD TÉMOIGNAGE - Cyan (remplace le logo) ===== */
-.dashboard-card--testimonial {
-    width: 25vw;
-    top: 4px; /* Même position que le logo en temps normal */
-    left: 4px; /* Même position que le logo normal */
-    border-color: var(--cyan-500);
+
+.dashboard-logo {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 13vw;
 }
 
-.dashboard-card--testimonial:hover {
-    border-color: var(--cyan-400);
-    box-shadow: 
-        0 0 25px rgba(0, 194, 209, 0.6),
-        0 0 50px rgba(0, 194, 209, 0.4);
+.dashboard-logo img {
+    width: 100%;
+    height: auto;
+    animation: logo-pulse 8s ease-in-out infinite;
 }
+
+@keyframes logo-pulse {
+    0%, 100% { 
+        transform: scale(1);
+        opacity: 0.6;
+    }
+    50% { 
+        transform: scale(1.08);
+        opacity: 0.9;
+    }
+}
+
 
 /* ===== CARD FONCTIONNALITÉS - Cyan ===== */
 .dashboard-card--features {
-    width: 23vw;
+    width: 25vw;
     min-width: 350px;
     top: 60vh;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 42%;
+    transform: translateX(-42%);
     border-color: var(--cyan-500);
 }
 
