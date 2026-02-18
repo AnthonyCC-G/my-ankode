@@ -253,48 +253,11 @@ body:not(.dark-mode) .stat-number {
     flex-direction: column;
 }
 
-.api-doc-intro {
-    background-color: var(--bg-secondary);
-    border: 2px solid var(--border-color);
-    border-radius: var(--radius-md);
-    padding: var(--spacing-xs);
-    margin-bottom: var(--spacing-xs);
-    text-align: center;
-}
-
-.api-doc-intro h2 {
-    color: var(--color-primary);
-    font-size: var(--font-size-xl);
-    font-weight: var(--font-weight-bold);
-    margin: 0 0 var(--spacing-xs) 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--spacing-xs);
-}
-
-.api-doc-intro p {
-    color: var(--text-primary); /* Changé de text-secondary à text-primary pour meilleur contraste */
-    margin: 0;
-    font-size: var(--font-size-sm);
-}
-
-body:not(.dark-mode) .api-doc-intro {
-    background-color: var(--bg-tertiary);
-}
-
-body:not(.dark-mode) .api-doc-intro h2 {
-    color: var(--cyan-700);
-}
-
-body:not(.dark-mode) .api-doc-intro p {
-    color: var(--text-secondary); /* En light mode on garde secondary */
-}
 
 /* Iframe Swagger UI */
 .api-doc-iframe {
     width: 100%;
-    height: calc(100vh - 500px); /* Ajusté pour remplir jusqu'au footer */
+    height: calc(100vh - 350px); /* Ajusté pour remplir jusqu'au footer */
     min-height: 500px;
     border: 2px solid var(--border-color);
     border-radius: var(--radius-md);
