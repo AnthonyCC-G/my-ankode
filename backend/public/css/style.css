@@ -131,7 +131,7 @@ body:not(.dark-mode) .footer-copyright {
 .mascot-container {
     position: fixed;
     bottom: 90px;
-    right: var(--spacing-sm);
+    right: var(--spacing-xs);
     z-index: calc(var(--z-sticky) - 1);
     display: flex;
     align-items: flex-end;
@@ -174,7 +174,7 @@ body:not(.dark-mode) .lightbulb:hover {
 /* ===== BULLE DE MESSAGE ===== */
 .bubble-container {
     position: absolute;
-    left: -55px;
+    left: -35px;
     bottom: 55px;
     width: 55px;
     height: 55px;

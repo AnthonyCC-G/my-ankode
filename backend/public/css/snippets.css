@@ -35,7 +35,7 @@
     display: flex;
     flex-direction: row;
     gap: var(--spacing-md);
-    height: calc(100vh - 300px); /* Hauteur disponible entre header et footer */
+    height: calc(100vh - 240px); /* Hauteur disponible entre header et footer */
     padding: 0 var(--spacing-lg);
     padding-bottom: 80px; /* Espace pour mascotte + mentions légales */
 }

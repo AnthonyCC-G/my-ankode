@@ -5,11 +5,12 @@
 
 /* ==================== HEADER TITRE DE PAGE ==================== */
 .admin-header {
-    width: 100%;
+    width: calc(100% - 60px); /* MODIF : Soustrait la largeur sidebar */
+    max-width: 1400px;
+    margin: 0 auto;
+    padding-top: 100px;
+    padding-bottom: var(--spacing-md);
     text-align: center;
-    padding: var(--spacing-lg) var(--spacing-md);
-    margin-top: 70px; /* Réduit de 80px à 70px */
-    margin-bottom: var(--spacing-sm); /* Réduit */
 }
 
 .admin-title {
@@ -256,8 +257,8 @@ body:not(.dark-mode) .stat-number {
     background-color: var(--bg-secondary);
     border: 2px solid var(--border-color);
     border-radius: var(--radius-md);
-    padding: var(--spacing-md);
-    margin-bottom: var(--spacing-md);
+    padding: var(--spacing-xs);
+    margin-bottom: var(--spacing-xs);
     text-align: center;
 }
 

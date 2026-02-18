@@ -121,20 +121,18 @@
             {# Ampoule - Theme switcher (TOUJOURS visible) #}
             <img src="{{ asset('images/lightbulb.png') }}" id="theme-switcher" class="lightbulb" alt="Changer le thème">
             
-            {# Personnage + Bulle - Masqués sur la page Kanban uniquement #}
-            {% if app.request.attributes.get('_route') != 'app_kanban' %}
-                <img src="{{ asset('images/character-happy.png') }}" id="character" class="character" alt="Mascotte My Ankode">
-                <div class="bubble-container">
-                    <img src="{{ asset('images/bubble.png') }}" class="bubble-image" alt="">
-                    <div class="bubble-content">
-                        <p class="bubble-text-small"></p>
-                        <div class="bubble-text-expanded">
-                            <p><strong>Astuce du jour :</strong></p>
-                            <p>Le dark mode, c'est LA religion des développeurs !</p>
-                        </div>
+            {# Personnage + Bulle #}
+            <img src="{{ asset('images/character-happy.png') }}" id="character" class="character" alt="Mascotte My Ankode">
+            <div class="bubble-container">
+                <img src="{{ asset('images/bubble.png') }}" class="bubble-image" alt="">
+                <div class="bubble-content">
+                    <p class="bubble-text-small"></p>
+                    <div class="bubble-text-expanded">
+                        <p><strong>Astuce du jour :</strong></p>
+                        <p>Le dark mode, c'est LA religion des développeurs !</p>
                     </div>
                 </div>
-            {% endif %}
+            </div>
         </div>
 
         {# ===== MOBILE : Bottom Navigation (4 icônes) ===== #}
