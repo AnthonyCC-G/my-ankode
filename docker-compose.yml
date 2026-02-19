@@ -104,6 +104,7 @@ services:
     environment:
       APP_ENV: dev                 # Environnement Symfony (dev = debug activé)
       APP_SECRET: changeme_in_production  # Secret pour tokens CSRF (à changer en prod)
+      SYMFONY_DOTENV_VARS: "" # cette ligne dis à Docker d'ignorer les variables du .env.local 
       # Connexion PostgreSQL via hostname Docker "postgres" (réseau interne)
       # ${POSTGRES_USER} : variable chargée depuis .env.docker ou .env.docker.local
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?serverVersion=16&charset=utf8
@@ -123,18 +124,14 @@ services:
     networks:
       - my-ankode-network
     
-    # Commande exécutée au démarrage du conteneur
-    # sh -c : exécuter plusieurs commandes dans un shell
-    # composer install --no-scripts : installer les dépendances PHP
-    # php -S 0.0.0.0:8000 -t public : lancer le serveur built-in PHP
-    #
-    # ⚠️ PROBLÈME : composer install relancé à CHAQUE démarrage (lent)
-    # ⚠️ PROBLÈME : php -S = mono-thread (1 requête à la fois, très lent)
+    # Commande exécutée au démarrage du conteneur :
+    # 1. composer install --no-scripts : installe les dépendances PHP (relancé à chaque démarrage)
+    # 2. chmod -R 777 var/ : permissions ouvertes pour le développement uniquement
+    #    En production, utiliser des permissions restrictives (775) avec l'utilisateur www-data
+    # 3. symfony serve : serveur Symfony CLI (gère correctement les variables d'environnement Docker)
+    #    Remplace php -S qui ne transmettait pas les variables système au processus web
     command: >
-      sh -c "
-        composer install --no-scripts;
-        php -S 0.0.0.0:8000 -t public
-      "
+      sh -c "composer install --no-scripts && chmod -R 777 var/ && symfony serve --no-tls --port=8000 --allow-all-ip"
       
   # ==========================================
   # SERVICE BASE DE DONNÉES - PostgreSQL 16

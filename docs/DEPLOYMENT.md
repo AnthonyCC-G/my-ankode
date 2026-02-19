@@ -105,14 +105,14 @@ my-ankode-mongo-express  Up 30 seconds       0.0.0.0:8081->8081/tcp
 
 ```bash
 # Créer le schéma PostgreSQL
-docker compose exec php php bin/console doctrine:database:create
-docker compose exec php php bin/console doctrine:migrations:migrate -n
+docker compose exec backend php bin/console doctrine:database:create
+docker compose exec backend php bin/console doctrine:migrations:migrate -n
 
 # Créer les collections MongoDB
-docker compose exec php php bin/console doctrine:mongodb:schema:create
+docker compose exec backend php bin/console doctrine:mongodb:schema:create
 
 # Charger les données de démonstration
-docker compose exec php php bin/console doctrine:fixtures:load -n
+docker compose exec backend php bin/console doctrine:fixtures:load -n
 ```
 
 **OU utiliser le script automatique** :
@@ -320,7 +320,7 @@ docker compose ps
 
 ```bash
 # Shell dans le conteneur backend
-docker compose exec php bash
+docker compose exec backend bash
 
 # Shell dans PostgreSQL
 docker compose exec postgres psql -U myankode -d myankode
@@ -336,37 +336,37 @@ docker compose exec mongo mongosh -u root -p root
 ./scripts/reset-all-fixtures-docker.sh
 
 # Migrations
-docker compose exec php php bin/console doctrine:migrations:migrate
+docker compose exec backend php bin/console doctrine:migrations:migrate
 
 # Vider et recréer le schéma
-docker compose exec php php bin/console doctrine:schema:drop --force --full-database
-docker compose exec php php bin/console doctrine:schema:create
+docker compose exec backend php bin/console doctrine:schema:drop --force --full-database
+docker compose exec backend php bin/console doctrine:schema:create
 ```
 
 ### Tests
 
 ```bash
 # Lancer tous les tests
-docker compose exec php php bin/phpunit
+docker compose exec backend php bin/phpunit
 
 # Tests avec statistiques
 ./scripts/check-tests-docker.sh
 
 # Tests spécifiques
-docker compose exec php php bin/phpunit tests/Controller/
+docker compose exec backend php bin/phpunit tests/Controller/
 ```
 
 ### Maintenance
 
 ```bash
 # Nettoyer le cache Symfony
-docker compose exec php php bin/console cache:clear
+docker compose exec backend php bin/console cache:clear
 
 # Vérifier les dépendances
-docker compose exec php composer validate
+docker compose exec backend composer validate
 
 # Mettre à jour les dépendances
-docker compose exec php composer update
+docker compose exec backend composer update
 
 # Rebuild complet (après modification Dockerfile)
 docker compose build --no-cache
@@ -406,7 +406,30 @@ docker compose up -d
 
 ---
 
-### Problème : Erreur de connexion PostgreSQL
+### Problème : Erreur de connexion PostgreSQL dans Docker
+
+**Symptôme** : `SQLSTATE[08006] connection to server at "127.0.0.1" refused`
+
+**Cause** : Le serveur PHP built-in (`php -S`) ne transmet pas les variables d'environnement système au processus web. Symfony se rabat alors sur le fichier `.env.local` (monté via bind mount) qui pointe vers `127.0.0.1` au lieu du hostname Docker `postgres`.
+
+**Solution** : Utiliser `symfony serve` au lieu de `php -S` dans la commande du docker-compose.yml. Symfony CLI transmet correctement les variables d'environnement système au processus PHP.
+
+**Diagnostic** :
+
+```bash
+# Vérifier quelle DATABASE_URL est active
+docker compose exec backend php bin/console debug:dotenv
+
+# Vérifier la variable d'environnement système
+docker compose exec backend php -r "echo getenv('DATABASE_URL');"
+
+# Tester la connexion en CLI
+docker compose exec backend php bin/console doctrine:query:sql "SELECT 1"
+```
+
+---
+
+### Problème : Erreur de connexion PostgreSQL (général)
 
 **Symptôme** : `Connection refused` ou `could not connect to server`
 
@@ -426,6 +449,27 @@ cat backend/.env | grep DATABASE_URL
 docker compose down
 docker volume rm my-ankode_postgres-data
 docker compose up -d
+```
+
+---
+
+### Problème : Permission denied / Hydrator directory not writable
+
+**Symptôme** : `Your hydrator directory must be writable` ou `Permission denied` lors de l'écriture de fichiers
+
+**Cause** : Le bind mount Windows→Linux peut créer des problèmes de permissions sur le dossier `var/` (cache, logs, hydrators Doctrine MongoDB).
+
+**Solution** : Le `chmod -R 777 var/` est intégré dans la commande de démarrage du docker-compose.yml pour le développement. En production, utiliser des permissions restrictives (775) avec l'utilisateur `www-data`.
+
+**Correctif manuel si nécessaire** :
+
+```bash
+# Dans le conteneur
+docker compose exec backend chmod -R 777 var/
+
+# Ou depuis l'hôte (Linux/Mac)
+sudo chown -R $USER:$USER backend/var
+sudo chmod -R 775 backend/var
 ```
 
 ---
@@ -477,13 +521,13 @@ BACKEND_PORT=8001
 
 ```bash
 # 1. Vérifier l'ordre de chargement
-docker compose exec php php bin/console doctrine:fixtures:load --group=user
+docker compose exec backend php bin/console doctrine:fixtures:load --group=user
 
 # 2. Utiliser le script complet
 ./scripts/reset-all-fixtures-docker.sh
 
 # 3. Vérifier les données
-docker compose exec php php bin/console doctrine:query:sql 'SELECT COUNT(*) FROM "user_"'
+docker compose exec backend php bin/console doctrine:query:sql 'SELECT COUNT(*) FROM "user_"'
 ```
 
 ---
@@ -496,30 +540,13 @@ docker compose exec php php bin/console doctrine:query:sql 'SELECT COUNT(*) FROM
 
 ```bash
 # 1. Utiliser le cache Composer
-docker compose exec php composer install --prefer-dist
+docker compose exec backend composer install --prefer-dist
 
 # 2. Désactiver Xdebug temporairement
-docker compose exec php php -d xdebug.mode=off /usr/bin/composer install
+docker compose exec backend php -d xdebug.mode=off /usr/bin/composer install
 
 # 3. Augmenter la mémoire
-docker compose exec php php -d memory_limit=2G /usr/bin/composer install
-```
-
----
-
-### Problème : Permission denied sur fichiers
-
-**Symptôme** : `Permission denied` lors de l'écriture de fichiers
-
-**Solutions** :
-
-```bash
-# Linux/Mac : Fixer les permissions
-sudo chown -R $USER:$USER backend/var
-sudo chmod -R 775 backend/var
-
-# Ou dans le conteneur
-docker compose exec php chown -R www-data:www-data /var/www/html/var
+docker compose exec backend php -d memory_limit=2G /usr/bin/composer install
 ```
 
 ---
