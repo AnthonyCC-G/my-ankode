@@ -5,11 +5,11 @@ namespace App\DataFixtures;
 
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;  // ← LIGNE AJOUTÉE
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class UserFixtures extends Fixture implements FixtureGroupInterface  // ← MODIFIÉ
+class UserFixtures extends Fixture implements FixtureGroupInterface
 {
     private UserPasswordHasherInterface $passwordHasher;
 
@@ -30,6 +30,8 @@ class UserFixtures extends Fixture implements FixtureGroupInterface  // ← MODI
         $hashedPassword = $this->passwordHasher->hashPassword($anthony, 'password123');
         $anthony->setPassword($hashedPassword);
         $anthony->setCreatedAt(new \DateTimeImmutable('-6 months'));
+        $anthony->setTermsAcceptedAt(new \DateTimeImmutable('-6 months'));
+        $anthony->setDataCollectionAcceptedAt(new \DateTimeImmutable('-6 months'));
         
         $manager->persist($anthony);
         $this->addReference('user_anthony', $anthony);
@@ -44,6 +46,8 @@ class UserFixtures extends Fixture implements FixtureGroupInterface  // ← MODI
         $hashedPasswordAlice = $this->passwordHasher->hashPassword($alice, 'password123');
         $alice->setPassword($hashedPasswordAlice);
         $alice->setCreatedAt(new \DateTimeImmutable('-3 months'));
+        $alice->setTermsAcceptedAt(new \DateTimeImmutable('-3 months'));
+        $alice->setDataCollectionAcceptedAt(new \DateTimeImmutable('-3 months'));
         
         $manager->persist($alice);
         $this->addReference('user_alice', $alice);
@@ -58,6 +62,8 @@ class UserFixtures extends Fixture implements FixtureGroupInterface  // ← MODI
         $hashedPasswordBob = $this->passwordHasher->hashPassword($bob, 'password123');
         $bob->setPassword($hashedPasswordBob);
         $bob->setCreatedAt(new \DateTimeImmutable('-2 months'));
+        $bob->setTermsAcceptedAt(new \DateTimeImmutable('-2 months'));
+        $bob->setDataCollectionAcceptedAt(new \DateTimeImmutable('-2 months'));
         
         $manager->persist($bob);
         $this->addReference('user_bob', $bob);
@@ -72,6 +78,8 @@ class UserFixtures extends Fixture implements FixtureGroupInterface  // ← MODI
         $hashedPasswordClara = $this->passwordHasher->hashPassword($clara, 'password123');
         $clara->setPassword($hashedPasswordClara);
         $clara->setCreatedAt(new \DateTimeImmutable('-1 month'));
+        $clara->setTermsAcceptedAt(new \DateTimeImmutable('-1 month'));
+        $clara->setDataCollectionAcceptedAt(new \DateTimeImmutable('-1 month'));
         
         $manager->persist($clara);
         $this->addReference('user_clara', $clara);
@@ -79,7 +87,6 @@ class UserFixtures extends Fixture implements FixtureGroupInterface  // ← MODI
         $manager->flush();
     }
 
-    // ← MÉTHODE AJOUTÉE ICI
     public static function getGroups(): array
     {
         return ['user'];

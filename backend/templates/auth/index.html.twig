@@ -34,22 +34,29 @@
                 
                 {# Username #}
                 <div class="form-group">
-                    {{ form_label(registrationForm.username, 'username =', {'label_attr': {'class': 'form-label'}}) }}
+                    <label for="{{ registrationForm.username.vars.id }}" class="form-label">
+                        username = <span class="required" aria-hidden="true">// required</span>
+                    </label>
                     {{ form_widget(registrationForm.username, {'attr': {'class': 'form-input', 'placeholder': 'Votre identifiant'}}) }}
                     <div class="form-error">{{ form_errors(registrationForm.username) }}</div>
                 </div>
 
                 {# Email #}
                 <div class="form-group">
-                    {{ form_label(registrationForm.email, 'email =', {'label_attr': {'class': 'form-label'}}) }}
+                    <label for="{{ registrationForm.email.vars.id }}" class="form-label">
+                        email = <span class="required">// required</span>
+                    </label>
                     {{ form_widget(registrationForm.email, {'attr': {'class': 'form-input', 'placeholder': 'votre@email.com'}}) }}
                     <div class="form-error">{{ form_errors(registrationForm.email) }}</div>
                 </div>
 
                 {# Mot de passe #}
                 <div class="form-group">
-                    {{ form_label(registrationForm.plainPassword, 'motDePasse =', {'label_attr': {'class': 'form-label'}}) }}
+                    <label for="{{ registrationForm.plainPassword.vars.id }}" class="form-label">
+                        motDePasse = <span class="required">// required</span>
+                    </label>
                     {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-input', 'placeholder': 'Mot de passe'}}) }}
+                    <span class="form-hint">/* Min. 16 caracteres - Majuscules, minuscules, chiffres et caractere special */</span>
                     <div class="form-error">{{ form_errors(registrationForm.plainPassword) }}</div>
                 </div>
 
@@ -58,11 +65,22 @@
                     <img src="{{ asset('images/Jenny.png') }}" alt="" class="auth-illustration__img">
                 </div>
 
-                {# Checkbox CGU #}
+                {# Checkbox CGU - avec lien vers mentions legales #}
                 <div class="form-group form-group--checkbox">
                     {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-checkbox'}}) }}
-                    {{ form_label(registrationForm.agreeTerms, "J'accepte les conditions d'utilisation", {'label_attr': {'class': 'form-label-checkbox'}}) }}
+                    <label for="{{ registrationForm.agreeTerms.vars.id }}" class="form-label-checkbox">
+                        J'accepte les <a href="{{ path('app_legal_mentions') }}" target="_blank" class="auth-link">conditions d'utilisation</a>
+                    </label>
                     <div class="form-error">{{ form_errors(registrationForm.agreeTerms) }}</div>
+                </div>
+
+                {# Checkbox collecte de donnees - avec lien vers page RGPD #}
+                <div class="form-group form-group--checkbox">
+                    {{ form_widget(registrationForm.agreeDataCollection, {'attr': {'class': 'form-checkbox'}}) }}
+                    <label for="{{ registrationForm.agreeDataCollection.vars.id }}" class="form-label-checkbox">
+                        J'ai pris connaissance de la <a href="{{ path('app_legal_mentions') }}#rgpd" target="_blank" class="auth-link">politique de collecte des données.</a>
+                    </label>
+                    <div class="form-error">{{ form_errors(registrationForm.agreeDataCollection) }}</div>
                 </div>
 
                 <button type="submit" class="btn btn--primary">S'inscrire</button>
@@ -86,7 +104,7 @@
                 <form method="post" action="{{ path('app_auth') }}" class="auth-form">
                     {# Email #}
                     <div class="form-group">
-                        <label for="inputEmail" class="form-label">email =</label>
+                        <label for="inputEmail" class="form-label">email = <span class="required">// required</span></label>
                         <input type="email" 
                             id="inputEmail" 
                             name="email" 
@@ -99,7 +117,7 @@
 
                     {# Mot de passe #}
                     <div class="form-group">
-                        <label for="inputPassword" class="form-label">motDePasse =</label>
+                        <label for="inputPassword" class="form-label">motDePasse = <span class="required">// required</span></label>
                         <input type="password" 
                             id="inputPassword" 
                             name="password" 

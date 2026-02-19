@@ -41,6 +41,7 @@
             {# Formulaire création projet (caché par défaut) #}
             <div class="project-form-container" id="project-form-container" style="display: none;">
                 <form class="project-form" id="project-form">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('api') }}">
                     <div class="form-group">
                         <label for="project-title">Titre du projet</label>
                         <input type="text" id="project-title" name="title" class="form-input" placeholder="Ex: Refonte du site" required>
@@ -118,6 +119,7 @@
                     {# Formulaire création tâche (caché par défaut) #}
                     <div class="task-form-container" id="task-form-todo" style="display: none;">
                         <form class="task-form">
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('api') }}">
                             <div class="form-group">
                                 <input type="text" name="title" class="form-input form-input--small" placeholder="Titre de la tâche" required>
                             </div>
