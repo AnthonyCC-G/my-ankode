@@ -16,7 +16,6 @@ use App\Tests\ApiTestCase;
  * - HTML injection
  * - NoSQL injection (MongoDB)
  * 
- * Référentiel DWWM CP7 : Sécurité des entrées utilisateur
  */
 class InputSanitizationTest extends ApiTestCase
 {

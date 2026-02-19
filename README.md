@@ -75,18 +75,18 @@ cp backend/.env.example backend/.env
 docker compose up -d
 
 # Installer les dépendances
-docker compose exec php composer install
+docker compose exec backend composer install
 
 # Créer la base de données et charger les fixtures
-docker compose exec php php bin/console doctrine:database:create
-docker compose exec php php bin/console doctrine:migrations:migrate -n
-docker compose exec php php bin/console doctrine:mongodb:schema:create
-docker compose exec php php bin/console doctrine:fixtures:load -n
+docker compose exec backend php bin/console doctrine:database:create
+docker compose exec backend php bin/console doctrine:migrations:migrate -n
+docker compose exec backend php bin/console doctrine:mongodb:schema:create
+docker compose exec backend php bin/console doctrine:fixtures:load -n
 ```
 
 ### Accès à l'application
 
-- **Application** : http://localhost:8080
+- **Application** : http://localhost:8000
 - **pgAdmin** : http://localhost:5050
 - **Mongo Express** : http://localhost:8081
 
@@ -120,7 +120,7 @@ La documentation technique est organisée en modules spécialisés :
 ./scripts/load-demo-articles-docker.sh
 
 # Lancer les tests
-docker compose exec php php bin/phpunit
+docker compose exec backend php bin/phpunit
 ```
 
 ---
@@ -155,11 +155,11 @@ MY-ANKODE suit une architecture 3-tiers classique :
 
 ```bash
 # Tous les tests
-docker compose exec php php bin/phpunit
+docker compose exec backend php bin/phpunit
 
 # Tests spécifiques
-docker compose exec php php bin/phpunit tests/Controller/
-docker compose exec php php bin/phpunit tests/Security/
+docker compose exec backend php bin/phpunit tests/Controller/
+docker compose exec backend php bin/phpunit tests/Security/
 ```
 
 ---
