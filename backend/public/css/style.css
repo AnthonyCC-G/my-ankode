@@ -76,7 +76,7 @@ body:not(.dark-mode) .logo img {
     width: 100%;
     background: rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(15px);
-    padding: var(--spacing-sm) 0;
+    padding: var(--spacing-xs) 0;
     z-index: var(--z-sticky);
 }
 
@@ -174,7 +174,7 @@ body:not(.dark-mode) .lightbulb:hover {
 /* ===== BULLE DE MESSAGE ===== */
 .bubble-container {
     position: absolute;
-    left: -35px;
+    left: -25px;
     bottom: 55px;
     width: 55px;
     height: 55px;
@@ -182,8 +182,8 @@ body:not(.dark-mode) .lightbulb:hover {
 }
 
 .bubble-image {
-    width: 100%;
-    height: 100%;
+    width: 80%;
+    height: 80%;
     object-fit: contain;
     pointer-events: none;
 }

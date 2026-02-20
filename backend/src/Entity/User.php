@@ -69,6 +69,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
+    /* acceptation des conditions d'utilisation -RGPD */
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $termsAcceptedAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $dataCollectionAcceptedAt = null;
+
     /**
      * @var Collection<int, Project>
      */
@@ -208,6 +215,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->createdAt = $createdAt;
         return $this;
     }
+
+    // ====== 7.5 GETTERS/SETTERS - ACCEPTATION RGPD conditions utilisations
+        public function getTermsAcceptedAt(): ?\DateTimeImmutable
+    {
+        return $this->termsAcceptedAt;
+    }
+
+    public function setTermsAcceptedAt(?\DateTimeImmutable $termsAcceptedAt): static
+    {
+        $this->termsAcceptedAt = $termsAcceptedAt;
+        return $this;
+    }
+
+    public function getDataCollectionAcceptedAt(): ?\DateTimeImmutable
+    {
+        return $this->dataCollectionAcceptedAt;
+    }
+
+    public function setDataCollectionAcceptedAt(?\DateTimeImmutable $dataCollectionAcceptedAt): static
+    {
+        $this->dataCollectionAcceptedAt = $dataCollectionAcceptedAt;
+        return $this;
+    }
+
 
     // ===== 8. MÉTHODE DÉPRÉCIÉE (SYMFONY 8) =====
 

@@ -147,6 +147,7 @@
 
                     {# Formulaire de confirmation #}
                     <form id="delete-account-form" class="delete-modal__form">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('api') }}">
                         {# Input mot de passe #}
                         <div class="form-group">
                             <label for="delete-password" class="form-label">

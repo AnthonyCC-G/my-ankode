@@ -11,7 +11,7 @@
 # - Persister les données avec des volumes Docker
 #
 # ARCHITECTURE DES SERVICES :
-# 1. backend     → Symfony 7 + PHP 8.3 (application web)
+# 1. backend     → Symfony 7.4 + PHP 8.3 (application web)
 # 2. postgres    → PostgreSQL 16 (base relationnelle)
 # 3. mongo       → MongoDB 6 (base documentaire NoSQL)
 # 4. pgadmin     → Interface web pour PostgreSQL
@@ -98,6 +98,7 @@ services:
     # ⚠️ Performance : Windows NTFS ↔ Linux ext4 = lent
     volumes:
       - ./backend:/var/www/html
+      - /var/www/html/vendor
     
     # Variables d'environnement injectées dans le conteneur
     # Surchargent les valeurs du fichier .env de Symfony
@@ -131,7 +132,7 @@ services:
     # 3. symfony serve : serveur Symfony CLI (gère correctement les variables d'environnement Docker)
     #    Remplace php -S qui ne transmettait pas les variables système au processus web
     command: >
-      sh -c "composer install --no-scripts && chmod -R 777 var/ && symfony serve --no-tls --port=8000 --allow-all-ip"
+      sh -c "chmod -R 777 var/ && symfony serve --no-tls --port=8000 --allow-all-ip"
       
   # ==========================================
   # SERVICE BASE DE DONNÉES - PostgreSQL 16

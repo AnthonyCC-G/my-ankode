@@ -79,6 +79,7 @@
             <div class="bloc-accordion open" id="form-accordion">
                 <form id="competence-form" class="competence-form">
                     <input type="hidden" id="competence-id" name="id">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('api') }}">
                     
                     {# Titre (obligatoire) #}
                     <div class="form-group">
