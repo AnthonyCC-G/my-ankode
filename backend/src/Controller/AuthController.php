@@ -86,6 +86,10 @@ class AuthController extends AbstractController
             // Hash du mot de passe
             $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
 
+            // Enregistrer la date d'acceptation des CGU et de la collecte de donnees
+            $user->setTermsAcceptedAt(new \DateTimeImmutable());
+            $user->setDataCollectionAcceptedAt(new \DateTimeImmutable());
+
             // Sauvegarde en BDD
             $entityManager->persist($user);
             $entityManager->flush();

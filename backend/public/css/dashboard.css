@@ -364,7 +364,7 @@ body:not(.dark-mode) .card-snippets .card-link {
     justify-self: start;
     background: transparent;
     padding-left: var(--spacing-lg);
-    color: gold;
+    color: var(--gold-700);
     border: 2px solid var(--gold-700);
     border-radius: var(--radius-md);
     font-size: 0.875rem; /* var(--font-size-sm) fluide */

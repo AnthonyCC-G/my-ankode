@@ -69,19 +69,18 @@ git clone https://github.com/[votre-username]/my-ankode.git
 cd my-ankode
 
 # Copier et configurer l'environnement
-cp backend/.env.example backend/.env
+cp .env.example .env
 
-# Lancer les conteneurs
+# Lancer les conteneurs (composer install inclus au build)
 docker compose up -d
 
-# Installer les dépendances
-docker compose exec backend composer install
-
-# Créer la base de données et charger les fixtures
-docker compose exec backend php bin/console doctrine:database:create
+# Option 1 : Démarrage manuel
 docker compose exec backend php bin/console doctrine:migrations:migrate -n
 docker compose exec backend php bin/console doctrine:mongodb:schema:create
 docker compose exec backend php bin/console doctrine:fixtures:load -n
+
+# Option 2 : Script de démarrage (recommandé)
+bash scripts/start.sh
 ```
 
 ### Accès à l'application

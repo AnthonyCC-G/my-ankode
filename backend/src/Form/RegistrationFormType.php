@@ -5,7 +5,7 @@
  * 
  * Responsabilités :
  * - Définir les champs du formulaire d'inscription (email, username, password)
- * - Valider les contraintes côté serveur (password min 6 car, CGU acceptées)
+ * - Valider les contraintes côté serveur (password min 16 car + complexite ANSSI)
  * - Gérer le champ plainPassword (non mappé, lu dans le controller pour hachage)
  * - Mapper les données au modèle User (Entity)
  * 
@@ -33,6 +33,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Regex;
 
 class RegistrationFormType extends AbstractType
 {
@@ -52,26 +53,37 @@ class RegistrationFormType extends AbstractType
                 'mapped' => false,
                 'constraints' => [
                     new IsTrue([
-                        'message' => 'You should agree to our terms.',
+                        'message' => 'Vous devez accepter nos conditions.',
                     ]),
                 ],
             ])
             
             // 1d. Champ mot de passe (non mappé, sera hashé dans le controller)
             ->add('plainPassword', PasswordType::class, [
-                // instead of being set onto the object directly,
-                // this is read and encoded in the controller
                 'mapped' => false,
                 'attr' => ['autocomplete' => 'new-password'],
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Please enter a password',
+                        'message' => 'Veuillez entrer un mot de passe',
                     ]),
                     new Length([
-                        'min' => 6,
-                        'minMessage' => 'Your password should be at least {{ limit }} characters',
-                        // max length allowed by Symfony for security reasons
+                        'min' => 16,
+                        'minMessage' => 'Le mot de passe doit contenir au moins {{ limit }} caracteres',
                         'max' => 4096,
+                    ]),
+                    new Regex([
+                        'pattern' => '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/',
+                        'message' => 'Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractere special',
+                    ]),
+                ],
+            ])
+
+            // 1e. Checkbox collecte de données personnelles (RGPD)
+            ->add('agreeDataCollection', CheckboxType::class, [
+                'mapped' => false,
+                'constraints' => [
+                    new IsTrue([
+                        'message' => 'Vous devez accepter la collecte de vos donnees personnelles.',
                     ]),
                 ],
             ])

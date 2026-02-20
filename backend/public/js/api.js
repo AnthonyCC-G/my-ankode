@@ -6,17 +6,27 @@
 
 const API = {
     /**
-     * Récupère le token CSRF depuis la balise meta
+     * Recupere le token CSRF - Double source (defense en profondeur)
+     * Priorite 1 : Hidden input dans le formulaire (methode classique)
+     * Priorite 2 : Meta tag dans le <head> (methode API/SPA)
      * @returns {string|null} Le token CSRF ou null si absent
      */
     getCsrfToken() {
-        const metaTag = document.querySelector('meta[name="csrf-token"]');
-        if (!metaTag) {
-            console.error('[API] Token CSRF manquant dans le DOM');
-            console.error('[API] Vérifier que base.html.twig contient : <meta name="csrf-token" content="{{ csrf_token(\'api\') }}">');
-            return null;
+        // Source 1 : Hidden input dans le formulaire actif
+        const hiddenInput = document.querySelector('input[name="_csrf_token"]');
+        if (hiddenInput && hiddenInput.value) {
+            return hiddenInput.value;
         }
-        return metaTag.content;
+        
+        // Source 2 : Meta tag (fallback pour les pages sans formulaire)
+        const metaTag = document.querySelector('meta[name="csrf-token"]');
+        if (metaTag && metaTag.content) {
+            return metaTag.content;
+        }
+        
+        console.error('[API] Token CSRF manquant dans le DOM');
+        console.error('[API] Verifier la presence du hidden input ou du meta tag CSRF');
+        return null;
     },
 
     /**

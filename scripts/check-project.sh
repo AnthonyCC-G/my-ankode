@@ -110,11 +110,11 @@ if [ $? -eq 0 ]; then
     echo "$ROUTES_OUTPUT" | grep -E "api_(projects|tasks|competences|snippets)" | awk '{printf "   %-25s %s %s\n", $1, $2, $3}'
     
     echo ""
-    echo "✅ Toutes les routes Symfony sont accessibles"
+    echo " Toutes les routes Symfony sont accessibles"
 else
-    echo "❌ Impossible de récupérer les routes Symfony"
+    echo " Impossible de récupérer les routes Symfony"
     echo "   Le conteneur backend ne répond pas correctement"
 fi
 
 echo ""
-echo "✅ Vérification terminée !"
+echo " Vérification terminée !"

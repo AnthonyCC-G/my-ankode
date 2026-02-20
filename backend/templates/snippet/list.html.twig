@@ -58,6 +58,7 @@
                 <form class="snippet-form" id="snippet-form">
                     {# ID caché pour savoir si on est en mode édition #}
                     <input type="hidden" id="snippet-id" name="id" value="">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('api') }}">
                     
                     {# LIGNE 1 : Titre + Langage (côte à côte) #}
                     <div class="form-row">
