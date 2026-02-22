@@ -35,12 +35,12 @@
     width: 100%;
     margin-right: auto;
     padding-left: var(--spacing-sm);
-    padding-right: var(--spacing-lg);
+    padding-right: 160px; /* ← espace pour mascotte (120px) + marge */
     display: grid;
     grid-template-columns: 1fr 1fr; /* 2 colonnes egales TOUJOURS */
-    grid-template-rows: 200px 1fr;
+    grid-template-rows: auto 1fr;
     gap: var(--spacing-xs);
-    height: calc(100vh - 400px);
+    min-height: calc(100vh - 400px);
     
 }
 
