@@ -151,6 +151,7 @@ function createProjectCard(project) {
     // Créer l'élément div.project-card
     const card = document.createElement('div');
     card.className = 'project-card';
+    card.tabIndex = 0; // Navigation clavier
     card.dataset.projectId = project.id; // Stocke l'ID dans un data-attribute
     
     // Ajouter la classe "selected" si c'est le projet actuel
@@ -548,6 +549,7 @@ function displayTasks() {
 function createTaskCard(task) {
     const card = document.createElement('div');
     card.className = 'task-card';
+    card.tabIndex = 0; // navigation clavier
     card.dataset.taskId = task.id;
     
     // NOUVELLE STRUCTURE : Ajouter une poignée de drag
@@ -1002,3 +1004,54 @@ function getStatusLabel(status) {
     };
     return labels[status] || status;
 }
+
+// ===== 31. NAVIGATION CLAVIER =====
+(function initKeyboardNavigation() {
+
+    document.addEventListener('keydown', function(e) {
+
+        // --- Echap : fermer les formulaires ouverts ---
+        if (e.key === 'Escape') {
+            hideProjectForm();
+            hideTaskForm();
+        }
+
+        // --- Flèches haut/bas : naviguer entre les cards projets ---
+        if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && document.activeElement.classList.contains('project-card')) {
+            e.preventDefault();
+            const cards = Array.from(document.querySelectorAll('.project-card'));
+            const currentIndex = cards.indexOf(document.activeElement);
+
+            if (e.key === 'ArrowDown') {
+                const next = cards[currentIndex + 1] || cards[0];
+                next.focus();
+            } else {
+                const prev = cards[currentIndex - 1] || cards[cards.length - 1];
+                prev.focus();
+            }
+        }
+
+        // --- Flèches haut/bas : naviguer entre les cards tâches ---
+        if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && document.activeElement.classList.contains('task-card')) {
+            e.preventDefault();
+            const cards = Array.from(document.querySelectorAll('.task-card'));
+            const currentIndex = cards.indexOf(document.activeElement);
+
+            if (e.key === 'ArrowDown') {
+                const next = cards[currentIndex + 1] || cards[0];
+                next.focus();
+            } else {
+                const prev = cards[currentIndex - 1] || cards[cards.length - 1];
+                prev.focus();
+            }
+        }
+
+        // --- Entrée : sélectionner le projet focusé ---
+        if (e.key === 'Enter' && document.activeElement.classList.contains('project-card')) {
+            const projectId = parseInt(document.activeElement.dataset.projectId);
+            if (projectId) selectProject(projectId);
+        }
+
+    });
+
+})();
