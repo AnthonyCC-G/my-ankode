@@ -1,0 +1,7 @@
+framework:
+    rate_limiter:
+        # 3 tentatives de login max par fenêtre de 15 minutes, par IP
+        login_limiter:
+            policy: fixed_window
+            limit: 3
+            interval: '15 minutes'
