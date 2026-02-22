@@ -29,3 +29,4 @@ EOF
 
 # Vendor racine
 vendor/
+backend/config/reference.php
