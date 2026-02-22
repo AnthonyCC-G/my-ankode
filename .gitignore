@@ -26,6 +26,4 @@ frontend/my-ankode-app/.angular/
 Thumbs.db
 EOF
 
-
-# Vendor racine
-vendor/
+composer.lock
