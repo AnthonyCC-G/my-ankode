@@ -13,6 +13,7 @@
 //   9. ACTIONS ARTICLES (Lu/Favori/Lien)
 //  10. CARROUSEL (Navigation)
 //  11. UTILITAIRES
+//  12. DEPLACEMENT CLAVIER (Navigation)
 // ============================================================================
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -676,6 +677,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const card = document.createElement('div');
         card.className = `article-card ${article.isRead ? 'read' : ''}`;
         card.dataset.articleId = article.id;
+        card.tabIndex = 0; // pour la navigation
         
         card.innerHTML = `
             <h4 class="article-title">${cleanText(article.title)}</h4>
@@ -1029,4 +1031,64 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // ========================================================================
+    // 12. NAVIGATION CLAVIER
+    // ========================================================================
+
+    (function initKeyboardNavigation() {
+
+        document.addEventListener('keydown', function(e) {
+
+            // --- Echap : fermer les accordéons ouverts ---
+            if (e.key === 'Escape') {
+                if (veilleGrid) {
+                    if (veilleGrid.classList.contains('search-expanded')) {
+                        searchToggle.click();
+                    }
+                    if (veilleGrid.classList.contains('favorites-expanded')) {
+                        favoritesToggle.click();
+                    }
+                }
+            }
+
+            // --- Flèches : naviguer entre les cards articles ---
+            if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+                const cards = document.querySelectorAll('.article-card');
+                if (!cards.length) return;
+
+                const focused = document.activeElement;
+                const cardArray = Array.from(cards);
+                const currentIndex = cardArray.indexOf(focused);
+
+                if (e.key === 'ArrowRight') {
+                    const next = cardArray[currentIndex + 1] || cardArray[0];
+                    next.focus();
+                } else {
+                    const prev = cardArray[currentIndex - 1] || cardArray[cardArray.length - 1];
+                    prev.focus();
+                }
+            }
+
+            // --- Entrée sur une card : ouvrir le lien ---
+            if (e.key === 'Enter' && document.activeElement.classList.contains('article-card')) {
+                const url = document.activeElement.querySelector('.btn-link')?.dataset.url;
+                if (url) window.open(url, '_blank');
+            }
+
+            // --- S : focus sur la recherche ---
+            if (e.key === 's' && document.activeElement.tagName !== 'INPUT') {
+                e.preventDefault();
+                const searchInput = document.getElementById('search-input');
+                if (searchInput) {
+                    if (!veilleGrid.classList.contains('search-expanded')) {
+                        searchToggle.click();
+                    }
+                    searchInput.focus();
+                }
+            }
+        });
+
+    })();
+
+
 }); // FIN DOMContentLoaded

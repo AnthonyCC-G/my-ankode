@@ -33,3 +33,4 @@ composer.lock
 # Vendor racine
 vendor/
 backend/config/reference.php
+composer.lock
